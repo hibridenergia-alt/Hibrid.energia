@@ -3,848 +3,1226 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HiBRID | Soluciones Energéticas - Aire y Sol</title>
-  <meta name="description" content="Sistemas híbridos solares y eólicos en Chile. Paneles solares, inversores híbridos, baterías, kits y soluciones de autonomía energética." />
+  <title>HiBRID | Soluciones Energéticas</title>
+  <meta name="description" content="HiBRID ofrece soluciones energéticas híbridas con paneles solares, baterías, inversores y aerogeneradores. Calcula tu consumo, arma tu carrito y solicita una cotización por WhatsApp." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    :root{
-      --bg:#0b1016;
-      --surface:#121923;
-      --surface-2:#192230;
-      --surface-3:#202c3d;
-      --text:#f4f7fb;
-      --muted:#a6b0be;
-      --border:rgba(255,255,255,.10);
-      --primary:#2ecc71;
-      --primary-dark:#24b764;
-      --primary-soft:rgba(46,204,113,.12);
-      --accent:#77d8ff;
-      --danger:#ff7a7a;
-      --warning:#ffbf5f;
-      --radius:20px;
-      --radius-sm:14px;
-      --shadow:0 20px 50px rgba(0,0,0,.28);
-      --max:1180px;
+    :root {
+      --bg: #0a0d11;
+      --surface: #12171d;
+      --surface-2: #1a2028;
+      --surface-3: #202834;
+      --border: rgba(255,255,255,.10);
+      --border-strong: rgba(255,255,255,.16);
+      --text: #f4f7fb;
+      --muted: #a8b0bc;
+      --faint: #798290;
+      --primary: #2ecc71;
+      --primary-dark: #22b962;
+      --primary-soft: rgba(46,204,113,.14);
+      --danger: #ff6b6b;
+      --warning: #ffbf5f;
+      --success: #73e6a1;
+      --radius-sm: 12px;
+      --radius-md: 18px;
+      --radius-lg: 24px;
+      --shadow: 0 20px 50px rgba(0,0,0,.34);
+      --max: 1180px;
     }
 
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      font-family:'Inter',sans-serif;
-      color:var(--text);
-      line-height:1.6;
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(46,204,113,.12), transparent 28%),
-        radial-gradient(circle at top right, rgba(119,216,255,.08), transparent 22%),
-        linear-gradient(180deg, #0a0f14 0%, #101720 100%);
+        radial-gradient(circle at top left, rgba(46,204,113,.10), transparent 26%),
+        linear-gradient(180deg, #080b10 0%, #10151c 100%);
+      color: var(--text);
+      line-height: 1.6;
     }
 
-    img{display:block;max-width:100%}
-    a{text-decoration:none;color:inherit}
+    img, svg { display: block; max-width: 100%; height: auto; }
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    .hidden { display: none !important; }
 
-    .container{
-      width:min(92%, var(--max));
-      margin:0 auto;
-    }
-
-    .hero{
-      padding:56px 0 34px;
-    }
-
-    .hero-grid{
-      display:grid;
-      grid-template-columns:1.08fr .92fr;
-      gap:24px;
-      align-items:stretch;
+    .container {
+      width: min(92%, var(--max));
+      margin-inline: auto;
     }
 
-    .panel,
-    .card,
-    .calc-box,
-    .feature-box,
-    .modal-card{
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(10px);
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+      background: rgba(10,13,17,.75);
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
 
-    .panel{
-      padding:30px;
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 0;
+      flex-wrap: wrap;
     }
 
-    .tag{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 14px;
-      border-radius:999px;
-      background:var(--primary-soft);
-      color:var(--primary);
-      font-size:.78rem;
-      font-weight:800;
-      letter-spacing:.3px;
-      margin-bottom:14px;
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
-    h1,h2,h3,h4{margin-top:0;line-height:1.08}
-    h1{
-      font-size:clamp(2.6rem, 5vw, 4.7rem);
-      margin-bottom:14px;
-    }
-    h2{
-      font-size:clamp(1.55rem, 3vw, 2.25rem);
-      margin-bottom:10px;
-    }
-    h3{
-      font-size:1.18rem;
-      margin-bottom:8px;
-    }
-
-    .lead{
-      color:var(--muted);
-      font-size:1.06rem;
-      max-width:60ch;
-      margin-bottom:24px;
-    }
-
-    .hero-actions,
-    .nav-links,
-    .filters,
-    .cta-row{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
+    .nav-link,
     .btn,
-    .pill,
-    .filter-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:50px;
-      padding:12px 18px;
-      border-radius:14px;
-      font-weight:700;
-      font-size:.95rem;
-      transition:.22s ease;
-      cursor:pointer;
-      border:1px solid transparent;
+    .chip,
+    .filter-btn {
+      transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease;
     }
 
-    .btn{
-      width:100%;
-      margin-top:14px;
+    .nav-link,
+    .filter-btn,
+    .chip {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      font-size: .92rem;
+      font-weight: 600;
     }
 
-    .btn-primary{
-      background:var(--primary);
-      color:#08120d;
-    }
-    .btn-primary:hover{
-      background:var(--primary-dark);
-      transform:translateY(-1px);
-    }
-
-    .btn-outline,
-    .pill,
-    .filter-btn{
-      background:rgba(255,255,255,.04);
-      border-color:var(--border);
-      color:var(--text);
-    }
-    .btn-outline:hover,
-    .pill:hover,
+    .nav-link:hover,
     .filter-btn:hover,
-    .filter-btn.active{
-      border-color:var(--primary);
-      background:rgba(255,255,255,.06);
-      color:var(--primary);
+    .chip:hover,
+    .filter-btn.active {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(46,204,113,.08);
     }
 
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:14px;
-      margin-top:16px;
+    .brand-logo {
+      width: 168px;
+      height: auto;
+      object-fit: contain;
     }
 
-    .stat{
-      padding:18px;
-      border-radius:16px;
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.03);
+    .hero {
+      padding: 34px 0 28px;
     }
 
-    .stat strong{
-      display:block;
-      color:var(--primary);
-      font-size:1.28rem;
-      margin-bottom:4px;
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap: 22px;
+      align-items: stretch;
     }
 
-    .section{
-      padding:18px 0 44px;
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      padding: 28px;
     }
 
-    .section-subtitle{
-      color:var(--muted);
-      max-width:72ch;
-      margin-bottom:24px;
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: .8rem;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
     }
 
-    .ecosystem{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:18px;
+    h1,h2,h3,h4 { margin: 0 0 10px; line-height: 1.1; }
+    h1 { font-size: clamp(2.35rem, 4.8vw, 4.4rem); }
+    h2 { font-size: clamp(1.55rem, 3vw, 2.2rem); }
+    h3 { font-size: 1.18rem; }
+    h4 { font-size: 1rem; }
+    p { margin: 0 0 14px; color: var(--muted); }
+
+    .hero-copy {
+      max-width: 62ch;
+      font-size: 1.03rem;
     }
 
-    .feature-box{
-      padding:22px;
-      transition:.25s ease;
+    .hero-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 24px;
     }
 
-    .feature-box:hover{
-      transform:translateY(-4px);
-      border-color:rgba(46,204,113,.35);
+    .btn {
+      min-height: 50px;
+      border: 1px solid transparent;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-weight: 800;
+      font-size: .95rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
     }
 
-    .icon-badge{
-      width:54px;
-      height:54px;
-      display:grid;
-      place-items:center;
-      border-radius:16px;
-      background:var(--primary-soft);
-      color:var(--primary);
-      font-size:1.4rem;
-      margin-bottom:14px;
+    .btn-primary {
+      background: var(--primary);
+      color: #08120d;
     }
 
-    .grid-products{
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
-      gap:20px;
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
     }
 
-    .card{
-      overflow:hidden;
-      display:flex;
-      flex-direction:column;
+    .btn-secondary {
+      background: rgba(255,255,255,.04);
+      border-color: var(--border);
+      color: var(--text);
     }
 
-    .card-media{
-      position:relative;
-      height:200px;
-      overflow:hidden;
-      border-bottom:1px solid var(--border);
+    .btn-secondary:hover {
+      background: rgba(255,255,255,.06);
+      border-color: var(--border-strong);
     }
 
-    .card-media img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      transition:transform .5s ease;
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 20px;
     }
 
-    .card:hover .card-media img{
-      transform:scale(1.06);
+    .stat {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,.03);
+      padding: 16px;
     }
 
-    .card-body{
-      padding:22px;
-      display:flex;
-      flex-direction:column;
-      flex:1;
+    .stat strong {
+      display: block;
+      color: var(--primary);
+      margin-bottom: 4px;
+      font-size: 1.05rem;
     }
 
-    .card p,
-    .feature-box p,
-    .panel p,
-    .calc-box p{
-      color:var(--muted);
+    .section {
+      padding: 18px 0 42px;
     }
 
-    .mini-list{
-      margin:12px 0 0;
-      padding-left:18px;
-      color:var(--muted);
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
     }
 
-    .mini-list li{margin-bottom:7px}
-
-    .price{
-      font-size:1.25rem;
-      font-weight:800;
-      color:var(--primary);
-      margin-top:8px;
+    .visual-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 20px;
     }
 
-    .card-actions{
-      margin-top:auto;
-      display:grid;
-      gap:10px;
+    .visual-card,
+    .product-card,
+    .cart-card,
+    .admin-panel,
+    .admin-login,
+    .result-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.025));
+      overflow: hidden;
     }
 
-    .calc-box{
-      padding:28px;
+    .visual-card img,
+    .product-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
-    .calc-grid{
-      display:grid;
-      grid-template-columns:1fr .9fr;
-      gap:20px;
-      align-items:start;
+    .visual-card {
+      min-height: 280px;
+      position: relative;
     }
 
-    label{
-      display:block;
-      margin-bottom:8px;
-      font-weight:700;
+    .visual-card .overlay {
+      position: absolute;
+      inset: auto 0 0 0;
+      padding: 14px;
+      background: linear-gradient(180deg, transparent, rgba(8,10,14,.85));
     }
 
-    input{
-      width:100%;
-      padding:15px 16px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background:var(--surface-2);
-      color:var(--text);
-      font-size:1rem;
-      outline:none;
-      margin-bottom:12px;
+    .visual-card .overlay strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 4px;
     }
 
-    input:focus{
-      border-color:var(--primary);
-      box-shadow:0 0 0 4px rgba(46,204,113,.14);
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
     }
 
-    .range-bar{
-      width:100%;
-      height:14px;
-      border-radius:999px;
-      background:linear-gradient(90deg, #2ecc71 0%, #f1c40f 52%, #ff6b6b 100%);
-      position:relative;
-      overflow:hidden;
-      margin:18px 0 10px;
-      border:1px solid rgba(255,255,255,.08);
+    .grid-products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
     }
 
-    .range-marker{
-      position:absolute;
-      top:-4px;
-      width:20px;
-      height:20px;
-      border-radius:50%;
-      background:#fff;
-      box-shadow:0 4px 12px rgba(0,0,0,.25);
-      border:3px solid var(--surface);
-      left:0%;
-      transform:translateX(-50%);
-      transition:left .3s ease;
+    .product-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
     }
 
-    .scale{
-      display:flex;
-      justify-content:space-between;
-      color:var(--muted);
-      font-size:.82rem;
+    .product-media {
+      height: 220px;
+      background: #0f1318;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
     }
 
-    .result{
-      margin-top:18px;
-      padding:18px;
-      border-radius:16px;
-      background:rgba(255,255,255,.04);
-      border:1px solid var(--border);
-      display:none;
+    .product-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
     }
 
-    .result.show{display:block}
-
-    .badge{
-      display:inline-block;
-      padding:6px 12px;
-      border-radius:999px;
-      font-size:.82rem;
-      font-weight:800;
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      padding: 6px 12px;
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .02em;
     }
 
-    .badge.low{background:rgba(46,204,113,.16);color:#88f1b2}
-    .badge.medium{background:rgba(255,191,95,.16);color:#ffcf81}
-    .badge.high{background:rgba(255,122,122,.16);color:#ffabab}
-
-    .side-stack{
-      display:grid;
-      gap:14px;
+    .product-brand {
+      color: var(--text);
+      font-weight: 700;
+      font-size: .94rem;
     }
 
-    .info-box{
-      padding:18px;
-      border-radius:16px;
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.03);
+    .features-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
     }
 
-    .floating-wa{
-      position:fixed;
-      right:18px;
-      bottom:18px;
-      width:62px;
-      height:62px;
-      border-radius:50%;
-      display:grid;
-      place-items:center;
-      background:#25D366;
-      color:#07120c;
-      font-size:1.5rem;
-      box-shadow:0 18px 30px rgba(0,0,0,.28);
-      z-index:50;
+    .features-list li { margin-bottom: 6px; }
+
+    .price {
+      color: var(--primary);
+      font-size: 1.24rem;
+      font-weight: 800;
     }
 
-    .floating-wa:hover{
-      transform:translateY(-2px);
+    .qty-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      margin-top: auto;
     }
 
-    .modal{
-      position:fixed;
-      inset:0;
-      background:rgba(6,9,14,.72);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-      z-index:100;
+    .qty-input,
+    .field,
+    .textarea,
+    .password-input {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface-2);
+      color: var(--text);
+      padding: 12px 14px;
+      outline: none;
     }
 
-    .modal.open{display:flex}
-
-    .modal-card{
-      width:min(920px, 100%);
-      overflow:hidden;
-      display:grid;
-      grid-template-columns:1fr 1fr;
+    .textarea {
+      min-height: 92px;
+      resize: vertical;
     }
 
-    .modal-image{
-      min-height:320px;
-      background:#0c1117 center/cover no-repeat;
+    .qty-input:focus,
+    .field:focus,
+    .textarea:focus,
+    .password-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(46,204,113,.14);
     }
 
-    .modal-content{
-      padding:28px;
+    .kits-grid,
+    .calc-grid {
+      display: grid;
+      gap: 18px;
     }
 
-    .close-btn{
-      position:absolute;
-      top:18px;
-      right:18px;
-      width:42px;
-      height:42px;
-      border:none;
-      border-radius:50%;
-      background:rgba(255,255,255,.08);
-      color:#fff;
-      cursor:pointer;
-      font-size:1.2rem;
+    .kits-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .calc-grid { grid-template-columns: 1fr .9fr; }
+
+    .kit-card,
+    .info-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,.03);
+      padding: 20px;
     }
 
-    footer{
-      border-top:1px solid var(--border);
-      padding:28px 0 36px;
-      text-align:center;
-      color:var(--muted);
-      font-size:.92rem;
+    .kit-card ul,
+    .info-card ul {
+      margin: 12px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
     }
 
-    @media (max-width:980px){
+    .result-box { padding: 18px; margin-top: 18px; }
+    .result-box.hidden { display: none; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: .8rem;
+      font-weight: 800;
+    }
+
+    .badge.low { background: rgba(46,204,113,.16); color: var(--success); }
+    .badge.medium { background: rgba(255,191,95,.14); color: var(--warning); }
+    .badge.high { background: rgba(255,107,107,.16); color: #ff9a9a; }
+
+    .cart-layout {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 20px;
+    }
+
+    .cart-card,
+    .admin-login,
+    .admin-panel {
+      padding: 20px;
+    }
+
+    .cart-items {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .cart-item {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      align-items: center;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .cart-item strong { display: block; color: var(--text); }
+
+    .cart-empty {
+      padding: 18px;
+      border: 1px dashed var(--border-strong);
+      border-radius: 16px;
+      color: var(--muted);
+      background: rgba(255,255,255,.02);
+    }
+
+    .summary-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .summary-row:last-child { border-bottom: 0; }
+
+    .summary-total {
+      color: var(--primary);
+      font-size: 1.25rem;
+      font-weight: 900;
+    }
+
+    .cart-actions,
+    .admin-actions {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .admin-note {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: .94rem;
+      margin-bottom: 16px;
+    }
+
+    .admin-product-list {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .admin-product-card {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      background: rgba(255,255,255,.03);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .full { grid-column: 1 / -1; }
+
+    .upload-box {
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px dashed var(--border-strong);
+      background: rgba(255,255,255,.02);
+    }
+
+    .admin-preview {
+      width: 100%;
+      max-width: 180px;
+      aspect-ratio: 1 / 1;
+      border-radius: 16px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      margin-top: 10px;
+      background: #0e1217;
+    }
+
+    .footer {
+      padding: 18px 0 42px;
+      color: var(--muted);
+      text-align: center;
+      font-size: .92rem;
+    }
+
+    @media (max-width: 1080px) {
+      .visual-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kits-grid { grid-template-columns: 1fr; }
+      .cart-layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 900px) {
       .hero-grid,
-      .calc-grid,
-      .ecosystem,
-      .modal-card{
-        grid-template-columns:1fr 1fr;
+      .calc-grid {
+        grid-template-columns: 1fr;
       }
+      .hero-actions { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr; }
     }
 
-    @media (max-width:760px){
-      .hero-grid,
-      .calc-grid,
-      .ecosystem,
-      .modal-card{
-        grid-template-columns:1fr;
-      }
-
-      .hero{padding-top:30px}
-      .panel,.calc-box{padding:22px}
-      .stats{grid-template-columns:1fr}
-      .floating-wa{width:58px;height:58px}
+    @media (max-width: 720px) {
+      .visual-grid { grid-template-columns: 1fr; }
+      .grid-products { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .qty-row { grid-template-columns: 1fr; }
+      .cart-item { grid-template-columns: 1fr; }
+      .brand-logo { width: 150px; }
     }
   </style>
 </head>
 <body>
-
-  <header class="hero">
-    <div class="container hero-grid">
-      <section class="panel">
-        <span class="tag">ECOSISTEMA SOLAR + EÓLICO</span>
-        <h1>HiBRID</h1>
-        <p class="lead">
-          Soluciones energéticas para hogar, parcela y proyectos especiales, integrando paneles solares, inversores híbridos, baterías y apoyo eólico según el sitio.
-        </p>
-
-        <div class="hero-actions">
-          <a href="#productos" class="pill">Ver productos</a>
-          <a href="#calculadora" class="pill">Calcular consumo</a>
-          <a href="https://wa.me/56956139055?text=Hola%2C%20quiero%20asesor%C3%ADa%20sobre%20una%20soluci%C3%B3n%20HiBRID." target="_blank" rel="noopener noreferrer" class="pill">Asesoría directa</a>
-        </div>
-      </section>
-
-      <section class="panel">
-        <h2>Autonomía energética en un solo sistema</h2>
-        <p>
-          Un sistema fotovoltaico típico integra paneles, inversor y otros elementos eléctricos y mecánicos, y puede sumar almacenamiento para uso nocturno o en horarios punta. En una solución híbrida, el inversor coordina la energía entre generación, baterías y red eléctrica.[page:3]
-        </p>
-
-        <div class="stats">
-          <div class="stat">
-            <strong>Solar</strong>
-            Generación principal durante el día.
-          </div>
-          <div class="stat">
-            <strong>Inversión</strong>
-            Conversión y gestión inteligente.
-          </div>
-          <div class="stat">
-            <strong>Baterías</strong>
-            Respaldo y continuidad.
-          </div>
-          <div class="stat">
-            <strong>Eólica</strong>
-            Complemento según sitio.
-          </div>
-        </div>
-      </section>
+  <header class="site-header">
+    <div class="container nav">
+      <img src="logotipo.png" alt="Logo HiBRID" class="brand-logo" onerror="this.style.display='none'">
+      <nav class="nav-links">
+        <a class="nav-link" href="#productos">Productos</a>
+        <a class="nav-link" href="#kits">Kits</a>
+        <a class="nav-link" href="#calculadora">Calculadora</a>
+        <a class="nav-link" href="#carrito">Carrito</a>
+        <a class="nav-link" href="#admin">Admin</a>
+      </nav>
     </div>
   </header>
 
-  <main class="container">
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <article class="panel">
+          <span class="eyebrow">Aire + Sol</span>
+          <h1>Soluciones energéticas híbridas con cotización directa por WhatsApp</h1>
+          <p class="hero-copy">
+            HiBRID integra paneles solares, baterías, inversores y aerogeneradores para crear proyectos de autonomía energética. El cliente puede ver productos, armar un carrito, pedir kits y enviar una solicitud completa por WhatsApp.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#productos">Ver productos</a>
+            <a class="btn btn-secondary" href="#calculadora">Calcular consumo</a>
+          </div>
+        </article>
+
+        <article class="panel">
+          <h2>Qué hace esta página</h2>
+          <p>La web muestra imágenes fijas de marca y secciones visuales, mientras el catálogo editable cambia nombres, marcas, descripciones, características y precios desde el modo admin.</p>
+          <div class="stats">
+            <div class="stat"><strong>Catálogo</strong>Productos editables por categoría.</div>
+            <div class="stat"><strong>Carrito</strong>Pedido acumulado antes de WhatsApp.</div>
+            <div class="stat"><strong>Kits</strong>Recomendación y cotización rápida.</div>
+            <div class="stat"><strong>Admin</strong>Edición interna sin tocar código.</div>
+          </div>
+        </article>
+      </div>
+    </section>
 
     <section class="section">
-      <h2>Cómo funciona el ecosistema</h2>
-      <p class="section-subtitle">
-        La solución se ordena en cuatro capas: generación, inversión y acondicionamiento, almacenamiento y distribución. Eso te ayuda a vender no solo equipos, sino un sistema completo.[page:3]
-      </p>
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Visual de marca</h2>
+            <p>Estas imágenes quedan fijas como parte del diseño general de la página.</p>
+          </div>
+        </div>
 
-      <div class="ecosystem">
-        <article class="feature-box">
-          <div class="icon-badge">☀</div>
-          <h3>Generación solar</h3>
-          <p>Paneles fotovoltaicos que convierten la radiación solar en energía DC.[page:3]</p>
-        </article>
-
-        <article class="feature-box">
-          <div class="icon-badge">↺</div>
-          <h3>Inversión híbrida</h3>
-          <p>El inversor transforma la energía y coordina paneles, batería y red.[page:3]</p>
-        </article>
-
-        <article class="feature-box">
-          <div class="icon-badge">▣</div>
-          <h3>Almacenamiento</h3>
-          <p>Baterías para respaldo, autoconsumo y operación nocturna.[page:3]</p>
-        </article>
-
-        <article class="feature-box">
-          <div class="icon-badge">🌀</div>
-          <h3>Apoyo eólico</h3>
-          <p>Complemento útil solo donde el recurso de viento justifica la instalación.[web:18]</p>
-        </article>
+        <div class="visual-grid">
+          <article class="visual-card">
+            <img src="paneles.jpg" alt="Paneles solares HiBRID" onerror="this.closest('.visual-card').style.display='none'">
+            <div class="overlay"><strong>Paneles solares</strong><span>Generación principal.</span></div>
+          </article>
+          <article class="visual-card">
+            <img src="bateria.jpg" alt="Baterías HiBRID" onerror="this.closest('.visual-card').style.display='none'">
+            <div class="overlay"><strong>Baterías</strong><span>Almacenamiento energético.</span></div>
+          </article>
+          <article class="visual-card">
+            <img src="inversor.jpg" alt="Inversor HiBRID" onerror="this.closest('.visual-card').style.display='none'">
+            <div class="overlay"><strong>Inversores</strong><span>Control del sistema.</span></div>
+          </article>
+          <article class="visual-card">
+            <img src="render-6.jpg" alt="Aerogeneradores HiBRID" onerror="this.closest('.visual-card').style.display='none'">
+            <div class="overlay"><strong>Aerogeneradores</strong><span>Apoyo eólico híbrido.</span></div>
+          </article>
+        </div>
       </div>
     </section>
 
     <section class="section" id="productos">
-      <h2>Productos y componentes</h2>
-      <p class="section-subtitle">
-        Un sistema híbrido puede incorporar generación solar, inversor híbrido, baterías y otros componentes BOS, que intervienen en varias etapas del sistema.[page:3]
-      </p>
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Productos editables</h2>
+            <p>Aquí el cliente puede revisar productos, elegir cantidades y agregarlos al carrito antes de enviar la solicitud final por WhatsApp.</p>
+          </div>
+        </div>
 
-      <div class="filters">
-        <button class="filter-btn active" onclick="filtrar('all', event)">Todos</button>
-        <button class="filter-btn" onclick="filtrar('solar', event)">Solar</button>
-        <button class="filter-btn" onclick="filtrar('inversor', event)">Inversores</button>
-        <button class="filter-btn" onclick="filtrar('bateria', event)">Baterías</button>
-        <button class="filter-btn" onclick="filtrar('eolico', event)">Eólico</button>
-        <button class="filter-btn" onclick="filtrar('kit', event)">Kits</button>
-      </div>
+        <div class="filters">
+          <button class="filter-btn active" data-filter="all" type="button">Todos</button>
+          <button class="filter-btn" data-filter="panel" type="button">Paneles</button>
+          <button class="filter-btn" data-filter="bateria" type="button">Baterías</button>
+          <button class="filter-btn" data-filter="inversor" type="button">Inversores</button>
+          <button class="filter-btn" data-filter="aerogenerador" type="button">Aerogeneradores</button>
+        </div>
 
-      <div class="grid-products">
-        <article class="card product-item" data-category="solar">
-          <div class="card-media">
-            <img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1200&q=80" alt="Paneles solares instalados">
-          </div>
-          <div class="card-body">
-            <span class="tag">Generación Solar</span>
-            <h3>Paneles solares alta eficiencia</h3>
-            <p>Base del sistema para producir energía durante las horas de sol.</p>
-            <ul class="mini-list">
-              <li>Módulos de alta captación.</li>
-              <li>Aplicación residencial y rural.</li>
-              <li>Primer bloque del sistema energético.</li>
-            </ul>
-            <div class="card-actions">
-              <button class="btn btn-outline" onclick="abrirModal('Paneles solares alta eficiencia','Generación principal del sistema. Ideales para viviendas, parcelas y soluciones híbridas.','https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1200&q=80')">Ver detalle</button>
-              <a href="https://wa.me/56956139055?text=Hola%2C%20me%20interesan%20los%20paneles%20solares%20de%20HiBRID." target="_blank" rel="noopener noreferrer" class="btn btn-outline">Consultar paneles</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="card product-item" data-category="inversor">
-          <div class="card-media">
-            <img src="https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?auto=format&fit=crop&w=1200&q=80" alt="Equipo técnico para sistema híbrido">
-          </div>
-          <div class="card-body">
-            <span class="tag">Conversión de Energía</span>
-            <h3>Inversores híbridos</h3>
-            <p>Centro de control del sistema entre paneles, baterías y red eléctrica.</p>
-            <ul class="mini-list">
-              <li>Conversión DC/AC.</li>
-              <li>Gestión de carga y respaldo.</li>
-              <li>Compatibilidad con almacenamiento.</li>
-            </ul>
-            <div class="card-actions">
-              <button class="btn btn-outline" onclick="abrirModal('Inversores híbridos','Combinan la gestión solar y baterías en un solo equipo, facilitando soluciones de respaldo y autoconsumo.','https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?auto=format&fit=crop&w=1200&q=80')">Ver detalle</button>
-              <a href="https://wa.me/56956139055?text=Hola%2C%20quiero%20cotizar%20un%20inversor%20h%C3%ADbrido." target="_blank" rel="noopener noreferrer" class="btn btn-outline">Cotizar inversor</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="card product-item" data-category="bateria">
-          <div class="card-media">
-            <img src="https://images.unsplash.com/photo-1624397640148-949b1732bb0a?auto=format&fit=crop&w=1200&q=80" alt="Sistema de baterías de almacenamiento">
-          </div>
-          <div class="card-body">
-            <span class="tag">Almacenamiento</span>
-            <h3>Baterías de respaldo</h3>
-            <p>Permiten almacenar energía para la noche o cortes de suministro.</p>
-            <ul class="mini-list">
-              <li>Más autonomía.</li>
-              <li>Mayor continuidad operativa.</li>
-              <li>Integración con inversor híbrido.</li>
-            </ul>
-            <div class="card-actions">
-              <button class="btn btn-outline" onclick="abrirModal('Baterías de respaldo','Sumar almacenamiento permite operar en horarios sin sol y mejorar el nivel de autonomía del proyecto.','https://images.unsplash.com/photo-1624397640148-949b1732bb0a?auto=format&fit=crop&w=1200&q=80')">Ver detalle</button>
-              <a href="https://wa.me/56956139055?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20bater%C3%ADas%20para%20sistema%20h%C3%ADbrido." target="_blank" rel="noopener noreferrer" class="btn btn-outline">Ver baterías</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="card product-item" data-category="eolico">
-          <div class="card-media">
-            <img src="https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=1200&q=80" alt="Aerogeneradores en terreno abierto">
-          </div>
-          <div class="card-body">
-            <span class="tag">Tecnología Aire + Sol</span>
-            <h3>Aerogeneradores complementarios</h3>
-            <p>Apoyo energético opcional para terrenos con buen recurso de viento.</p>
-            <ul class="mini-list">
-              <li>Útil en zonas abiertas.</li>
-              <li>Requiere evaluación del sitio.</li>
-              <li>Complementa el sistema híbrido.</li>
-            </ul>
-            <div class="card-actions">
-              <button class="btn btn-outline" onclick="abrirModal('Aerogeneradores complementarios','La energía eólica residencial o rural depende del recurso local, altura y turbulencia del sitio, por lo que debe evaluarse caso a caso.','https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=1200&q=80')">Ver detalle</button>
-              <a href="https://wa.me/56956139055?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20soluci%C3%B3n%20e%C3%B3lica%20complementaria." target="_blank" rel="noopener noreferrer" class="btn btn-outline">Ver solución eólica</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="card product-item" data-category="kit">
-          <div class="card-media">
-            <img src="https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=1200&q=80" alt="Kit solar residencial">
-          </div>
-          <div class="card-body">
-            <span class="tag">Más vendido</span>
-            <h3>Kit Residencial 5kW</h3>
-            <p>Solución llave en mano para consumo medio, ahorro y respaldo base.</p>
-            <div class="price">$2.490.000 + IVA</div>
-            <ul class="mini-list">
-              <li>Paneles solares.</li>
-              <li>Inversor híbrido.</li>
-              <li>Estructura y protecciones.</li>
-            </ul>
-            <div class="card-actions">
-              <button class="btn btn-outline" onclick="abrirModal('Kit Residencial 5kW','Sistema pensado para viviendas o parcelas con consumo medio y objetivo de ahorro más respaldo.','https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=1200&q=80')">Ver detalle</button>
-              <a href="https://wa.me/56956139055?text=Hola%2C%20me%20interesa%20el%20Kit%20Residencial%205kW." target="_blank" rel="noopener noreferrer" class="btn btn-primary">Cotizar kit 5kW</a>
-            </div>
-          </div>
-        </article>
+        <div class="grid-products" id="productGrid"></div>
       </div>
     </section>
 
-    <section class="section" id="calculadora">
-      <div class="calc-box">
-        <div class="calc-grid">
+    <section class="section" id="kits">
+      <div class="container">
+        <div class="section-head">
           <div>
-            <h2>Calculadora y asistente de dimensionamiento</h2>
-            <p>Ingresa tu consumo mensual estimado para recibir una recomendación inicial y derivarla directo a WhatsApp.</p>
-
-            <label for="kwh">Tu consumo mensual (kWh)</label>
-            <input type="number" id="kwh" placeholder="Ej: 250" min="1" oninput="moverMarcador()">
-
-            <div class="range-bar">
-              <div class="range-marker" id="rangeMarker"></div>
-            </div>
-            <div class="scale">
-              <span>Bajo</span>
-              <span>Medio</span>
-              <span>Alto</span>
-            </div>
-
-            <button class="btn btn-primary" onclick="calcular()">Calcular y obtener recomendación</button>
-
-            <div id="resultado" class="result" aria-live="polite"></div>
+            <h2>Kits y soluciones</h2>
+            <p>Estos kits pueden enviarse a WhatsApp como base para una cotización rápida.</p>
           </div>
+        </div>
 
-          <div class="side-stack">
-            <div class="info-box">
-              <h3>Qué evalúa esta herramienta</h3>
-              <p>Clasifica tu consumo y orienta el kit en una etapa comercial inicial.</p>
-            </div>
-            <div class="info-box">
-              <h3>Qué puede incluir el sistema</h3>
-              <p>Paneles, inversor híbrido, baterías, estructura, protecciones y evaluación eólica complementaria.[page:3]</p>
-            </div>
-            <div class="info-box">
-              <h3>Importante</h3>
-              <p>La propuesta final debe afinarse según cargas simultáneas, ubicación, respaldo requerido y objetivo real de autonomía.</p>
-            </div>
-          </div>
+        <div class="kits-grid">
+          <article class="kit-card">
+            <span class="tag">Kit base</span>
+            <h3>Kit Inicial Residencial</h3>
+            <p>Solución orientada a iluminación, consumos básicos y respaldo parcial.</p>
+            <ul>
+              <li>Paneles solares de entrada.</li>
+              <li>Inversor básico según demanda.</li>
+              <li>Posibilidad de expansión.</li>
+            </ul>
+            <button class="btn btn-secondary" type="button" onclick="agregarKit('Kit Inicial Residencial')">Agregar kit al carrito</button>
+          </article>
+
+          <article class="kit-card">
+            <span class="tag">Kit medio</span>
+            <h3>Kit Residencial 5kW</h3>
+            <p>Ideal para vivienda con refrigerador, iluminación, TV y electrodomésticos habituales.</p>
+            <ul>
+              <li>Mejor equilibrio entre ahorro y autonomía.</li>
+              <li>Compatible con baterías.</li>
+              <li>Escalable por etapa.</li>
+            </ul>
+            <button class="btn btn-secondary" type="button" onclick="agregarKit('Kit Residencial 5kW')">Agregar kit al carrito</button>
+          </article>
+
+          <article class="kit-card">
+            <span class="tag">Alta demanda</span>
+            <h3>Kit Autonomía Total</h3>
+            <p>Pensado para mayor consumo, respaldo extendido y opción de apoyo eólico.</p>
+            <ul>
+              <li>Mayor capacidad fotovoltaica.</li>
+              <li>Respaldo con baterías.</li>
+              <li>Escenario híbrido completo.</li>
+            </ul>
+            <button class="btn btn-secondary" type="button" onclick="agregarKit('Kit Autonomía Total')">Agregar kit al carrito</button>
+          </article>
         </div>
       </div>
     </section>
 
+    <section class="section" id="calculadora">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Calculadora de consumo</h2>
+            <p>Esta herramienta recomienda un kit según el consumo mensual ingresado.</p>
+          </div>
+        </div>
+
+        <div class="calc-grid">
+          <article class="panel">
+            <label for="kwhInput"><strong>Consumo mensual en kWh</strong></label>
+            <input id="kwhInput" class="field" type="number" min="1" step="1" placeholder="Ejemplo: 250">
+            <button class="btn btn-primary" type="button" onclick="calcularKit()">Calcular recomendación</button>
+            <div class="result-box hidden" id="calcResult"></div>
+          </article>
+
+          <article class="panel">
+            <div class="info-card">
+              <h3>Cómo usamos este resultado</h3>
+              <ul>
+                <li>Clasificamos el nivel de demanda.</li>
+                <li>Recomendamos un kit base.</li>
+                <li>Permitimos agregarlo al carrito.</li>
+                <li>El resumen se envía a WhatsApp con el pedido completo.</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="carrito">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Carrito y presupuesto</h2>
+            <p>El cliente arma su pedido y luego lo envía a WhatsApp como solicitud de presupuesto.</p>
+          </div>
+        </div>
+
+        <div class="cart-layout">
+          <article class="cart-card">
+            <h3>Productos agregados</h3>
+            <div id="cartItems" class="cart-items"></div>
+          </article>
+
+          <aside class="cart-card">
+            <h3>Resumen</h3>
+            <div class="summary-row"><span>Items</span><strong id="cartCount">0</strong></div>
+            <div class="summary-row"><span>Total estimado</span><strong id="cartTotal" class="summary-total">$0</strong></div>
+            <div class="cart-actions">
+              <button class="btn btn-primary" type="button" onclick="enviarWhatsApp()">Enviar presupuesto a WhatsApp</button>
+              <button class="btn btn-secondary" type="button" onclick="vaciarCarrito()">Vaciar carrito</button>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="admin">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Modo administrador</h2>
+            <p>Sirve para uso interno, para editar nombres, precios, marcas, características e imágenes sin tocar el código fuente.</p>
+          </div>
+        </div>
+
+        <div class="admin-login" id="adminLoginBox">
+          <div class="admin-note">Este acceso es práctico para uso interno, pero no reemplaza un sistema seguro con backend.</div>
+          <label for="adminPassword"><strong>Contraseña admin</strong></label>
+          <input id="adminPassword" class="password-input" type="password" placeholder="Ingresa la clave">
+          <div class="admin-actions">
+            <button class="btn btn-primary" type="button" onclick="loginAdmin()">Entrar al panel</button>
+          </div>
+        </div>
+
+        <div class="admin-panel hidden" id="adminPanel">
+          <div class="admin-note">Aquí puedes modificar el catálogo editable. Los cambios se guardan en este navegador.</div>
+          <div class="admin-actions">
+            <button class="btn btn-secondary" type="button" onclick="logoutAdmin()">Cerrar admin</button>
+            <button class="btn btn-secondary" type="button" onclick="resetCatalog()">Restaurar catálogo base</button>
+          </div>
+          <div class="admin-product-list" id="adminProductList"></div>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <footer>
-    <p>© 2026 HiBRID · Soluciones Energéticas. Todos los derechos reservados.</p>
+  <footer class="footer container">
+    © 2026 HiBRID · Soluciones energéticas híbridas · Presupuestos por WhatsApp
   </footer>
 
-  <a class="floating-wa" href="https://wa.me/56956139055?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20las%20soluciones%20energ%C3%A9ticas%20HiBRID." target="_blank" rel="noopener noreferrer" aria-label="Abrir WhatsApp">✆</a>
-
-  <div class="modal" id="modalProducto" aria-hidden="true">
-    <div class="modal-card" style="position:relative;">
-      <button class="close-btn" onclick="cerrarModal()" aria-label="Cerrar">✕</button>
-      <div class="modal-image" id="modalImage"></div>
-      <div class="modal-content">
-        <span class="tag">Detalle del producto</span>
-        <h2 id="modalTitle">Producto</h2>
-        <p id="modalText"></p>
-        <a id="modalWa" href="https://wa.me/56956139055?text=Hola%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n." class="btn btn-primary" target="_blank" rel="noopener noreferrer">Solicitar información</a>
-      </div>
-    </div>
-  </div>
-
   <script>
-    function filtrar(categoria, event) {
-      const items = document.querySelectorAll('.product-item');
-      const botones = document.querySelectorAll('.filter-btn');
+    const WHATSAPP_NUMBER = '56956139055';
+    const ADMIN_PASSWORD = 'hibrid2026';
+    const STORAGE_KEY = 'hibrid_catalog_v1';
+    const CART_KEY = 'hibrid_cart_v1';
 
-      botones.forEach(btn => btn.classList.remove('active'));
-      if (event) event.target.classList.add('active');
+    const defaultProducts = [
+      { id:'panel-1', category:'panel', categoryLabel:'Paneles', name:'Espacio panel 1', brand:'Marca editable', price:129990, description:'Espacio para panel solar editable desde admin.', features:['Potencia editable','Descripción básica editable','Precio editable'], image:'paneles.jpg' },
+      { id:'panel-2', category:'panel', categoryLabel:'Paneles', name:'Espacio panel 2', brand:'Marca editable', price:159990, description:'Segundo espacio para panel solar.', features:['Modelo editable','Datos básicos','Stock interno'], image:'paneles.jpg' },
+      { id:'panel-3', category:'panel', categoryLabel:'Paneles', name:'Espacio panel 3', brand:'Marca editable', price:189990, description:'Tercer espacio para panel solar.', features:['Marca editable','Precio editable','Uso residencial'], image:'paneles.jpg' },
+      { id:'panel-4', category:'panel', categoryLabel:'Paneles', name:'Espacio panel 4', brand:'Marca editable', price:0, description:'Espacio disponible para nuevo panel.', features:['Editable','Editable','Editable'], image:'paneles.jpg' },
+      { id:'panel-5', category:'panel', categoryLabel:'Paneles', name:'Espacio panel 5', brand:'Marca editable', price:0, description:'Espacio disponible para nuevo panel.', features:['Editable','Editable','Editable'], image:'paneles.jpg' },
 
-      items.forEach(item => {
-        const mostrar = categoria === 'all' || item.dataset.category === categoria;
-        item.style.display = mostrar ? 'flex' : 'none';
+      { id:'bateria-1', category:'bateria', categoryLabel:'Baterías', name:'Espacio batería 1', brand:'Marca editable', price:990000, description:'Espacio para batería de respaldo.', features:['Capacidad editable','Tecnología editable','Aplicación editable'], image:'bateria.jpg' },
+      { id:'bateria-2', category:'bateria', categoryLabel:'Baterías', name:'Espacio batería 2', brand:'Marca editable', price:1790000, description:'Segundo espacio para batería.', features:['Litio u otra química','Escalable','Precio editable'], image:'bateria.jpg' },
+      { id:'bateria-3', category:'bateria', categoryLabel:'Baterías', name:'Espacio batería 3', brand:'Marca editable', price:0, description:'Espacio disponible para nueva batería.', features:['Editable','Editable','Editable'], image:'bateria.jpg' },
+
+      { id:'inversor-1', category:'inversor', categoryLabel:'Inversores', name:'Espacio inversor 1', brand:'Marca editable', price:490000, description:'Espacio para inversor híbrido.', features:['Potencia editable','Voltaje editable','Control inteligente'], image:'inversor.jpg' },
+      { id:'inversor-2', category:'inversor', categoryLabel:'Inversores', name:'Espacio inversor 2', brand:'Marca editable', price:790000, description:'Segundo espacio para inversor.', features:['Marca editable','Precio editable','Compatibilidad baterías'], image:'inversor.jpg' },
+      { id:'inversor-3', category:'inversor', categoryLabel:'Inversores', name:'Espacio inversor 3', brand:'Marca editable', price:0, description:'Espacio disponible para nuevo inversor.', features:['Editable','Editable','Editable'], image:'inversor.jpg' },
+
+      { id:'aero-1', category:'aerogenerador', categoryLabel:'Aerogeneradores', name:'Espacio aerogenerador 1', brand:'Marca editable', price:890000, description:'Espacio para aerogenerador pequeño o mediano.', features:['Potencia editable','Altura editable','Complemento híbrido'], image:'render-6.jpg' },
+      { id:'aero-2', category:'aerogenerador', categoryLabel:'Aerogeneradores', name:'Espacio aerogenerador 2', brand:'Marca editable', price:1490000, description:'Espacio para segundo aerogenerador.', features:['Diseño editable','Aplicación rural','Precio editable'], image:'render-6.jpg' }
+    ];
+
+    let catalog = loadCatalog();
+    let cart = loadCart();
+    let activeFilter = 'all';
+
+    function loadCatalog() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return JSON.parse(JSON.stringify(defaultProducts));
+      try {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed : JSON.parse(JSON.stringify(defaultProducts));
+      } catch {
+        return JSON.parse(JSON.stringify(defaultProducts));
+      }
+    }
+
+    function saveCatalog() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog));
+    }
+
+    function loadCart() {
+      const saved = localStorage.getItem(CART_KEY);
+      if (!saved) return [];
+      try {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveCart() {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    }
+
+    function formatCLP(value) {
+      return new Intl.NumberFormat('es-CL', {
+        style:'currency',
+        currency:'CLP',
+        maximumFractionDigits:0
+      }).format(Number(value) || 0);
+    }
+
+    function getFilteredCatalog() {
+      return activeFilter === 'all'
+        ? catalog
+        : catalog.filter(item => item.category === activeFilter);
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById('productGrid');
+      const items = getFilteredCatalog();
+
+      grid.innerHTML = items.map(item => `
+        <article class="product-card">
+          <div class="product-media">
+            <img src="${item.image}" alt="${escapeHtml(item.name)}">
+          </div>
+          <div class="product-body">
+            <span class="tag">${escapeHtml(item.categoryLabel)}</span>
+            <h3>${escapeHtml(item.name)}</h3>
+            <div class="product-brand">${escapeHtml(item.brand)}</div>
+            <p>${escapeHtml(item.description)}</p>
+            <ul class="features-list">
+              ${(item.features || []).map(feature => `<li>${escapeHtml(feature)}</li>`).join('')}
+            </ul>
+            <div class="price">${formatCLP(item.price)}</div>
+            <div class="qty-row">
+              <input class="qty-input" type="number" min="1" step="1" value="1" id="qty-${item.id}">
+              <button class="btn btn-primary" type="button" onclick="addToCart('${item.id}')">Agregar</button>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderCart() {
+      const cartItemsBox = document.getElementById('cartItems');
+      const countEl = document.getElementById('cartCount');
+      const totalEl = document.getElementById('cartTotal');
+
+      if (!cart.length) {
+        cartItemsBox.innerHTML = '<div class="cart-empty">Aún no hay productos en el carrito.</div>';
+      } else {
+        cartItemsBox.innerHTML = cart.map(item => `
+          <div class="cart-item">
+            <div>
+              <strong>${escapeHtml(item.name)}</strong>
+              <span>${escapeHtml(item.brand || item.type || 'Solicitud')}</span>
+            </div>
+            <div>x${item.qty}</div>
+            <div>
+              <strong>${formatCLP((item.price || 0) * item.qty)}</strong>
+              <button class="chip" type="button" onclick="removeFromCart('${item.key}')">Quitar</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
+      const totalPrice = cart.reduce((acc, item) => acc + ((item.price || 0) * item.qty), 0);
+      countEl.textContent = totalItems;
+      totalEl.textContent = formatCLP(totalPrice);
+    }
+
+    function renderAdmin() {
+      const list = document.getElementById('adminProductList');
+      list.innerHTML = catalog.map(item => `
+        <article class="admin-product-card">
+          <h3>${escapeHtml(item.name)}</h3>
+          <div class="form-grid">
+            <div>
+              <label for="name-${item.id}">Nombre</label>
+              <input class="field" id="name-${item.id}" value="${escapeAttr(item.name)}">
+            </div>
+            <div>
+              <label for="brand-${item.id}">Marca</label>
+              <input class="field" id="brand-${item.id}" value="${escapeAttr(item.brand)}">
+            </div>
+            <div>
+              <label for="price-${item.id}">Precio CLP</label>
+              <input class="field" id="price-${item.id}" type="number" min="0" step="1" value="${Number(item.price) || 0}">
+            </div>
+            <div>
+              <label for="category-${item.id}">Categoría</label>
+              <select class="field" id="category-${item.id}">
+                <option value="panel" ${item.category==='panel'?'selected':''}>Paneles</option>
+                <option value="bateria" ${item.category==='bateria'?'selected':''}>Baterías</option>
+                <option value="inversor" ${item.category==='inversor'?'selected':''}>Inversores</option>
+                <option value="aerogenerador" ${item.category==='aerogenerador'?'selected':''}>Aerogeneradores</option>
+              </select>
+            </div>
+            <div class="full">
+              <label for="description-${item.id}">Descripción</label>
+              <textarea class="textarea" id="description-${item.id}">${escapeTextarea(item.description)}</textarea>
+            </div>
+            <div class="full">
+              <label for="features-${item.id}">Características, separadas por coma</label>
+              <textarea class="textarea" id="features-${item.id}">${escapeTextarea((item.features || []).join(', '))}</textarea>
+            </div>
+            <div class="full upload-box">
+              <label for="image-${item.id}">Cargar imagen del producto</label>
+              <input class="field" id="image-${item.id}" type="file" accept="image/*" onchange="handleImageUpload(event, '${item.id}')">
+              <img class="admin-preview" id="preview-${item.id}" src="${item.image}" alt="Vista previa">
+            </div>
+          </div>
+          <div class="admin-actions">
+            <button class="btn btn-primary" type="button" onclick="saveProduct('${item.id}')">Guardar cambios</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function setFilter(filter) {
+      activeFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
       });
+      renderProducts();
     }
 
-    function moverMarcador() {
-      const input = document.getElementById('kwh');
-      const marker = document.getElementById('rangeMarker');
-      const valor = Number(input.value) || 0;
-      const max = 500;
-      const porcentaje = Math.min((valor / max) * 100, 100);
-      marker.style.left = porcentaje + '%';
+    function addToCart(productId) {
+      const product = catalog.find(item => item.id === productId);
+      if (!product) return;
+
+      const qtyInput = document.getElementById(`qty-${productId}`);
+      const qty = Math.max(1, Number(qtyInput?.value) || 1);
+      const existing = cart.find(item => item.key === productId);
+
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        cart.push({
+          key: productId,
+          id: product.id,
+          name: product.name,
+          brand: product.brand,
+          price: Number(product.price) || 0,
+          qty,
+          type: product.categoryLabel
+        });
+      }
+
+      saveCart();
+      renderCart();
     }
 
-    function calcular() {
-      const kwh = Number(document.getElementById('kwh').value);
-      const resultado = document.getElementById('resultado');
+    function agregarKit(name) {
+      const key = `kit-${name}`;
+      const existing = cart.find(item => item.key === key);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({
+          key,
+          id:key,
+          name,
+          brand:'Kit sugerido',
+          price:0,
+          qty:1,
+          type:'Kit'
+        });
+      }
+      saveCart();
+      renderCart();
+    }
+
+    function removeFromCart(key) {
+      cart = cart.filter(item => item.key !== key);
+      saveCart();
+      renderCart();
+    }
+
+    function vaciarCarrito() {
+      cart = [];
+      saveCart();
+      renderCart();
+    }
+
+    function calcularKit() {
+      const input = document.getElementById('kwhInput');
+      const box = document.getElementById('calcResult');
+      const kwh = Number(input.value);
 
       if (!kwh || kwh <= 0) {
-        alert("Por favor ingresa un valor válido de kWh.");
+        alert('Por favor ingresa un consumo mensual válido.');
+        input.focus();
         return;
       }
 
-      let urgencia = '';
-      let badgeClass = '';
-      let kitRecomendado = '';
-      let descripcion = '';
-      let incluye = '';
+      let level = '';
+      let badge = '';
+      let kit = '';
+      let detail = '';
 
       if (kwh <= 150) {
-        urgencia = 'BAJO / PROYECTO INICIAL';
-        badgeClass = 'low';
-        kitRecomendado = 'Kit Base Residencial / Solar Directo';
-        descripcion = 'Ideal para iluminación, router, TV y consumos acotados.';
-        incluye = 'Paneles solares, inversor base, estructura y protecciones.';
+        level = 'BAJO / PROYECTO INICIAL';
+        badge = 'low';
+        kit = 'Kit Inicial Residencial';
+        detail = 'Pensado para consumos acotados y respaldo parcial.';
       } else if (kwh <= 300) {
-        urgencia = 'MEDIO';
-        badgeClass = 'medium';
-        kitRecomendado = 'Kit Residencial 5kW';
-        descripcion = 'Pensado para vivienda con refrigerador, luces, TV y electrodomésticos habituales.';
-        incluye = 'Paneles solares, inversor híbrido, estructura, protecciones y opción de baterías.';
+        level = 'MEDIO';
+        badge = 'medium';
+        kit = 'Kit Residencial 5kW';
+        detail = 'Adecuado para uso residencial medio y mejor equilibrio general.';
       } else {
-        urgencia = 'ALTO CONSUMO / PRIORIDAD ALTA';
-        badgeClass = 'high';
-        kitRecomendado = 'Kit Autonomía Total (Híbrido + Eólico opcional)';
-        descripcion = 'Diseñado para proyectos con mayor demanda, almacenamiento y posible complemento eólico.';
-        incluye = 'Paneles solares, inversor híbrido de mayor capacidad, banco de baterías y evaluación del sitio.';
+        level = 'ALTO CONSUMO';
+        badge = 'high';
+        kit = 'Kit Autonomía Total';
+        detail = 'Requiere análisis más robusto, con baterías y eventual apoyo eólico.';
       }
 
-      const mensaje = `Hola, mi consumo mensual es de ${kwh} kWh. El sistema me recomendó el ${kitRecomendado}. Clasificación: ${urgencia}. Deseo avanzar con la cotización.`;
-      const linkWhatsApp = `https://wa.me/56956139055?text=${encodeURIComponent(mensaje)}`;
-
-      resultado.className = "result show";
-      resultado.innerHTML = `
-        <h3 style="color: var(--primary); margin-top:0;">Resultado del análisis</h3>
-        <p><strong>Recomendación:</strong> ${kitRecomendado}</p>
-        <p><strong>Detalle:</strong> ${descripcion}</p>
-        <p><strong>Incluye normalmente:</strong> ${incluye}</p>
-        <p><strong>Prioridad:</strong> <span class="badge ${badgeClass}">${urgencia}</span></p>
-        <a href="${linkWhatsApp}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Enviar este resultado a WhatsApp</a>
+      box.classList.remove('hidden');
+      box.innerHTML = `
+        <h3>Resultado estimado</h3>
+        <p><strong>Kit recomendado:</strong> ${escapeHtml(kit)}</p>
+        <p><strong>Clasificación:</strong> <span class="badge ${badge}">${escapeHtml(level)}</span></p>
+        <p>${escapeHtml(detail)}</p>
+        <button class="btn btn-primary" type="button" onclick="agregarKit('${kit.replace(/'/g, "\\'")}')">Agregar recomendación al carrito</button>
       `;
     }
 
-    function abrirModal(titulo, texto, imagen) {
-      const modal = document.getElementById('modalProducto');
-      document.getElementById('modalTitle').textContent = titulo;
-      document.getElementById('modalText').textContent = texto;
-      document.getElementById('modalImage').style.backgroundImage = `url('${imagen}')`;
-      document.getElementById('modalWa').href =
-        `https://wa.me/56956139055?text=${encodeURIComponent('Hola, quiero más información sobre ' + titulo + '.')}`;
-      modal.classList.add('open');
-      modal.setAttribute('aria-hidden', 'false');
+    function enviarWhatsApp() {
+      const calcInput = document.getElementById('kwhInput');
+      const consumo = calcInput.value ? `${calcInput.value} kWh` : 'No informado';
+      const total = cart.reduce((acc, item) => acc + ((item.price || 0) * item.qty), 0);
+
+      const lines = [
+        'Hola, quiero solicitar un presupuesto HiBRID.',
+        '',
+        'Resumen del pedido:'
+      ];
+
+      if (cart.length) {
+        cart.forEach(item => {
+          lines.push(`- ${item.qty} x ${item.name} (${item.brand || item.type || 'Ítem'})${item.price ? ' - ' + formatCLP(item.price * item.qty) : ''}`);
+        });
+      } else {
+        lines.push('- Aún no se han agregado productos.');
+      }
+
+      lines.push('');
+      lines.push(`Consumo informado: ${consumo}`);
+      lines.push(`Total estimado: ${formatCLP(total)}`);
+      lines.push('');
+      lines.push('Quiero recibir recomendación, cotización y opciones de kit/solución.');
+
+      const url = `https://wa.me/56956139055?text=${encodeURIComponent(lines.join('
+'))}`;
+      window.open(url, '_blank');
     }
 
-    function cerrarModal() {
-      const modal = document.getElementById('modalProducto');
-      modal.classList.remove('open');
-      modal.setAttribute('aria-hidden', 'true');
+    function loginAdmin() {
+      const pass = document.getElementById('adminPassword').value;
+      if (pass !== ADMIN_PASSWORD) {
+        alert('Clave incorrecta.');
+        return;
+      }
+      document.getElementById('adminLoginBox').classList.add('hidden');
+      document.getElementById('adminPanel').classList.remove('hidden');
+      renderAdmin();
     }
 
-    document.getElementById('modalProducto').addEventListener('click', function(e){
-      if(e.target === this) cerrarModal();
+    function logoutAdmin() {
+      document.getElementById('adminPassword').value = '';
+      document.getElementById('adminLoginBox').classList.remove('hidden');
+      document.getElementById('adminPanel').classList.add('hidden');
+    }
+
+    function saveProduct(id) {
+      const item = catalog.find(product => product.id === id);
+      if (!item) return;
+
+      item.name = document.getElementById(`name-${id}`).value.trim() || item.name;
+      item.brand = document.getElementById(`brand-${id}`).value.trim() || 'Marca editable';
+      item.price = Math.max(0, Number(document.getElementById(`price-${id}`).value) || 0);
+      item.category = document.getElementById(`category-${id}`).value;
+      item.categoryLabel = categoryLabel(item.category);
+      item.description = document.getElementById(`description-${id}`).value.trim() || item.description;
+      item.features = document.getElementById(`features-${id}`).value
+        .split(',')
+        .map(text => text.trim())
+        .filter(Boolean)
+        .slice(0, 6);
+
+      saveCatalog();
+      renderProducts();
+      renderAdmin();
+      alert('Producto actualizado correctamente.');
+    }
+
+    function handleImageUpload(event, id) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const item = catalog.find(product => product.id === id);
+        if (!item) return;
+        item.image = e.target.result;
+        saveCatalog();
+        const preview = document.getElementById(`preview-${id}`);
+        if (preview) preview.src = item.image;
+        renderProducts();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetCatalog() {
+      if (!confirm('¿Seguro que quieres restaurar el catálogo base?')) return;
+      catalog = JSON.parse(JSON.stringify(defaultProducts));
+      saveCatalog();
+      renderProducts();
+      renderAdmin();
+      alert('Catálogo restaurado.');
+    }
+
+    function categoryLabel(category) {
+      return {
+        panel: 'Paneles',
+        bateria: 'Baterías',
+        inversor: 'Inversores',
+        aerogenerador: 'Aerogeneradores'
+      }[category] || 'Productos';
+    }
+
+    function escapeHtml(text) {
+      return String(text ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function escapeAttr(text) {
+      return escapeHtml(text).replace(/`/g, '&#096;');
+    }
+
+    function escapeTextarea(text) {
+      return String(text ?? '').replace(/<//g, '&lt;/');
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => setFilter(btn.dataset.filter));
     });
 
-    moverMarcador();
+    renderProducts();
+    renderCart();
   </script>
 </body>
 </html>
