@@ -3,21 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HiBRID - Soluciones Energéticas</title>
+  <title>HiBRID | Soluciones Energéticas</title>
+  <meta name="description" content="Catálogo HiBRID de paneles, baterías, inversores, kits solares y sistemas eólicos con carrito y cotización por WhatsApp.">
+
   <style>
     :root{
       --bg:#0a0d11;
+      --bg-2:#10151c;
       --panel:#131820;
       --panel-2:#1a2029;
       --line:#26303d;
-      --green:#22c55e;
-      --green-2:#16a34a;
       --text:#f3f4f6;
       --muted:#9ca3af;
+      --green:#22c55e;
+      --green-2:#16a34a;
       --danger:#ef4444;
-      --radius:14px;
-      --shadow:0 12px 30px rgba(0,0,0,.28);
-      --max:1200px;
+      --radius:16px;
+      --shadow:0 12px 32px rgba(0,0,0,.28);
+      --max:1180px;
     }
 
     *{box-sizing:border-box}
@@ -25,188 +28,242 @@
     body{
       margin:0;
       font-family:Arial,sans-serif;
-      background:linear-gradient(180deg,#0a0d11 0%,#10151c 100%);
+      background:linear-gradient(180deg,var(--bg) 0%,var(--bg-2) 100%);
       color:var(--text);
     }
 
-    img{max-width:100%;display:block}
+    img{display:block;max-width:100%}
     button,input,textarea,select{font:inherit}
     a{text-decoration:none;color:inherit}
 
-    header{
+    .site-header{
       position:sticky;
       top:0;
-      z-index:30;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      padding:14px 18px;
-      background:rgba(19,24,32,.94);
+      z-index:50;
+      background:rgba(19,24,32,.96);
       border-bottom:1px solid var(--line);
       backdrop-filter:blur(10px);
-      flex-wrap:wrap;
     }
 
-    header img{
-      height:70px;
-      width:auto;
-      object-fit:contain;
-      border-radius:8px;
-    }
-
-    nav{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-
-    nav button{
-      background:transparent;
-      border:1px solid var(--line);
-      color:var(--text);
-      cursor:pointer;
-      font-size:14px;
-      padding:10px 14px;
-      border-radius:999px;
-    }
-
-    nav button:hover,
-    nav button.active{
-      border-color:var(--green);
-      color:var(--green);
-    }
-
-    .vista{
-      display:none;
-      padding:22px;
+    .header-wrap{
       max-width:var(--max);
       margin:auto;
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
     }
 
-    .activo{display:block}
-
-    .hero{
-      text-align:center;
-      padding:34px 0 10px;
+    .brand img{
+      width:min(100%,280px);
+      height:78px;
+      object-fit:contain;
+      object-position:left center;
+      border-radius:10px;
     }
 
-    .hero h1{
-      font-size:clamp(2rem,4vw,3.4rem);
-      margin-bottom:10px;
+    .nav{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
     }
 
-    .hero p{
-      color:var(--muted);
-      max-width:700px;
-      margin:auto;
-    }
-
-    .grid-items{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:16px;
-      margin-top:22px;
-    }
-
-    .card-item{
-      background:var(--panel);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:14px;
-      box-shadow:var(--shadow);
+    .nav button,
+    .btn,
+    .btn-mini{
+      border:none;
+      cursor:pointer;
+      border-radius:999px;
       transition:.2s ease;
     }
 
-    .card-item:hover{
-      transform:translateY(-2px);
-      border-color:var(--green);
-    }
-
-    .card-item.clickable{
-      cursor:pointer;
-    }
-
-    .card-item img{
-      width:100%;
-      height:150px;
-      object-fit:cover;
-      border-radius:10px;
-      margin-bottom:12px;
-      background:#0f1318;
-    }
-
-    .card-item h4,.card-item h3{
-      margin:0 0 8px;
-    }
-
-    .card-item p{
-      color:var(--muted);
-      margin:0 0 10px;
-      font-size:14px;
-    }
-
-    .price{
-      color:var(--green);
-      font-weight:bold;
-      font-size:1.05rem;
-      margin:8px 0 12px;
-    }
-
-    .btn-green,.btn-dark,.btn-danger,.btn-mini{
-      border:none;
-      padding:11px 14px;
-      font-weight:bold;
-      border-radius:10px;
-      cursor:pointer;
-      width:100%;
-      margin-top:8px;
-    }
-
-    .btn-green{
-      background:var(--green);
-      color:#05110a;
-    }
-
-    .btn-green:hover{background:var(--green-2)}
-
-    .btn-dark{
-      background:var(--panel-2);
+    .nav button{
+      padding:10px 14px;
+      background:transparent;
       color:var(--text);
       border:1px solid var(--line);
+      font-weight:700;
     }
 
-    .btn-danger{
-      background:var(--danger);
-      color:#fff;
+    .nav button:hover,
+    .nav button.active{
+      color:var(--green);
+      border-color:var(--green);
+      background:rgba(34,197,94,.08);
     }
 
-    .btn-mini{
-      width:auto;
-      padding:8px 12px;
-      margin-top:0;
-      background:#111827;
-      border:1px solid var(--line);
-      color:#fff;
+    .view{
+      display:none;
+      max-width:var(--max);
+      margin:auto;
+      padding:20px 16px 40px;
     }
 
-    input[type="checkbox"] {
-      width: auto;
-      display: inline-block;
-      margin-right: 10px;
+    .view.active{display:block}
+
+    .hero{
+      text-align:center;
+      padding:16px 0 12px;
+    }
+
+    .hero h1{
+      margin:0 0 10px;
+      font-size:clamp(2rem,4vw,3.5rem);
+      line-height:1.08;
+    }
+
+    .hero p{
+      margin:0 auto;
+      max-width:760px;
+      color:var(--muted);
+      font-size:1rem;
+    }
+
+    .section-title{
+      margin:24px 0 10px;
+      font-size:1.15rem;
     }
 
     .panel{
       background:var(--panel);
       border:1px solid var(--line);
       border-radius:var(--radius);
-      padding:18px;
       box-shadow:var(--shadow);
+      padding:18px;
     }
 
-    .panel + .panel{margin-top:16px}
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:16px;
+    }
 
-    input,select,textarea{
+    .category-card,
+    .product-card,
+    .admin-card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .category-card{
+      cursor:pointer;
+      transition:.2s ease;
+    }
+
+    .category-card:hover,
+    .product-card:hover{
+      transform:translateY(-2px);
+      border-color:var(--green);
+    }
+
+    .category-card img,
+    .product-card img{
+      width:100%;
+      height:170px;
+      object-fit:cover;
+      background:#0d1218;
+    }
+
+    .card-body{padding:14px}
+    .card-body h3,.card-body h4{margin:0 0 8px}
+    .card-body p{
+      margin:0 0 10px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .price{
+      color:var(--green);
+      font-weight:800;
+      font-size:1.1rem;
+      margin:10px 0 12px;
+    }
+
+    .btn{
+      width:100%;
+      padding:12px 14px;
+      font-weight:800;
+      border-radius:12px;
+      margin-top:8px;
+    }
+
+    .btn-primary{background:var(--green);color:#07120b}
+    .btn-primary:hover{background:var(--green-2)}
+    .btn-secondary{background:var(--panel-2);color:var(--text);border:1px solid var(--line)}
+    .btn-danger{background:var(--danger);color:#fff}
+
+    .btn-back{
+      width:auto;
+      padding:9px 14px;
+      margin-bottom:14px;
+      background:var(--panel-2);
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .toolbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin:12px 0 16px;
+    }
+
+    .toolbar button{
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#111827;
+      color:#fff;
+      cursor:pointer;
+      font-weight:700;
+    }
+
+    .toolbar button.active{
+      color:var(--green);
+      border-color:var(--green);
+      background:rgba(34,197,94,.08);
+    }
+
+    .two-col{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:16px;
+    }
+
+    .cart-line{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      padding:12px 0;
+      border-bottom:1px solid var(--line);
+    }
+
+    .cart-line:last-child{border-bottom:none}
+    .muted{color:var(--muted)}
+
+    .qty-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:8px;
+      align-items:center;
+    }
+
+    .btn-mini{
+      padding:8px 12px;
+      background:#111827;
+      color:#fff;
+      border:1px solid var(--line);
+      width:auto;
+    }
+
+    input,textarea,select{
       width:100%;
       padding:11px 12px;
       margin:8px 0 12px;
@@ -217,74 +274,32 @@
       outline:none;
     }
 
-    input:focus,select:focus,textarea:focus{
+    input:focus,textarea:focus,select:focus{
       border-color:var(--green);
     }
 
-    .toolbar{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin:10px 0 18px;
-    }
-
-    .toolbar button{
-      background:#111827;
-      color:#fff;
-      border:1px solid var(--line);
-      padding:10px 12px;
-      border-radius:999px;
-      cursor:pointer;
-    }
-
-    .toolbar button.active{
-      border-color:var(--green);
-      color:var(--green);
-    }
-
-    .cart-line{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      padding:12px 0;
-      border-bottom:1px solid var(--line);
-      align-items:center;
-    }
-
-    .cart-line:last-child{border-bottom:none}
-
-    .cart-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:14px;
-    }
-
-    .cart-actions button{
-      flex:1 1 220px;
-    }
-
-    .qty-actions{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      flex-wrap:wrap;
-      margin-top:8px;
-    }
-
-    .muted{color:var(--muted)}
-    .two-col{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:16px;
+    textarea{
+      min-height:90px;
+      resize:vertical;
     }
 
     .admin-card{
-      border:1px solid var(--line);
-      border-radius:12px;
       padding:14px;
-      background:#11161d;
       margin-top:12px;
+    }
+
+    .admin-check{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin:10px 0 12px;
+      color:var(--green);
+      font-weight:700;
+    }
+
+    .admin-check input{
+      width:auto;
+      margin:0;
     }
 
     .empty-box{
@@ -293,499 +308,505 @@
       border-radius:12px;
       color:var(--muted);
       text-align:center;
-      margin-top:14px;
+      margin-top:10px;
     }
 
     .save-note{
       color:var(--green);
       font-size:14px;
-      margin-top:8px;
+      margin-top:10px;
     }
 
-    @media (max-width:768px){
-      .vista{padding:16px}
-      header{padding:12px}
+    @media (max-width:820px){
       .two-col{grid-template-columns:1fr}
-      .cart-line{flex-direction:column;align-items:flex-start}
+      .cart-line{flex-direction:column}
+      .brand img{height:72px;width:min(100%,240px)}
     }
   </style>
 </head>
 <body>
+  <header class="site-header">
+    <div class="header-wrap">
+      <div class="brand">
+        <img src="logohi.jpg" alt="Logo HiBRID" onerror="this.style.display='none'">
+      </div>
 
-  <header>
-    <img src="logohi.jpg" alt="HiBRID Logo" onerror="this.style.display='none'">
-    <nav>
-      <button data-nav="inicio" onclick="irA('inicio')">Inicio</button>
-      <button data-nav="carrito" onclick="irA('carrito')">🛒 Carrito (<span id="contador-carrito">0</span>)</button>
-      <button data-nav="admin-login" onclick="irA('admin-login')">⚙️ Admin</button>
-    </nav>
+      <nav class="nav">
+        <button data-nav="home" onclick="goTo('home')">Inicio</button>
+        <button data-nav="cart" onclick="goTo('cart')">🛒 Carrito (<span id="cart-count">0</span>)</button>
+        <button data-nav="admin-login" onclick="goTo('admin-login')">⚙️ Admin</button>
+      </nav>
+    </div>
   </header>
 
   <main>
-    <section id="inicio" class="vista activo">
+    <section id="home" class="view active">
       <div class="hero">
-        <h1>Transformamos el Aire y el Sol en Energía Autónoma</h1>
-        <p>Expertos en sistemas solares híbridos, respaldo residencial y productividad energética con una experiencia simple, rápida y directa por WhatsApp.</p>
+        <h1>Transformamos el aire y el sol en energía autónoma</h1>
+        <p>Portada visual fija para acceder a cada área del negocio. El catálogo real se carga dentro de cada categoría y se edita desde el panel administrador.</p>
       </div>
 
-      <h3>Selecciona una categoría</h3>
-      <div class="grid-items">
-        <div class="card-item clickable" onclick="irA('calculadora')">
-          <img src="render-6.jpg" alt="Calculadora">
-          <h4>Calculadora</h4>
-          <p>Recomendación de kit según tu consumo mensual.</p>
-        </div>
+      <h2 class="section-title">Áreas principales</h2>
 
-        <div class="card-item clickable" onclick="abrirCategoria('paneles')">
-          <img src="paneles.jpg" alt="Paneles">
-          <h4>Paneles solares</h4>
-          <p>Monocristalinos y soluciones fotovoltaicas.</p>
-        </div>
+      <div class="grid">
+        <article class="category-card" onclick="goTo('calculator')">
+          <img src="kitsolar.jpg" alt="Calculadora HiBRID" onerror="this.src='logohi.jpg'">
+          <div class="card-body">
+            <h3>Calculadora</h3>
+            <p>Recomendación inicial de kit según consumo mensual.</p>
+          </div>
+        </article>
 
-        <div class="card-item clickable" onclick="abrirCategoria('baterias')">
-          <img src="bateria.jpg" alt="Baterías">
-          <h4>Baterías</h4>
-          <p>Acumulación segura para respaldo energético.</p>
-        </div>
+        <article class="category-card" onclick="openCategory('paneles')">
+          <img src="paneles.jpg" alt="Paneles solares" onerror="this.src='logohi.jpg'">
+          <div class="card-body">
+            <h3>Paneles</h3>
+            <p>Catálogo fotovoltaico editable desde admin.</p>
+          </div>
+        </article>
 
-        <div class="card-item clickable" onclick="abrirCategoria('inversores')">
-          <img src="inversor.jpg" alt="Inversores">
-          <h4>Inversores</h4>
-          <p>Conversión eficiente para sistemas híbridos.</p>
-        </div>
+        <article class="category-card" onclick="openCategory('baterias')">
+          <img src="bateria.jpg" alt="Baterías" onerror="this.src='logohi.jpg'">
+          <div class="card-body">
+            <h3>Baterías</h3>
+            <p>Equipos de respaldo y almacenamiento energético.</p>
+          </div>
+        </article>
 
-        <div class="card-item clickable" onclick="abrirCategoria('kits')">
-          <img src="render-6.jpg" alt="Kits">
-          <h4>Kits</h4>
-          <p>Soluciones prearmadas listas para cotizar.</p>
-        </div>
+        <article class="category-card" onclick="openCategory('inversores')">
+          <img src="inversor.jpg" alt="Inversores" onerror="this.src='logohi.jpg'">
+          <div class="card-body">
+            <h3>Inversores</h3>
+            <p>Conversión y control para sistemas híbridos.</p>
+          </div>
+        </article>
 
-        <div class="card-item clickable" onclick="abrirCategoria('eolico')">
-          <img src="9192.jpg" alt="Eólico">
-          <h4>Aerogeneradores</h4>
-          <p>Sistemas de energía eólica complementaria.</p>
-        </div>
+        <article class="category-card" onclick="openCategory('kits')">
+          <img src="kitsolar.jpg" alt="Kit solar" onerror="this.src='logohi.jpg'">
+          <div class="card-body">
+            <h3>Kits</h3>
+            <p>Soluciones prearmadas listas para cotizar.</p>
+          </div>
+        </article>
+
+        <article class="category-card" onclick="openCategory('eolico')">
+          <img src="eolica.jpg" alt="Sistema eólico" onerror="this.src='logohi.jpg'">
+          <div class="card-body">
+            <h3>Eólica</h3>
+            <p>Aerogeneradores y apoyo por viento.</p>
+          </div>
+        </article>
       </div>
     </section>
 
-    <section id="calculadora" class="vista">
-      <button class="btn-dark" style="width:auto; margin-bottom:15px; padding:8px 16px;" onclick="irA('inicio')">← Volver al inicio</button>
+    <section id="calculator" class="view">
+      <button class="btn btn-back" onclick="goTo('home')">← Volver al inicio</button>
       <div class="panel">
         <h2>Calculadora de consumo</h2>
-        <p class="muted">Ingresa tu consumo mensual aproximado para obtener un kit sugerido.</p>
-        <input type="number" id="consumo-kwh" placeholder="Ej: 350">
-        <button class="btn-green" onclick="calcularSistema()">Calcular sistema</button>
-        <div id="resultado-calculo" style="margin-top:16px;"></div>
+        <p class="muted">Ingresa el consumo mensual aproximado en kWh para sugerir una solución base.</p>
+        <input type="number" id="kwh-input" placeholder="Ejemplo: 350">
+        <button class="btn btn-primary" onclick="calculateKit()">Calcular sistema</button>
+        <div id="calc-result" style="margin-top:16px"></div>
       </div>
     </section>
 
-    <section id="productos" class="vista">
-      <button class="btn-dark" style="width:auto; margin-bottom:15px; padding:8px 16px;" onclick="irA('inicio')">← Volver al inicio</button>
+    <section id="category" class="view">
+      <button class="btn btn-back" onclick="goTo('home')">← Volver al inicio</button>
       <div class="panel">
-        <h2 id="titulo-categoria">Productos</h2>
-        <p class="muted" id="subtitulo-categoria">Catálogo disponible.</p>
-        <div id="contenedor-productos" class="grid-items"></div>
+        <h2 id="category-title">Categoría</h2>
+        <p id="category-subtitle" class="muted">Listado de productos.</p>
+        <div id="product-grid" class="grid"></div>
       </div>
     </section>
 
-    <section id="carrito" class="vista">
-      <button class="btn-dark" style="width:auto; margin-bottom:15px; padding:8px 16px;" onclick="irA('inicio')">← Seguir viendo equipos</button>
+    <section id="cart" class="view">
+      <button class="btn btn-back" onclick="goTo('home')">← Seguir viendo equipos</button>
       <div class="two-col">
         <div class="panel">
           <h2>Tu carrito de cotización</h2>
-          <div id="lista-carrito">
-            <p class="muted">El carrito está vacío.</p>
-          </div>
+          <div id="cart-list"></div>
         </div>
 
         <div class="panel">
           <h3>Resumen</h3>
-          <p>Total estimado: <strong>$<span id="total-carrito">0</span></strong></p>
-          <div class="cart-actions">
-            <button class="btn-green" style="background:#25d366;color:white;" onclick="enviarWhatsApp()">Enviar a WhatsApp</button>
-            <button class="btn-dark" onclick="vaciarCarrito()">Vaciar carrito</button>
-          </div>
+          <p>Total estimado: <strong>$<span id="cart-total">0</span></strong></p>
+          <button class="btn btn-primary" style="background:#25d366;color:#fff" onclick="sendWhatsApp()">Enviar a WhatsApp</button>
+          <button class="btn btn-secondary" onclick="clearCart()">Vaciar carrito</button>
         </div>
       </div>
     </section>
 
-    <section id="admin-login" class="vista">
-      <button class="btn-dark" style="width:auto; margin-bottom:15px; padding:8px 16px;" onclick="irA('inicio')">← Volver al inicio</button>
-      <div class="panel" style="max-width: 400px; margin: auto;">
-        <h2>Acceso Administrativo</h2>
+    <section id="admin-login" class="view">
+      <button class="btn btn-back" onclick="goTo('home')">← Volver al inicio</button>
+      <div class="panel" style="max-width:420px;margin:auto">
+        <h2>Acceso administrativo</h2>
         <p class="muted">Ingresa tu contraseña para editar el catálogo.</p>
-        <input type="password" id="pass-admin" placeholder="Contraseña">
-        <button class="btn-green" onclick="verificarLoginAdmin()">Ingresar al panel</button>
+        <input type="password" id="admin-pass" placeholder="Contraseña">
+        <button class="btn btn-primary" onclick="loginAdmin()">Ingresar al panel</button>
       </div>
     </section>
 
-    <section id="admin" class="vista">
-      <button class="btn-dark" style="width:auto; margin-bottom:15px; padding:8px 16px;" onclick="irA('inicio')">← Salir del panel</button>
+    <section id="admin" class="view">
+      <button class="btn btn-back" onclick="goTo('home')">← Salir del panel</button>
       <div class="panel">
         <h2>Panel de administración</h2>
-        <p class="muted">Aquí puedes editar, mostrar u ocultar productos y asignar el nombre exacto del archivo de imagen.</p>
-        <div class="toolbar" id="admin-filtros"></div>
-        <div id="admin-lista"></div>
+        <p class="muted">Aquí editas productos por categoría. La portada principal usa imágenes fijas; el inventario real se crea aquí.</p>
+        <div class="toolbar" id="admin-toolbar"></div>
+        <div id="admin-list"></div>
         <p class="save-note">Los cambios quedan guardados en este navegador.</p>
       </div>
     </section>
   </main>
 
   <script>
-    const WHATSAPP = "56956139055";
-    const ADMIN_PASS = "hibrid2026";
-    const STORAGE_KEY = "hibrid_catalog_v2";
+    const WHATSAPP_NUMBER = '56956139055';
+    const ADMIN_PASSWORD = 'hibrid2026';
+    const STORAGE_KEY = 'hibrid_catalog_final_v1';
 
-    let carrito = [];
-    let categoriaActual = "paneles";
+    let cart = [];
+    let currentCategory = 'paneles';
 
-    const productosBase = {
+    const baseCatalog = {
       paneles: [
-        { id: 1, nombre: "Panel Monocristalino 550W", precio: 129990, descripcion: "Panel solar de alto rendimiento para proyectos residenciales.", imagen: "paneles.jpg", visible: true },
-        { id: 2, nombre: "Panel 450W Full Black", precio: 109990, descripcion: "Diseño elegante y buena eficiencia para instalaciones visibles.", imagen: "paneles.jpg", visible: true },
-        { id: 3, nombre: "Espacio Panel 3", precio: 0, descripcion: "", imagen: "paneles.jpg", visible: false },
-        { id: 4, nombre: "Espacio Panel 4", precio: 0, descripcion: "", imagen: "paneles.jpg", visible: false },
-        { id: 5, nombre: "Espacio Panel 5", precio: 0, descripcion: "", imagen: "paneles.jpg", visible: false },
-        { id: 6, nombre: "Espacio Panel 6", precio: 0, descripcion: "", imagen: "paneles.jpg", visible: false },
-        { id: 7, nombre: "Espacio Panel 7", precio: 0, descripcion: "", imagen: "paneles.jpg", visible: false },
-        { id: 8, nombre: "Espacio Panel 8", precio: 0, descripcion: "", imagen: "paneles.jpg", visible: false }
+        { id: 1, nombre: 'Panel Monocristalino 550W', precio: 129990, descripcion: 'Panel solar de alto rendimiento para proyectos residenciales.', imagen: 'paneles.jpg', visible: true },
+        { id: 2, nombre: 'Panel 450W Full Black', precio: 109990, descripcion: 'Diseño elegante y buena eficiencia para instalaciones visibles.', imagen: 'paneles.jpg', visible: true },
+        { id: 3, nombre: 'Espacio Panel 3', precio: 0, descripcion: '', imagen: 'paneles.jpg', visible: false }
       ],
       baterias: [
-        { id: 9, nombre: "Batería Litio 5kWh", precio: 990000, descripcion: "Respaldo energético confiable para sistemas híbridos.", imagen: "bateria.jpg", visible: true },
-        { id: 10, nombre: "Batería Litio 10kWh", precio: 1690000, descripcion: "Mayor autonomía para consumos más exigentes.", imagen: "bateria.jpg", visible: true },
-        { id: 11, nombre: "Espacio Batería 3", precio: 0, descripcion: "", imagen: "bateria.jpg", visible: false },
-        { id: 12, nombre: "Espacio Batería 4", precio: 0, descripcion: "", imagen: "bateria.jpg", visible: false }
+        { id: 4, nombre: 'Batería Litio 5kWh', precio: 990000, descripcion: 'Respaldo energético confiable para sistemas híbridos.', imagen: 'bateria.jpg', visible: true },
+        { id: 5, nombre: 'Batería Litio 10kWh', precio: 1690000, descripcion: 'Mayor autonomía para consumos más exigentes.', imagen: 'bateria.jpg', visible: true }
       ],
       inversores: [
-        { id: 13, nombre: "Inversor Híbrido 3kW", precio: 490000, descripcion: "Conversión estable para hogares pequeños y medianos.", imagen: "inversor.jpg", visible: true },
-        { id: 14, nombre: "Inversor Híbrido 5kW", precio: 790000, descripcion: "Opción versátil para sistemas solares con baterías.", imagen: "inversor.jpg", visible: true },
-        { id: 15, nombre: "Espacio Inversor 3", precio: 0, descripcion: "", imagen: "inversor.jpg", visible: false },
-        { id: 16, nombre: "Espacio Inversor 4", precio: 0, descripcion: "", imagen: "inversor.jpg", visible: false }
+        { id: 6, nombre: 'Inversor Híbrido 3kW', precio: 490000, descripcion: 'Conversión estable para hogares pequeños y medianos.', imagen: 'inversor.jpg', visible: true },
+        { id: 7, nombre: 'Inversor Híbrido 5kW', precio: 790000, descripcion: 'Opción versátil para sistemas solares con baterías.', imagen: 'inversor.jpg', visible: true }
       ],
       kits: [
-        { id: 17, nombre: "Kit Inicial Residencial", precio: 1490000, descripcion: "Base para consumos bajos y respaldo parcial.", imagen: "render-6.jpg", visible: true },
-        { id: 18, nombre: "Kit Residencial 5kW", precio: 2490000, descripcion: "Ideal para vivienda con consumo medio.", imagen: "render-6.jpg", visible: true },
-        { id: 19, nombre: "Kit Autonomía Total", precio: 4290000, descripcion: "Pensado para alto consumo y apoyo híbrido completo.", imagen: "render-6.jpg", visible: true },
-        { id: 20, nombre: "Espacio Kit 4", precio: 0, descripcion: "", imagen: "render-6.jpg", visible: false },
-        { id: 21, nombre: "Espacio Kit 5", precio: 0, descripcion: "", imagen: "render-6.jpg", visible: false }
+        { id: 8, nombre: 'Kit Inicial Residencial', precio: 1490000, descripcion: 'Base para consumos bajos y respaldo parcial.', imagen: 'kitsolar.jpg', visible: true },
+        { id: 9, nombre: 'Kit Residencial 5kW', precio: 2490000, descripcion: 'Ideal para vivienda con consumo medio.', imagen: 'kitsolar.jpg', visible: true },
+        { id: 10, nombre: 'Kit Autonomía Total', precio: 4290000, descripcion: 'Pensado para alto consumo y apoyo híbrido completo.', imagen: 'kitsolar.jpg', visible: true }
       ],
       eolico: [
-        { id: 22, nombre: "Aerogenerador 1kW", precio: 890000, descripcion: "Complemento eólico ideal para zonas con viento.", imagen: "9192.jpg", visible: true },
-        { id: 23, nombre: "Espacio Eólico 2", precio: 0, descripcion: "", imagen: "9192.jpg", visible: false },
-        { id: 24, nombre: "Espacio Eólico 3", precio: 0, descripcion: "", imagen: "9192.jpg", visible: false }
+        { id: 11, nombre: 'Aerogenerador 1kW', precio: 890000, descripcion: 'Complemento eólico ideal para zonas con viento.', imagen: 'eolica.jpg', visible: true }
       ]
     };
 
-    let productos = cargarCatalogo();
+    let catalog = loadCatalog();
 
-    function cargarCatalogo() {
-      const guardado = localStorage.getItem(STORAGE_KEY);
-      if (!guardado) return JSON.parse(JSON.stringify(productosBase));
+    function loadCatalog() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return JSON.parse(JSON.stringify(baseCatalog));
       try {
-        return JSON.parse(guardado);
+        return JSON.parse(saved);
       } catch {
-        return JSON.parse(JSON.stringify(productosBase));
+        return JSON.parse(JSON.stringify(baseCatalog));
       }
     }
 
-    function guardarCatalogo() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(productos));
+    function saveCatalog() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog));
     }
 
-    function irA(idVista) {
-      location.hash = idVista;
+    function goTo(viewId) {
+      showView(viewId);
+      history.pushState({ view: viewId }, '', '#' + viewId);
     }
 
-    function cambiarVista(idVista){
-      document.querySelectorAll('.vista').forEach(v => v.classList.remove('activo'));
-      const vista = document.getElementById(idVista) || document.getElementById('inicio');
-      vista.classList.add('activo');
+    function showView(viewId) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      const target = document.getElementById(viewId) || document.getElementById('home');
+      target.classList.add('active');
 
-      document.querySelectorAll('nav button[data-nav]').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.nav === idVista);
+      document.querySelectorAll('.nav button[data-nav]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.nav === viewId);
       });
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo(0, 0);
     }
 
-    function manejarHash() {
-      const hash = location.hash.replace('#', '') || 'inicio';
-      cambiarVista(hash);
+    function syncFromHash() {
+      const viewId = location.hash.replace('#', '') || 'home';
+      showView(viewId);
     }
 
-    function verificarLoginAdmin() {
-      const pass = document.getElementById('pass-admin').value;
-      if (pass === ADMIN_PASS) {
-        irA('admin');
-        document.getElementById('pass-admin').value = '';
+    function getCategoryMeta(category) {
+      return {
+        paneles: { title: 'Listado de Paneles', subtitle: 'Productos solares cargados desde el panel administrador.' },
+        baterias: { title: 'Listado de Baterías', subtitle: 'Equipos de acumulación y respaldo energético.' },
+        inversores: { title: 'Listado de Inversores', subtitle: 'Soluciones híbridas y de conversión eficiente.' },
+        kits: { title: 'Listado de Kits', subtitle: 'Soluciones prearmadas listas para cotizar.' },
+        eolico: { title: 'Listado Eólico', subtitle: 'Aerogeneradores y sistemas de apoyo por viento.' }
+      }[category];
+    }
+
+    function openCategory(category) {
+      currentCategory = category;
+      const meta = getCategoryMeta(category);
+      document.getElementById('category-title').textContent = meta.title;
+      document.getElementById('category-subtitle').textContent = meta.subtitle;
+      renderProducts(category);
+      goTo('category');
+    }
+
+    function renderProducts(category) {
+      const grid = document.getElementById('product-grid');
+      grid.innerHTML = '';
+
+      const visibleItems = catalog[category].filter(item => item.visible);
+
+      if (!visibleItems.length) {
+        grid.innerHTML = '<div class="empty-box">No hay productos visibles en esta categoría.</div>';
+        return;
+      }
+
+      visibleItems.forEach(item => {
+        const card = document.createElement('article');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <img src="${item.imagen}" alt="${escapeHtml(item.nombre)}" onerror="this.src='logohi.jpg'">
+          <div class="card-body">
+            <h3>${escapeHtml(item.nombre)}</h3>
+            <p>${escapeHtml(item.descripcion || 'Sin descripción aún.')}</p>
+            <div class="price">$${Number(item.precio || 0).toLocaleString('es-CL')}</div>
+            <button class="btn btn-primary">Agregar al carrito</button>
+          </div>
+        `;
+        card.querySelector('button').addEventListener('click', () => addToCart(item.nombre, item.precio));
+        grid.appendChild(card);
+      });
+    }
+
+    function addToCart(nombre, precio) {
+      const existing = cart.find(item => item.nombre === nombre);
+      if (existing) {
+        existing.cantidad += 1;
+      } else {
+        cart.push({ nombre, precio: Number(precio) || 0, cantidad: 1 });
+      }
+      updateCartCount();
+      renderCart();
+    }
+
+    function changeQty(nombre, delta) {
+      const item = cart.find(row => row.nombre === nombre);
+      if (!item) return;
+      item.cantidad += delta;
+      if (item.cantidad <= 0) {
+        cart = cart.filter(row => row.nombre !== nombre);
+      }
+      updateCartCount();
+      renderCart();
+    }
+
+    function removeFromCart(nombre) {
+      cart = cart.filter(item => item.nombre !== nombre);
+      updateCartCount();
+      renderCart();
+    }
+
+    function clearCart() {
+      cart = [];
+      updateCartCount();
+      renderCart();
+    }
+
+    function updateCartCount() {
+      document.getElementById('cart-count').textContent = cart.reduce((sum, item) => sum + item.cantidad, 0);
+    }
+
+    function renderCart() {
+      const list = document.getElementById('cart-list');
+      const totalBox = document.getElementById('cart-total');
+
+      if (!cart.length) {
+        list.innerHTML = '<p class="muted">El carrito está vacío.</p>';
+        totalBox.textContent = '0';
+        return;
+      }
+
+      let total = 0;
+      list.innerHTML = '';
+
+      cart.forEach(item => {
+        const subtotal = item.precio * item.cantidad;
+        total += subtotal;
+
+        const row = document.createElement('div');
+        row.className = 'cart-line';
+        row.innerHTML = `
+          <div>
+            <strong>${escapeHtml(item.nombre)}</strong>
+            <div class="muted">Cantidad: ${item.cantidad}</div>
+            <div class="qty-actions">
+              <button class="btn-mini" data-act="minus">-</button>
+              <button class="btn-mini" data-act="plus">+</button>
+              <button class="btn-mini" data-act="remove">Quitar</button>
+            </div>
+          </div>
+          <div><strong>$${subtotal.toLocaleString('es-CL')}</strong></div>
+        `;
+
+        row.querySelector('[data-act="minus"]').addEventListener('click', () => changeQty(item.nombre, -1));
+        row.querySelector('[data-act="plus"]').addEventListener('click', () => changeQty(item.nombre, 1));
+        row.querySelector('[data-act="remove"]').addEventListener('click', () => removeFromCart(item.nombre));
+        list.appendChild(row);
+      });
+
+      totalBox.textContent = total.toLocaleString('es-CL');
+    }
+
+    function sendWhatsApp() {
+      if (!cart.length) {
+        alert('Agrega productos al carrito primero.');
+        return;
+      }
+
+      let total = 0;
+      const lines = ['Hola, quiero cotizar los siguientes productos de HiBRID:', ''];
+
+      cart.forEach(item => {
+        const subtotal = item.precio * item.cantidad;
+        total += subtotal;
+        lines.push(`- ${item.nombre} x${item.cantidad}: $${subtotal.toLocaleString('es-CL')}`);
+      });
+
+      lines.push('');
+      lines.push(`Total estimado: $${total.toLocaleString('es-CL')}`);
+
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('
+'))}`;
+      window.open(url, '_blank');
+    }
+
+    function calculateKit() {
+      const value = Number(document.getElementById('kwh-input').value);
+      const box = document.getElementById('calc-result');
+
+      if (!value || value <= 0) {
+        box.innerHTML = '<p class="muted">Ingresa un consumo válido.</p>';
+        return;
+      }
+
+      let kit = '';
+      let message = '';
+
+      if (value <= 150) {
+        kit = 'Kit Inicial Residencial';
+        message = 'Consumo bajo: se recomienda una solución base para respaldo parcial.';
+      } else if (value <= 300) {
+        kit = 'Kit Residencial 5kW';
+        message = 'Consumo medio: buen equilibrio entre ahorro y autonomía.';
+      } else {
+        kit = 'Kit Autonomía Total';
+        message = 'Consumo alto: conviene evaluar un sistema más robusto.';
+      }
+
+      box.innerHTML = `
+        <div class="panel">
+          <h3>Resultado</h3>
+          <p>${escapeHtml(message)}</p>
+          <p><strong>Kit sugerido:</strong> ${escapeHtml(kit)}</p>
+          <button class="btn btn-primary" id="calc-add-kit">Agregar kit al carrito</button>
+        </div>
+      `;
+
+      document.getElementById('calc-add-kit').addEventListener('click', () => {
+        const match = catalog.kits.find(item => item.nombre === kit);
+        if (match) addToCart(match.nombre, match.precio);
+        goTo('cart');
+      });
+    }
+
+    function loginAdmin() {
+      const pass = document.getElementById('admin-pass').value;
+      if (pass === ADMIN_PASSWORD) {
+        document.getElementById('admin-pass').value = '';
+        renderAdmin();
+        goTo('admin');
       } else {
         alert('Contraseña incorrecta');
       }
     }
 
-    function abrirCategoria(categoria){
-      categoriaActual = categoria;
-      const titulos = {
-        paneles: "Inventario de Paneles Solares",
-        baterias: "Inventario de Baterías",
-        inversores: "Inventario de Inversores",
-        kits: "Kits Energéticos Prearmados",
-        eolico: "Sistemas Eólicos"
-      };
-      const subtitulos = {
-        paneles: "Paneles disponibles para cotización.",
-        baterias: "Baterías de litio y respaldo energético.",
-        inversores: "Inversores híbridos para distintas necesidades.",
-        kits: "Soluciones llave en mano.",
-        eolico: "Aerogeneradores y complementos de viento."
-      };
+    function renderAdmin() {
+      const toolbar = document.getElementById('admin-toolbar');
+      const list = document.getElementById('admin-list');
+      toolbar.innerHTML = '';
+      list.innerHTML = '';
 
-      document.getElementById('titulo-categoria').innerText = titulos[categoria];
-      document.getElementById('subtitulo-categoria').innerText = subtitulos[categoria];
-      renderProductos(categoria);
-      irA('productos');
-    }
-
-    function renderProductos(categoria){
-      const contenedor = document.getElementById('contenedor-productos');
-      contenedor.innerHTML = '';
-
-      const visibles = productos[categoria].filter(item => item.visible);
-
-      if (!visibles.length) {
-        contenedor.innerHTML = `<div class="empty-box">No hay productos visibles en esta categoría.</div>`;
-        return;
-      }
-
-      visibles.forEach((item) => {
-        const card = document.createElement('div');
-        card.className = 'card-item';
-        card.innerHTML = `
-          <img src="${item.imagen}" alt="${item.nombre}" onerror="this.src='render-6.jpg'">
-          <h3>${item.nombre}</h3>
-          <p>${item.descripcion || 'Sin descripción aún.'}</p>
-          <div class="price">$${item.precio.toLocaleString('es-CL')}</div>
-          <button class="btn-green">Agregar al carrito</button>
-        `;
-        card.querySelector('button').addEventListener('click', () => agregarAlCarrito(item.nombre, item.precio));
-        contenedor.appendChild(card);
-      });
-    }
-
-    function agregarAlCarrito(nombre, precio){
-      const existente = carrito.find(item => item.nombre === nombre);
-      if (existente) {
-        existente.cantidad += 1;
-      } else {
-        carrito.push({ nombre, precio, cantidad: 1 });
-      }
-      actualizarContador();
-      actualizarCarritoVisual();
-    }
-
-    function cambiarCantidad(nombre, delta){
-      const item = carrito.find(p => p.nombre === nombre);
-      if (!item) return;
-      item.cantidad += delta;
-      if (item.cantidad <= 0) {
-        carrito = carrito.filter(p => p.nombre !== nombre);
-      }
-      actualizarContador();
-      actualizarCarritoVisual();
-    }
-
-    function quitarDelCarrito(nombre){
-      carrito = carrito.filter(item => item.nombre !== nombre);
-      actualizarContador();
-      actualizarCarritoVisual();
-    }
-
-    function actualizarContador(){
-      document.getElementById('contador-carrito').innerText =
-        carrito.reduce((acc, item) => acc + item.cantidad, 0);
-    }
-
-    function actualizarCarritoVisual(){
-      const contenedor = document.getElementById('lista-carrito');
-      const totalSpan = document.getElementById('total-carrito');
-
-      if (carrito.length === 0){
-        contenedor.innerHTML = '<p class="muted">El carrito está vacío.</p>';
-        totalSpan.innerText = '0';
-        return;
-      }
-
-      let total = 0;
-      contenedor.innerHTML = '';
-
-      carrito.forEach((item) => {
-        total += item.precio * item.cantidad;
-        const fila = document.createElement('div');
-        fila.className = 'cart-line';
-        fila.innerHTML = `
-          <div>
-            <strong>${item.nombre}</strong>
-            <div class="muted">Cantidad: ${item.cantidad}</div>
-            <div class="qty-actions">
-              <button class="btn-mini" data-action="minus">-</button>
-              <button class="btn-mini" data-action="plus">+</button>
-              <button class="btn-danger" style="width:auto;padding:8px 10px;margin-top:0;" data-action="remove">Quitar</button>
-            </div>
-          </div>
-          <div>
-            <div>$${(item.precio * item.cantidad).toLocaleString('es-CL')}</div>
-          </div>
-        `;
-        fila.querySelector('[data-action="minus"]').addEventListener('click', () => cambiarCantidad(item.nombre, -1));
-        fila.querySelector('[data-action="plus"]').addEventListener('click', () => cambiarCantidad(item.nombre, 1));
-        fila.querySelector('[data-action="remove"]').addEventListener('click', () => quitarDelCarrito(item.nombre));
-        contenedor.appendChild(fila);
-      });
-
-      totalSpan.innerText = total.toLocaleString('es-CL');
-    }
-
-    function vaciarCarrito(){
-      carrito = [];
-      actualizarContador();
-      actualizarCarritoVisual();
-    }
-
-    function enviarWhatsApp(){
-      if (carrito.length === 0){
-        alert("Agrega productos al carrito primero.");
-        return;
-      }
-
-      let total = 0;
-      const lineas = ["Hola, quiero cotizar los siguientes productos de HiBRID:", ""];
-
-      carrito.forEach(item => {
-        const subtotal = item.precio * item.cantidad;
-        total += subtotal;
-        lineas.push(`- ${item.nombre} x${item.cantidad}: $${subtotal.toLocaleString('es-CL')}`);
-      });
-
-      lineas.push("");
-      lineas.push(`Total estimado: $${total.toLocaleString('es-CL')}`);
-
-      const texto = encodeURIComponent(lineas.join('
-'));
-      const url = `https://wa.me/${WHATSAPP}?text=${texto}`;
-      window.open(url, '_blank');
-    }
-
-    function calcularSistema(){
-      const valor = Number(document.getElementById('consumo-kwh').value);
-      const salida = document.getElementById('resultado-calculo');
-
-      if (!valor || valor <= 0){
-        salida.innerHTML = '<p class="muted">Ingresa un consumo válido.</p>';
-        return;
-      }
-
-      let kit = '';
-      let mensaje = '';
-
-      if (valor <= 150){
-        kit = 'Kit Inicial Residencial';
-        mensaje = 'Consumo bajo: se recomienda una solución base para respaldo parcial.';
-      } else if (valor <= 300){
-        kit = 'Kit Residencial 5kW';
-        mensaje = 'Consumo medio: esta opción logra buen equilibrio entre ahorro y autonomía.';
-      } else {
-        kit = 'Kit Autonomía Total';
-        mensaje = 'Consumo alto: conviene evaluar un sistema más robusto con respaldo amplio.';
-      }
-
-      salida.innerHTML = `
-        <div class="panel">
-          <h3>Resultado</h3>
-          <p>${mensaje}</p>
-          <p><strong>Kit sugerido:</strong> ${kit}</p>
-          <button class="btn-green" id="btn-kit-calculado">Agregar kit al carrito</button>
-        </div>
-      `;
-
-      document.getElementById('btn-kit-calculado').addEventListener('click', () => {
-        agregarKitDesdeCalculadora(kit);
-      });
-    }
-
-    function agregarKitDesdeCalculadora(nombreKit){
-      const kit = productos.kits.find(k => k.nombre === nombreKit);
-      if (kit) agregarAlCarrito(kit.nombre, kit.precio);
-      irA('carrito');
-    }
-
-    function renderAdmin(){
-      const filtros = document.getElementById('admin-filtros');
-      const lista = document.getElementById('admin-lista');
-
-      filtros.innerHTML = '';
       ['paneles','baterias','inversores','kits','eolico'].forEach(cat => {
         const btn = document.createElement('button');
         btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
-        if (cat === categoriaActual) btn.classList.add('active');
+        if (cat === currentCategory) btn.classList.add('active');
         btn.addEventListener('click', () => {
-          categoriaActual = cat;
+          currentCategory = cat;
           renderAdmin();
         });
-        filtros.appendChild(btn);
+        toolbar.appendChild(btn);
       });
 
-      lista.innerHTML = '';
-      productos[categoriaActual].forEach((item) => {
+      catalog[currentCategory].forEach(item => {
         const box = document.createElement('div');
         box.className = 'admin-card';
         box.innerHTML = `
           <label>Nombre del producto</label>
-          <input type="text" value="${item.nombre}" data-field="nombre">
+          <input type="text" data-field="nombre" value="${escapeAttr(item.nombre)}">
 
           <label>Precio</label>
-          <input type="number" value="${item.precio}" data-field="precio">
+          <input type="number" data-field="precio" value="${Number(item.precio) || 0}">
 
           <label>Descripción</label>
-          <textarea data-field="descripcion">${item.descripcion}</textarea>
+          <textarea data-field="descripcion">${escapeText(item.descripcion)}</textarea>
 
-          <label>Nombre de la Imagen (Ej: paneles.jpg, 9192.jpg)</label>
-          <input type="text" value="${item.imagen}" data-field="imagen">
+          <label>Nombre del archivo de imagen</label>
+          <input type="text" data-field="imagen" value="${escapeAttr(item.imagen)}">
 
-          <label style="display:flex;align-items:center;margin-top:10px;cursor:pointer;">
-            <input type="checkbox" ${item.visible ? 'checked' : ''} data-field="visible">
-            <span style="color:var(--green);font-weight:bold;">Mostrar producto al público</span>
+          <label class="admin-check">
+            <input type="checkbox" data-field="visible" ${item.visible ? 'checked' : ''}>
+            Mostrar producto al público
           </label>
 
-          <button class="btn-green" style="margin-top:15px;">Guardar cambios</button>
+          <button class="btn btn-primary">Guardar cambios</button>
         `;
 
         box.querySelector('button').addEventListener('click', () => {
-          item.nombre = box.querySelector('[data-field="nombre"]').value.trim();
+          item.nombre = box.querySelector('[data-field="nombre"]').value.trim() || item.nombre;
           item.precio = Number(box.querySelector('[data-field="precio"]').value) || 0;
           item.descripcion = box.querySelector('[data-field="descripcion"]').value.trim();
-          item.imagen = box.querySelector('[data-field="imagen"]').value.trim() || 'render-6.jpg';
+          item.imagen = box.querySelector('[data-field="imagen"]').value.trim() || 'logohi.jpg';
           item.visible = box.querySelector('[data-field="visible"]').checked;
-
-          guardarCatalogo();
+          saveCatalog();
           renderAdmin();
-
-          if (location.hash === '#productos') {
-            renderProductos(categoriaActual);
-          }
-
           alert('Producto actualizado correctamente.');
         });
 
-        lista.appendChild(box);
+        list.appendChild(box);
       });
     }
 
-    window.addEventListener('hashchange', manejarHash);
+    function escapeHtml(text) {
+      return String(text ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
 
-    actualizarContador();
-    actualizarCarritoVisual();
+    function escapeAttr(text) {
+      return escapeHtml(text).replace(/`/g, '&#096;');
+    }
+
+    function escapeText(text) {
+      return String(text ?? '').replace(/<//g, '&lt;/');
+    }
+
+    window.addEventListener('popstate', syncFromHash);
+    window.addEventListener('hashchange', syncFromHash);
+
+    updateCartCount();
+    renderCart();
     renderAdmin();
-    manejarHash();
+    syncFromHash();
   </script>
 </body>
 </html>
