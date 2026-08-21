@@ -1,49 +1,480 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HiBRID | Soluciones Energéticas</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: #fff; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: auto; }
-        .card { background: #2d2d2d; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #2ecc71; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
-        .btn { display: block; background: #2ecc71; color: #000; text-align: center; padding: 15px; border-radius: 5px; text-decoration: none; font-weight: bold; cursor: pointer; }
-        h1, h2 { color: #2ecc71; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HiBRID | Soluciones Energéticas</title>
+  <meta name="description" content="HiBRID ofrece soluciones energéticas autónomas con energía solar y apoyo eólico. Calcula tu consumo y solicita una cotización por WhatsApp." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface-2: #1f2630;
+      --card: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.10);
+      --text: #f5f7fa;
+      --muted: #aab4c3;
+      --primary: #2ecc71;
+      --primary-dark: #21b863;
+      --primary-soft: rgba(46, 204, 113, 0.12);
+      --warning: #f39c12;
+      --danger: #ff6b6b;
+      --shadow: 0 18px 40px rgba(0,0,0,0.25);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --max: 1100px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(46, 204, 113, 0.10), transparent 30%),
+        linear-gradient(180deg, #0b0f14 0%, #11161d 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(92%, var(--max));
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 64px 0 32px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .hero-box,
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-box {
+      padding: 34px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      margin-bottom: 18px;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+      line-height: 1.1;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 4.2rem);
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      margin-bottom: 10px;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      margin-bottom: 8px;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 58ch;
+      margin-bottom: 22px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .btn,
+    button.btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      min-height: 52px;
+      padding: 14px 18px;
+      border: none;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.25s ease;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #08120d;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .stat {
+      padding: 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.35rem;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .section {
+      padding: 18px 0 40px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .card {
+      padding: 26px;
+    }
+
+    .card p {
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #dbe4ef;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      outline: none;
+      font-size: 1rem;
+      margin-bottom: 14px;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.16);
+    }
+
+    .result {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      display: none;
+    }
+
+    .result.show {
+      display: block;
+      animation: fadeIn .25s ease;
+    }
+
+    .badge {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .badge.low {
+      background: rgba(46, 204, 113, 0.16);
+      color: #79f0ab;
+    }
+
+    .badge.medium {
+      background: rgba(243, 156, 18, 0.16);
+      color: #ffc76a;
+    }
+
+    .badge.high {
+      background: rgba(255, 107, 107, 0.16);
+      color: #ff9c9c;
+    }
+
+    .kit-list {
+      display: grid;
+      gap: 18px;
+    }
+
+    .kit-price {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 10px 0 16px;
+    }
+
+    .kit-features {
+      padding-left: 18px;
+      margin: 0 0 18px;
+      color: var(--muted);
+    }
+
+    .kit-features li {
+      margin-bottom: 8px;
+    }
+
+    .note {
+      font-size: 0.92rem;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    footer {
+      padding: 10px 0 50px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.92rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 860px) {
+      .hero-grid,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding-top: 36px;
+      }
+
+      .hero-box,
+      .card {
+        padding: 22px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
+  <header class="hero">
+    <div class="container hero-grid">
+      <div class="hero-box">
+        <span class="eyebrow">Energía autónoma · Aire + Sol</span>
         <h1>HiBRID</h1>
-        <p>Soluciones Energéticas: Aire y Sol.</p>
+        <p class="lead">
+          Soluciones energéticas para hogares y proyectos que buscan reducir consumo de red,
+          mejorar autonomía y cotizar una instalación de forma rápida.
+        </p>
 
-        <div class="card">
-            <h2>Calculadora de Consumo</h2>
-            <input type="number" id="kwh" placeholder="Ingresa tu consumo mensual (kWh)">
-            <button class="btn" onclick="calcular()">CALCULAR Y COTIZAR</button>
-            <p id="resultado"></p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#calculadora">Calcular consumo</a>
+          <a class="btn btn-secondary" href="https://wa.me/56956139055?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20sus%20kits%20energ%C3%A9ticos." target="_blank" rel="noopener noreferrer">Hablar por WhatsApp</a>
         </div>
+      </div>
 
-        <h2>Nuestros Kits</h2>
-        <div class="card">
-            <h3>Kit Residencial 5kW</h3>
-            <p>$2.490.000 + IVA</p>
-            <a href="https://wa.me/569XXXXXXXX?text=Hola, me interesa el Kit Residencial 5kW. Clasificación: MEDIO" class="btn">COTIZAR KIT</a>
+      <div class="hero-box">
+        <h2>¿Por qué HiBRID?</h2>
+        <div class="stats">
+          <div class="stat">
+            <strong>Solar</strong>
+            Generación limpia para consumo diario.
+          </div>
+          <div class="stat">
+            <strong>Híbrido</strong>
+            Combinación flexible según necesidad.
+          </div>
+          <div class="stat">
+            <strong>Ahorro</strong>
+            Menor dependencia de la red eléctrica.
+          </div>
+          <div class="stat">
+            <strong>Cotización</strong>
+            Respuesta rápida por WhatsApp.
+          </div>
         </div>
+      </div>
     </div>
+  </header>
 
-    <script>
-        function calcular() {
-            let kwh = document.getElementById('kwh').value;
-            let msg = "";
-            let urgencia = kwh > 300 ? "URGENTE (Alto Consumo)" : (kwh > 150 ? "MEDIO" : "BAJO");
-            let kit = kwh > 300 ? "Kit Autonomía Total" : "Kit Residencial";
-            
-            let link = `https://wa.me/56956139055?text=Hola, mi consumo es ${kwh} kWh. Recomendaron el ${kit}. Clasificación: ${urgencia}`;
-            
-            document.getElementById('resultado').innerHTML = `Recomendado: <strong>${kit}</strong><br><a href="${link}" class="btn" style="margin-top:10px">SOLICITAR PRESUPUESTO</a>`;
-        }
-    </script>
+  <main class="container">
+    <section class="section grid" id="calculadora">
+      <article class="card">
+        <h2>Calculadora de consumo</h2>
+        <p>Ingresa tu consumo mensual en kWh para obtener una recomendación inicial.</p>
+
+        <label for="kwh">Consumo mensual (kWh)</label>
+        <input
+          type="number"
+          id="kwh"
+          min="1"
+          step="1"
+          placeholder="Ejemplo: 250"
+          inputmode="numeric"
+        />
+
+        <button class="btn btn-primary" onclick="calcular()">Calcular y cotizar</button>
+
+        <div id="resultado" class="result" aria-live="polite"></div>
+      </article>
+
+      <article class="card">
+        <h2>Kit destacado</h2>
+        <p>Una opción pensada para viviendas, parcelas o usuarios que quieren empezar con autonomía energética.</p>
+
+        <div class="kit-list">
+          <div>
+            <h3>Kit Residencial 5kW</h3>
+            <div class="kit-price">$2.490.000 + IVA</div>
+            <ul class="kit-features">
+              <li>Ideal para consumo residencial medio.</li>
+              <li>Base para ahorro y respaldo energético.</li>
+              <li>Escalable según requerimiento del cliente.</li>
+            </ul>
+            <a
+              class="btn btn-secondary"
+              href="https://wa.me/56956139055?text=Hola%2C%20me%20interesa%20el%20Kit%20Residencial%205kW.%20Quiero%20recibir%20una%20cotizaci%C3%B3n."
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Cotizar kit
+            </a>
+          </div>
+        </div>
+
+        <p class="note">Valores referenciales. La recomendación final puede variar según consumo, ubicación y objetivo de autonomía.</p>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 HiBRID · Soluciones energéticas autónomas
+  </footer>
+
+  <script>
+    function calcular() {
+      const input = document.getElementById('kwh');
+      const resultado = document.getElementById('resultado');
+      const kwh = Number(input.value);
+
+      if (!kwh || kwh <= 0) {
+        alert('Por favor ingresa un consumo mensual válido.');
+        input.focus();
+        return;
+      }
+
+      let urgencia = '';
+      let urgenciaClase = '';
+      let kit = '';
+      let rango = '';
+
+      if (kwh <= 150) {
+        urgencia = 'BAJO';
+        urgenciaClase = 'low';
+        kit = 'Kit Base Residencial';
+        rango = 'Sistema inicial para consumos bajos o respaldo parcial.';
+      } else if (kwh <= 300) {
+        urgencia = 'MEDIO';
+        urgenciaClase = 'medium';
+        kit = 'Kit Residencial 5kW';
+        rango = 'Buena alternativa para ahorro y operación residencial media.';
+      } else {
+        urgencia = 'URGENTE / ALTO CONSUMO';
+        urgenciaClase = 'high';
+        kit = 'Kit Autonomía Total';
+        rango = 'Recomendado evaluar una solución híbrida de mayor capacidad.';
+      }
+
+      const mensaje = `Hola, mi consumo mensual es de ${kwh} kWh. Me recomendaron el ${kit}. Clasificación: ${urgencia}. Quiero una cotización.`;
+      const link = `https://wa.me/56956139055?text=${encodeURIComponent(mensaje)}`;
+
+      resultado.className = 'result show';
+      resultado.innerHTML = `
+        <h3>Resultado estimado</h3>
+        <p><strong>Kit recomendado:</strong> ${kit}</p>
+        <p><strong>Perfil de consumo:</strong> <span class="badge ${urgenciaClase}">${urgencia}</span></p>
+        <p>${rango}</p>
+        <a class="btn btn-primary" href="${link}" target="_blank" rel="noopener noreferrer">Solicitar presupuesto</a>
+      `;
+    }
+  </script>
 </body>
 </html>
