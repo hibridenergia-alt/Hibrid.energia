@@ -45,10 +45,11 @@
       background:rgba(19,24,32,.94);
       border-bottom:1px solid var(--line);
       backdrop-filter:blur(10px);
+      flex-wrap:wrap;
     }
 
     header img{
-      height:42px;
+      height:70px;
       width:auto;
       object-fit:contain;
       border-radius:8px;
@@ -70,7 +71,8 @@
       border-radius:999px;
     }
 
-    nav button:hover{
+    nav button:hover,
+    nav button.active{
       border-color:var(--green);
       color:var(--green);
     }
@@ -151,7 +153,7 @@
       margin:8px 0 12px;
     }
 
-    .btn-green,.btn-dark,.btn-danger{
+    .btn-green,.btn-dark,.btn-danger,.btn-mini{
       border:none;
       padding:11px 14px;
       font-weight:bold;
@@ -177,6 +179,21 @@
     .btn-danger{
       background:var(--danger);
       color:#fff;
+    }
+
+    .btn-mini{
+      width:auto;
+      padding:8px 12px;
+      margin-top:0;
+      background:#111827;
+      border:1px solid var(--line);
+      color:#fff;
+    }
+
+    input[type="checkbox"] {
+      width: auto;
+      display: inline-block;
+      margin-right: 10px;
     }
 
     .panel{
@@ -247,6 +264,14 @@
       flex:1 1 220px;
     }
 
+    .qty-actions{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-top:8px;
+    }
+
     .muted{color:var(--muted)}
     .two-col{
       display:grid;
@@ -262,10 +287,26 @@
       margin-top:12px;
     }
 
+    .empty-box{
+      padding:20px;
+      border:1px dashed var(--line);
+      border-radius:12px;
+      color:var(--muted);
+      text-align:center;
+      margin-top:14px;
+    }
+
+    .save-note{
+      color:var(--green);
+      font-size:14px;
+      margin-top:8px;
+    }
+
     @media (max-width:768px){
       .vista{padding:16px}
       header{padding:12px}
       .two-col{grid-template-columns:1fr}
+      .cart-line{flex-direction:column;align-items:flex-start}
     }
   </style>
 </head>
@@ -274,9 +315,9 @@
   <header>
     <img src="logohi.jpg" alt="HiBRID Logo" onerror="this.style.display='none'">
     <nav>
-      <button onclick="cambiarVista('inicio')">Inicio</button>
-      <button onclick="cambiarVista('carrito')">🛒 Carrito (<span id="contador-carrito">0</span>)</button>
-      <button onclick="cambiarVista('admin')">⚙️ Admin</button>
+      <button data-nav="inicio" onclick="irA('inicio')">Inicio</button>
+      <button data-nav="carrito" onclick="irA('carrito')">🛒 Carrito (<span id="contador-carrito">0</span>)</button>
+      <button data-nav="admin-login" onclick="irA('admin-login')">⚙️ Admin</button>
     </nav>
   </header>
 
@@ -289,7 +330,7 @@
 
       <h3>Selecciona una categoría</h3>
       <div class="grid-items">
-        <div class="card-item clickable" onclick="cambiarVista('calculadora')">
+        <div class="card-item clickable" onclick="irA('calculadora')">
           <img src="render-6.jpg" alt="Calculadora">
           <h4>Calculadora</h4>
           <p>Recomendación de kit según tu consumo mensual.</p>
@@ -313,15 +354,22 @@
           <p>Conversión eficiente para sistemas híbridos.</p>
         </div>
 
-        <div class="card-item clickable" onclick="cambiarVista('kits')">
+        <div class="card-item clickable" onclick="abrirCategoria('kits')">
           <img src="render-6.jpg" alt="Kits">
           <h4>Kits</h4>
           <p>Soluciones prearmadas listas para cotizar.</p>
+        </div>
+
+        <div class="card-item clickable" onclick="abrirCategoria('eolico')">
+          <img src="9192.jpg" alt="Eólico">
+          <h4>Aerogeneradores</h4>
+          <p>Sistemas de energía eólica complementaria.</p>
         </div>
       </div>
     </section>
 
     <section id="calculadora" class="vista">
+      <button class="btn-dark" style="width:auto; margin-bottom:15px; padding:8px 16px;" onclick="irA('inicio')">← Volver al inicio</button>
       <div class="panel">
         <h2>Calculadora de consumo</h2>
         <p class="muted">Ingresa tu consumo mensual aproximado para obtener un kit sugerido.</p>
@@ -332,6 +380,7 @@
     </section>
 
     <section id="productos" class="vista">
+      <button class="btn-dark" style="width:auto; margin-bottom:15px; padding:8px 16px;" onclick="irA('inicio')">← Volver al inicio</button>
       <div class="panel">
         <h2 id="titulo-categoria">Productos</h2>
         <p class="muted" id="subtitulo-categoria">Catálogo disponible.</p>
@@ -339,14 +388,8 @@
       </div>
     </section>
 
-    <section id="kits" class="vista">
-      <div class="panel">
-        <h2>Kits energéticos</h2>
-        <div class="grid-items" id="contenedor-kits"></div>
-      </div>
-    </section>
-
     <section id="carrito" class="vista">
+      <button class="btn-dark" style="width:auto; margin-bottom:15px; padding:8px 16px;" onclick="irA('inicio')">← Seguir viendo equipos</button>
       <div class="two-col">
         <div class="panel">
           <h2>Tu carrito de cotización</h2>
@@ -366,47 +409,118 @@
       </div>
     </section>
 
+    <section id="admin-login" class="vista">
+      <button class="btn-dark" style="width:auto; margin-bottom:15px; padding:8px 16px;" onclick="irA('inicio')">← Volver al inicio</button>
+      <div class="panel" style="max-width: 400px; margin: auto;">
+        <h2>Acceso Administrativo</h2>
+        <p class="muted">Ingresa tu contraseña para editar el catálogo.</p>
+        <input type="password" id="pass-admin" placeholder="Contraseña">
+        <button class="btn-green" onclick="verificarLoginAdmin()">Ingresar al panel</button>
+      </div>
+    </section>
+
     <section id="admin" class="vista">
+      <button class="btn-dark" style="width:auto; margin-bottom:15px; padding:8px 16px;" onclick="irA('inicio')">← Salir del panel</button>
       <div class="panel">
         <h2>Panel de administración</h2>
-        <p class="muted">Aquí puedes editar nombre, precio y descripción de los productos. Esta versión evita subida de imágenes para que sea más rápida y estable en móvil.</p>
-
+        <p class="muted">Aquí puedes editar, mostrar u ocultar productos y asignar el nombre exacto del archivo de imagen.</p>
         <div class="toolbar" id="admin-filtros"></div>
         <div id="admin-lista"></div>
+        <p class="save-note">Los cambios quedan guardados en este navegador.</p>
       </div>
     </section>
   </main>
 
   <script>
     const WHATSAPP = "56956139055";
+    const ADMIN_PASS = "hibrid2026";
+    const STORAGE_KEY = "hibrid_catalog_v2";
+
     let carrito = [];
     let categoriaActual = "paneles";
 
-    const productos = {
+    const productosBase = {
       paneles: [
-        { id: 1, nombre: "Panel Monocristalino 550W", precio: 129990, descripcion: "Panel solar de alto rendimiento para proyectos residenciales y comerciales.", imagen: "paneles.jpg" },
-        { id: 2, nombre: "Panel 450W Full Black", precio: 109990, descripcion: "Diseño elegante y buena eficiencia para instalaciones visibles.", imagen: "paneles.jpg" }
+        { id: 1, nombre: "Panel Monocristalino 550W", precio: 129990, descripcion: "Panel solar de alto rendimiento para proyectos residenciales.", imagen: "paneles.jpg", visible: true },
+        { id: 2, nombre: "Panel 450W Full Black", precio: 109990, descripcion: "Diseño elegante y buena eficiencia para instalaciones visibles.", imagen: "paneles.jpg", visible: true },
+        { id: 3, nombre: "Espacio Panel 3", precio: 0, descripcion: "", imagen: "paneles.jpg", visible: false },
+        { id: 4, nombre: "Espacio Panel 4", precio: 0, descripcion: "", imagen: "paneles.jpg", visible: false },
+        { id: 5, nombre: "Espacio Panel 5", precio: 0, descripcion: "", imagen: "paneles.jpg", visible: false },
+        { id: 6, nombre: "Espacio Panel 6", precio: 0, descripcion: "", imagen: "paneles.jpg", visible: false },
+        { id: 7, nombre: "Espacio Panel 7", precio: 0, descripcion: "", imagen: "paneles.jpg", visible: false },
+        { id: 8, nombre: "Espacio Panel 8", precio: 0, descripcion: "", imagen: "paneles.jpg", visible: false }
       ],
       baterias: [
-        { id: 3, nombre: "Batería Litio 5kWh", precio: 990000, descripcion: "Respaldo energético confiable para sistemas híbridos.", imagen: "bateria.jpg" },
-        { id: 4, nombre: "Batería Litio 10kWh", precio: 1690000, descripcion: "Mayor autonomía para consumos más exigentes.", imagen: "bateria.jpg" }
+        { id: 9, nombre: "Batería Litio 5kWh", precio: 990000, descripcion: "Respaldo energético confiable para sistemas híbridos.", imagen: "bateria.jpg", visible: true },
+        { id: 10, nombre: "Batería Litio 10kWh", precio: 1690000, descripcion: "Mayor autonomía para consumos más exigentes.", imagen: "bateria.jpg", visible: true },
+        { id: 11, nombre: "Espacio Batería 3", precio: 0, descripcion: "", imagen: "bateria.jpg", visible: false },
+        { id: 12, nombre: "Espacio Batería 4", precio: 0, descripcion: "", imagen: "bateria.jpg", visible: false }
       ],
       inversores: [
-        { id: 5, nombre: "Inversor Híbrido 3kW", precio: 490000, descripcion: "Conversión estable para hogares pequeños y medianos.", imagen: "inversor.jpg" },
-        { id: 6, nombre: "Inversor Híbrido 5kW", precio: 790000, descripcion: "Opción versátil para sistemas solares con baterías.", imagen: "inversor.jpg" }
+        { id: 13, nombre: "Inversor Híbrido 3kW", precio: 490000, descripcion: "Conversión estable para hogares pequeños y medianos.", imagen: "inversor.jpg", visible: true },
+        { id: 14, nombre: "Inversor Híbrido 5kW", precio: 790000, descripcion: "Opción versátil para sistemas solares con baterías.", imagen: "inversor.jpg", visible: true },
+        { id: 15, nombre: "Espacio Inversor 3", precio: 0, descripcion: "", imagen: "inversor.jpg", visible: false },
+        { id: 16, nombre: "Espacio Inversor 4", precio: 0, descripcion: "", imagen: "inversor.jpg", visible: false }
+      ],
+      kits: [
+        { id: 17, nombre: "Kit Inicial Residencial", precio: 1490000, descripcion: "Base para consumos bajos y respaldo parcial.", imagen: "render-6.jpg", visible: true },
+        { id: 18, nombre: "Kit Residencial 5kW", precio: 2490000, descripcion: "Ideal para vivienda con consumo medio.", imagen: "render-6.jpg", visible: true },
+        { id: 19, nombre: "Kit Autonomía Total", precio: 4290000, descripcion: "Pensado para alto consumo y apoyo híbrido completo.", imagen: "render-6.jpg", visible: true },
+        { id: 20, nombre: "Espacio Kit 4", precio: 0, descripcion: "", imagen: "render-6.jpg", visible: false },
+        { id: 21, nombre: "Espacio Kit 5", precio: 0, descripcion: "", imagen: "render-6.jpg", visible: false }
+      ],
+      eolico: [
+        { id: 22, nombre: "Aerogenerador 1kW", precio: 890000, descripcion: "Complemento eólico ideal para zonas con viento.", imagen: "9192.jpg", visible: true },
+        { id: 23, nombre: "Espacio Eólico 2", precio: 0, descripcion: "", imagen: "9192.jpg", visible: false },
+        { id: 24, nombre: "Espacio Eólico 3", precio: 0, descripcion: "", imagen: "9192.jpg", visible: false }
       ]
     };
 
-    const kits = [
-      { nombre: "Kit Inicial Residencial", precio: 1490000, descripcion: "Base para consumos bajos y respaldo parcial.", imagen: "render-6.jpg" },
-      { nombre: "Kit Residencial 5kW", precio: 2490000, descripcion: "Ideal para vivienda con consumo medio.", imagen: "render-6.jpg" },
-      { nombre: "Kit Autonomía Total", precio: 4290000, descripcion: "Pensado para alto consumo y apoyo híbrido completo.", imagen: "render-6.jpg" }
-    ];
+    let productos = cargarCatalogo();
+
+    function cargarCatalogo() {
+      const guardado = localStorage.getItem(STORAGE_KEY);
+      if (!guardado) return JSON.parse(JSON.stringify(productosBase));
+      try {
+        return JSON.parse(guardado);
+      } catch {
+        return JSON.parse(JSON.stringify(productosBase));
+      }
+    }
+
+    function guardarCatalogo() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(productos));
+    }
+
+    function irA(idVista) {
+      location.hash = idVista;
+    }
 
     function cambiarVista(idVista){
       document.querySelectorAll('.vista').forEach(v => v.classList.remove('activo'));
-      document.getElementById(idVista).classList.add('activo');
+      const vista = document.getElementById(idVista) || document.getElementById('inicio');
+      vista.classList.add('activo');
+
+      document.querySelectorAll('nav button[data-nav]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.nav === idVista);
+      });
+
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function manejarHash() {
+      const hash = location.hash.replace('#', '') || 'inicio';
+      cambiarVista(hash);
+    }
+
+    function verificarLoginAdmin() {
+      const pass = document.getElementById('pass-admin').value;
+      if (pass === ADMIN_PASS) {
+        irA('admin');
+        document.getElementById('pass-admin').value = '';
+      } else {
+        alert('Contraseña incorrecta');
+      }
     }
 
     function abrirCategoria(categoria){
@@ -414,54 +528,46 @@
       const titulos = {
         paneles: "Inventario de Paneles Solares",
         baterias: "Inventario de Baterías",
-        inversores: "Inventario de Inversores"
+        inversores: "Inventario de Inversores",
+        kits: "Kits Energéticos Prearmados",
+        eolico: "Sistemas Eólicos"
       };
       const subtitulos = {
         paneles: "Paneles disponibles para cotización.",
         baterias: "Baterías de litio y respaldo energético.",
-        inversores: "Inversores híbridos para distintas necesidades."
+        inversores: "Inversores híbridos para distintas necesidades.",
+        kits: "Soluciones llave en mano.",
+        eolico: "Aerogeneradores y complementos de viento."
       };
 
       document.getElementById('titulo-categoria').innerText = titulos[categoria];
       document.getElementById('subtitulo-categoria').innerText = subtitulos[categoria];
       renderProductos(categoria);
-      cambiarVista('productos');
+      irA('productos');
     }
 
     function renderProductos(categoria){
       const contenedor = document.getElementById('contenedor-productos');
       contenedor.innerHTML = '';
 
-      productos[categoria].forEach((item) => {
+      const visibles = productos[categoria].filter(item => item.visible);
+
+      if (!visibles.length) {
+        contenedor.innerHTML = `<div class="empty-box">No hay productos visibles en esta categoría.</div>`;
+        return;
+      }
+
+      visibles.forEach((item) => {
         const card = document.createElement('div');
         card.className = 'card-item';
         card.innerHTML = `
-          <img src="${item.imagen}" alt="${item.nombre}">
+          <img src="${item.imagen}" alt="${item.nombre}" onerror="this.src='render-6.jpg'">
           <h3>${item.nombre}</h3>
-          <p>${item.descripcion}</p>
+          <p>${item.descripcion || 'Sin descripción aún.'}</p>
           <div class="price">$${item.precio.toLocaleString('es-CL')}</div>
           <button class="btn-green">Agregar al carrito</button>
         `;
         card.querySelector('button').addEventListener('click', () => agregarAlCarrito(item.nombre, item.precio));
-        contenedor.appendChild(card);
-      });
-    }
-
-    function renderKits(){
-      const contenedor = document.getElementById('contenedor-kits');
-      contenedor.innerHTML = '';
-
-      kits.forEach((kit) => {
-        const card = document.createElement('div');
-        card.className = 'card-item';
-        card.innerHTML = `
-          <img src="${kit.imagen}" alt="${kit.nombre}">
-          <h3>${kit.nombre}</h3>
-          <p>${kit.descripcion}</p>
-          <div class="price">$${kit.precio.toLocaleString('es-CL')}</div>
-          <button class="btn-green">Agregar al carrito</button>
-        `;
-        card.querySelector('button').addEventListener('click', () => agregarAlCarrito(kit.nombre, kit.precio));
         contenedor.appendChild(card);
       });
     }
@@ -473,14 +579,30 @@
       } else {
         carrito.push({ nombre, precio, cantidad: 1 });
       }
-      document.getElementById('contador-carrito').innerText = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+      actualizarContador();
+      actualizarCarritoVisual();
+    }
+
+    function cambiarCantidad(nombre, delta){
+      const item = carrito.find(p => p.nombre === nombre);
+      if (!item) return;
+      item.cantidad += delta;
+      if (item.cantidad <= 0) {
+        carrito = carrito.filter(p => p.nombre !== nombre);
+      }
+      actualizarContador();
       actualizarCarritoVisual();
     }
 
     function quitarDelCarrito(nombre){
       carrito = carrito.filter(item => item.nombre !== nombre);
-      document.getElementById('contador-carrito').innerText = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+      actualizarContador();
       actualizarCarritoVisual();
+    }
+
+    function actualizarContador(){
+      document.getElementById('contador-carrito').innerText =
+        carrito.reduce((acc, item) => acc + item.cantidad, 0);
     }
 
     function actualizarCarritoVisual(){
@@ -504,13 +626,19 @@
           <div>
             <strong>${item.nombre}</strong>
             <div class="muted">Cantidad: ${item.cantidad}</div>
+            <div class="qty-actions">
+              <button class="btn-mini" data-action="minus">-</button>
+              <button class="btn-mini" data-action="plus">+</button>
+              <button class="btn-danger" style="width:auto;padding:8px 10px;margin-top:0;" data-action="remove">Quitar</button>
+            </div>
           </div>
           <div>
             <div>$${(item.precio * item.cantidad).toLocaleString('es-CL')}</div>
-            <button class="btn-danger" style="width:auto;padding:8px 10px;margin-top:8px;">Quitar</button>
           </div>
         `;
-        fila.querySelector('button').addEventListener('click', () => quitarDelCarrito(item.nombre));
+        fila.querySelector('[data-action="minus"]').addEventListener('click', () => cambiarCantidad(item.nombre, -1));
+        fila.querySelector('[data-action="plus"]').addEventListener('click', () => cambiarCantidad(item.nombre, 1));
+        fila.querySelector('[data-action="remove"]').addEventListener('click', () => quitarDelCarrito(item.nombre));
         contenedor.appendChild(fila);
       });
 
@@ -519,7 +647,7 @@
 
     function vaciarCarrito(){
       carrito = [];
-      document.getElementById('contador-carrito').innerText = '0';
+      actualizarContador();
       actualizarCarritoVisual();
     }
 
@@ -529,16 +657,20 @@
         return;
       }
 
-      let texto = "Hola, quiero cotizar los siguientes productos de HiBRID:%0A";
       let total = 0;
+      const lineas = ["Hola, quiero cotizar los siguientes productos de HiBRID:", ""];
 
       carrito.forEach(item => {
         const subtotal = item.precio * item.cantidad;
-        texto += `- ${item.nombre} x${item.cantidad}: $${subtotal.toLocaleString('es-CL')}%0A`;
         total += subtotal;
+        lineas.push(`- ${item.nombre} x${item.cantidad}: $${subtotal.toLocaleString('es-CL')}`);
       });
 
-      texto += `%0ATotal estimado: $${total.toLocaleString('es-CL')}`;
+      lineas.push("");
+      lineas.push(`Total estimado: $${total.toLocaleString('es-CL')}`);
+
+      const texto = encodeURIComponent(lineas.join('
+'));
       const url = `https://wa.me/${WHATSAPP}?text=${texto}`;
       window.open(url, '_blank');
     }
@@ -571,15 +703,19 @@
           <h3>Resultado</h3>
           <p>${mensaje}</p>
           <p><strong>Kit sugerido:</strong> ${kit}</p>
-          <button class="btn-green" onclick="agregarKitDesdeCalculadora('${kit}')">Agregar kit al carrito</button>
+          <button class="btn-green" id="btn-kit-calculado">Agregar kit al carrito</button>
         </div>
       `;
+
+      document.getElementById('btn-kit-calculado').addEventListener('click', () => {
+        agregarKitDesdeCalculadora(kit);
+      });
     }
 
     function agregarKitDesdeCalculadora(nombreKit){
-      const kit = kits.find(k => k.nombre === nombreKit);
+      const kit = productos.kits.find(k => k.nombre === nombreKit);
       if (kit) agregarAlCarrito(kit.nombre, kit.precio);
-      cambiarVista('carrito');
+      irA('carrito');
     }
 
     function renderAdmin(){
@@ -587,7 +723,7 @@
       const lista = document.getElementById('admin-lista');
 
       filtros.innerHTML = '';
-      ['paneles','baterias','inversores'].forEach(cat => {
+      ['paneles','baterias','inversores','kits','eolico'].forEach(cat => {
         const btn = document.createElement('button');
         btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
         if (cat === categoriaActual) btn.classList.add('active');
@@ -605,30 +741,51 @@
         box.innerHTML = `
           <label>Nombre del producto</label>
           <input type="text" value="${item.nombre}" data-field="nombre">
+
           <label>Precio</label>
           <input type="number" value="${item.precio}" data-field="precio">
+
           <label>Descripción</label>
           <textarea data-field="descripcion">${item.descripcion}</textarea>
-          <button class="btn-green">Guardar cambios</button>
+
+          <label>Nombre de la Imagen (Ej: paneles.jpg, 9192.jpg)</label>
+          <input type="text" value="${item.imagen}" data-field="imagen">
+
+          <label style="display:flex;align-items:center;margin-top:10px;cursor:pointer;">
+            <input type="checkbox" ${item.visible ? 'checked' : ''} data-field="visible">
+            <span style="color:var(--green);font-weight:bold;">Mostrar producto al público</span>
+          </label>
+
+          <button class="btn-green" style="margin-top:15px;">Guardar cambios</button>
         `;
 
         box.querySelector('button').addEventListener('click', () => {
-          item.nombre = box.querySelector('[data-field="nombre"]').value;
+          item.nombre = box.querySelector('[data-field="nombre"]').value.trim();
           item.precio = Number(box.querySelector('[data-field="precio"]').value) || 0;
-          item.descripcion = box.querySelector('[data-field="descripcion"]').value;
-          alert('Producto actualizado correctamente.');
-          if (document.getElementById('productos').classList.contains('activo')) {
+          item.descripcion = box.querySelector('[data-field="descripcion"]').value.trim();
+          item.imagen = box.querySelector('[data-field="imagen"]').value.trim() || 'render-6.jpg';
+          item.visible = box.querySelector('[data-field="visible"]').checked;
+
+          guardarCatalogo();
+          renderAdmin();
+
+          if (location.hash === '#productos') {
             renderProductos(categoriaActual);
           }
+
+          alert('Producto actualizado correctamente.');
         });
 
         lista.appendChild(box);
       });
     }
 
-    renderKits();
+    window.addEventListener('hashchange', manejarHash);
+
+    actualizarContador();
     actualizarCarritoVisual();
     renderAdmin();
+    manejarHash();
   </script>
 </body>
 </html>
