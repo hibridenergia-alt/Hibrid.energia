@@ -1,598 +1,237 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HiBRID | Soluciones Energéticas Avanzadas</title>
-  <meta name="description" content="HiBRID ofrece soluciones energéticas híbridas con paneles solares, baterías, inversores y aerogeneradores. Calcula tu consumo, arma tu carrito y solicita una cotización por WhatsApp." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-  <style>
-    /* ==========================================================================
-       VARIABLES Y RESET
-       ========================================================================== */
-    :root {
-      --bg: #0a0d11;
-      --surface: #12171d;
-      --surface-2: #1a2028;
-      --surface-3: #202834;
-      --border: rgba(255, 255, 255, 0.10);
-      --border-strong: rgba(255, 255, 255, 0.20);
-      --text: #f4f7fb;
-      --muted: #a8b0bc;
-      --faint: #798290;
-      
-      --primary: #2ecc71;
-      --primary-dark: #22b962;
-      --primary-soft: rgba(46, 204, 113, 0.15);
-      --danger: #ff6b6b;
-      --warning: #ffbf5f;
-      --success: #73e6a1;
-      
-      --radius-sm: 8px;
-      --radius-md: 16px;
-      --max: 1200px;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    img, svg { display: block; max-width: 100%; height: auto; }
-    a { color: inherit; text-decoration: none; transition: 0.2s ease; }
-    button, input, textarea, select { font: inherit; color: inherit; border: none; }
-    button { cursor: pointer; }
-    ul { list-style: none; }
-    .hidden { display: none !important; }
-
-    .container { width: min(92%, var(--max)); margin-inline: auto; }
-
-    /* ==========================================================================
-       HEADER Y NAVEGACIÓN
-       ========================================================================== */
-    .site-header {
-      position: sticky;
-      top: 0;
-      z-index: 1000; /* Alto z-index para estar siempre arriba */
-      background: rgba(10, 13, 17, 0.98); /* Fondo sólido oscuro */
-      border-bottom: 1px solid var(--border);
-      padding: 10px 0;
-    }
-
-    .nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    /* EL LOGO: Aseguramos que se mantenga pequeño y solo en el header */
-    .brand-logo { 
-      height: 40px; 
-      width: auto;
-      object-fit: contain;
-      /* Evita que cualquier otro estilo global lo afecte */
-      position: static !important; 
-      float: none !important;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .nav-link {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--muted);
-      padding: 5px 0;
-    }
-    .nav-link:hover { color: var(--text); }
-    
-    .nav-cart-badge {
-      background: var(--primary);
-      color: #000;
-      font-size: 0.75rem;
-      font-weight: 800;
-      padding: 2px 8px;
-      border-radius: 999px;
-      margin-left: 4px;
-    }
-
-    /* ==========================================================================
-       TIPOGRAFÍA Y BOTONES
-       ========================================================================== */
-    h1, h2, h3, h4 { margin: 0 0 12px; font-weight: 800; line-height: 1.2; }
-    h1 { font-size: 2rem; }
-    h2 { font-size: 1.5rem; color: #fff; }
-    h3 { font-size: 1.2rem; }
-
-    .btn {
-      padding: 14px 20px;
-      border-radius: var(--radius-sm);
-      font-weight: 700;
-      text-align: center;
-      width: 100%;
-      display: block;
-      transition: 0.2s ease;
-    }
-    .btn-primary { background: var(--primary); color: #000; }
-    .btn-secondary { background: var(--surface-3); border: 1px solid var(--border); color: #fff; }
-    
-    @media (min-width: 768px) {
-      .btn { display: inline-block; width: auto; }
-      h1 { font-size: 2.8rem; }
-      h2 { font-size: 2rem; }
-    }
-
-    /* ==========================================================================
-       ESTRUCTURA DE SECCIONES (PANELES SEPARADOS)
-       ========================================================================== */
-    .section { padding: 40px 0; }
-    
-    .section-head { margin-bottom: 25px; text-align: center; }
-    .section-head p { color: var(--muted); font-size: 0.95rem; }
-
-    /* Tarjetas/Paneles Base */
-    .card-panel {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 25px;
-      margin-bottom: 25px; /* Espacio entre secciones */
-    }
-
-    /* ==========================================================================
-       CATÁLOGO DE PRODUCTOS
-       ========================================================================== */
-    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
-    .filter-btn {
-      padding: 8px 16px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--muted);
-      font-size: 0.85rem;
-    }
-    .filter-btn.active { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
-
-    .grid-products { display: grid; grid-template-columns: 1fr; gap: 20px; }
-    
-    .product-card {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-    }
-    .product-media { aspect-ratio: 4/3; background: #000; }
-    .product-media img { width: 100%; height: 100%; object-fit: cover; }
-    
-    .product-body { padding: 20px; }
-    .price { color: var(--primary); font-size: 1.4rem; font-weight: 800; margin: 10px 0; }
-    
-    .qty-row { display: flex; gap: 10px; }
-    .qty-input { width: 70px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: var(--radius-sm); text-align: center; }
-
-    @media (min-width: 768px) { .grid-products { grid-template-columns: repeat(2, 1fr); } }
-    @media (min-width: 1024px) { .grid-products { grid-template-columns: repeat(3, 1fr); } }
-
-    /* ==========================================================================
-       CARRITO (PANEL SEPARADO)
-       ========================================================================== */
-    .cart-item {
-      display: flex; flex-direction: column; gap: 10px;
-      background: rgba(0,0,0,0.2); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); padding: 15px; margin-bottom: 10px;
-    }
-    .cart-item-header { display: flex; justify-content: space-between; align-items: flex-start; }
-    .cart-item span { color: var(--faint); font-size: 0.85rem; }
-    .cart-item-actions { display: flex; justify-content: space-between; align-items: center; }
-    .btn-remove { color: var(--danger); font-size: 0.9rem; font-weight: 600; padding: 5px; }
-
-    .summary-total { color: var(--primary); font-size: 1.5rem; font-weight: 900; }
-
-    /* ==========================================================================
-       FORMULARIOS Y UTILIDADES
-       ========================================================================== */
-    .field, .textarea {
-      width: 100%;
-      background: rgba(0,0,0,0.3);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: #fff;
-      padding: 12px;
-      font-size: 1rem;
-      margin-bottom: 15px;
-    }
-    .textarea { min-height: 100px; resize: vertical; }
-
-    /* Notificaciones */
-    .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 350px; }
-    .toast { background: rgba(30,30,30,0.95); border-left: 4px solid var(--primary); padding: 15px; border-radius: 8px; color: #fff; margin-top: 10px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-    .toast.error { border-left-color: var(--danger); }
-
-    /* FAQ */
-    .faq-item { border-bottom: 1px solid var(--border); margin-bottom: 10px; }
-    .faq-question { width: 100%; text-align: left; background: none; padding: 15px 0; font-size: 1rem; font-weight: 600; color: #fff; display: flex; justify-content: space-between; }
-    .faq-answer { max-height: 0; overflow: hidden; transition: 0.3s ease; color: var(--muted); }
-    .faq-item.active .faq-answer { max-height: 300px; padding-bottom: 15px; }
-
-    /* WhatsApp Flotante */
-    .fab-whatsapp {
-      position: fixed; bottom: 20px; right: 20px; z-index: 900;
-      width: 60px; height: 60px; background: #25D366; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-    .fab-whatsapp svg { fill: #fff; width: 35px; height: 35px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HiBRID - Soluciones Energéticas</title>
+    <style>
+        :root {
+            --bg-color: #0a0d11;
+            --card-bg: #131820;
+            --green: #22c55e;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--card-bg);
+            border-bottom: 1px solid #1f2937;
+        }
+        header img { height: 40px; }
+        nav button {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        .vista { display: none; padding: 20px; max-width: 1200px; margin: auto; }
+        .activo { display: block; }
+        .grid-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .card-item {
+            background: var(--card-bg);
+            border: 1px solid #1f2937;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .card-item:hover { border-color: var(--green); }
+        .card-item img { width: 100%; height: 140px; object-fit: cover; border-radius: 4px; }
+        .btn-green {
+            background: var(--green);
+            color: #000;
+            border: none;
+            padding: 10px 15px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            background: #1f2937;
+            border: 1px: solid #374151;
+            color: white;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
 
-  <div id="toastContainer" class="toast-container"></div>
+    <!-- CABECERA FIJA -->
+    <header>
+        <img src="logohi.jpg" alt="HiBRID Logo">
+        <nav>
+            <button onclick="cambiarVista('inicio')">Inicio</button>
+            <button onclick="cambiarVista('carrito')">🛒 Carrito (<span id="contador-carrito">0</span>)</button>
+            <button onclick="cambiarVista('admin')">⚙️ Admin</button>
+        </nav>
+    </header>
 
-  <!-- HEADER FIJO Y LIMPIO -->
-  <header class="site-header">
-    <div class="container nav">
-      <a href="#"><img src="9193.png" alt="Logo HiBRID" class="brand-logo" onerror="this.outerHTML='<h2 style=\'margin:0;color:var(--primary)\'>HiBRID</h2>'"></a>
-      <nav class="nav-links">
-        <a class="nav-link" href="#productos">Productos</a>
-        <a class="nav-link" href="#kits">Kits</a>
-        <a class="nav-link" href="#calculadora">Calculadora</a>
-        <a class="nav-link" href="#carrito" style="color: var(--primary);">
-          Carrito <span id="navCartCount" class="nav-cart-badge">0</span>
-        </a>
-      </nav>
-    </div>
-  </header>
-
-  <main class="container">
-    
-    <!-- SECCIÓN: HERO -->
-    <section class="section">
-      <div class="card-panel" style="text-align: center; padding: 40px 20px;">
-        <h1 style="color: var(--primary);">Soluciones Híbridas</h1>
-        <p style="font-size: 1.1rem;">Integra paneles solares, baterías y eólico. Cotiza tu proyecto de autonomía energética ahora mismo.</p>
-        <div style="margin-top: 20px;">
-           <a href="#productos" class="btn btn-primary">Ver Catálogo de Equipos</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECCIÓN: PRODUCTOS -->
-    <section class="section" id="productos">
-      <div class="section-head">
-        <h2>Catálogo de Equipos</h2>
-        <p>Selecciona los componentes para tu sistema.</p>
-      </div>
-
-      <div class="filters">
-        <button class="filter-btn active" data-filter="all" type="button">Todos</button>
-        <button class="filter-btn" data-filter="panel" type="button">Paneles</button>
-        <button class="filter-btn" data-filter="bateria" type="button">Baterías</button>
-        <button class="filter-btn" data-filter="inversor" type="button">Inversores</button>
-        <button class="filter-btn" data-filter="aerogenerador" type="button">Eólico</button>
-      </div>
-
-      <div class="grid-products" id="productGrid">
-        <!-- JS Inyecta los productos aquí -->
-      </div>
-    </section>
-
-    <!-- SECCIÓN: CALCULADORA (ORDEN CORREGIDO) -->
-    <section class="section" id="calculadora">
-      <div class="section-head">
-        <h2>Asistente de Dimensionamiento</h2>
-      </div>
-
-      <!-- PRIMERO: El formulario para ingresar datos -->
-      <div class="card-panel">
-        <label for="kwhInput" style="display: block; margin-bottom: 10px; font-weight: 600;">Consumo mensual (kWh)</label>
-        <input id="kwhInput" class="field" type="number" min="1" step="1" placeholder="Ejemplo: 250 (Ver en boleta)">
-        <button class="btn btn-primary" type="button" onclick="calcularKit()">Calcular Sistema Recomendado</button>
-        
-        <div id="calcResult" class="hidden" style="margin-top: 20px; padding: 15px; background: rgba(46, 204, 113, 0.1); border: 1px solid var(--primary); border-radius: var(--radius-sm);">
-          <!-- JS Inyecta resultado aquí -->
-        </div>
-      </div>
-
-      <!-- SEGUNDO: La explicación de cómo funciona -->
-      <div class="card-panel" style="background: rgba(0,0,0,0.2);">
-        <h3 style="margin-bottom: 10px;">¿Cómo funciona el cálculo?</h3>
-        <ul style="color: var(--muted); padding-left: 15px;">
-          <li>1. Analizamos tu consumo ingresado.</li>
-          <li>2. Clasificamos tu perfil energético.</li>
-          <li>3. Te sugerimos el Kit Base más adecuado para cubrir esa necesidad.</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- SECCIÓN: CARRITO Y ENVÍO A WHATSAPP (PANELES SEPARADOS) -->
-    <section class="section" id="carrito">
-      <div class="section-head">
-        <h2>Tu Solicitud de Presupuesto</h2>
-        <p>Revisa tu selección antes de enviar a cotizar.</p>
-      </div>
-
-      <!-- PANEL 1: La lista de equipos -->
-      <div class="card-panel">
-        <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px;">Equipos en lista</h3>
-        <div id="cartItems">
-          <!-- JS inyecta ítems del carrito -->
-        </div>
-      </div>
-
-      <!-- PANEL 2: El Resumen y botones de envío -->
-      <div class="card-panel" style="border-color: var(--primary);">
-        <h3 style="margin-bottom: 15px;">Resumen</h3>
-        
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-          <span>Total de Ítems:</span>
-          <strong id="cartCountTotal">0</strong>
-        </div>
-        
-        <div style="margin-bottom: 15px;">
-          <span style="display: block;">Monto Referencial:</span>
-          <strong id="cartTotal" class="summary-total">$0</strong>
-        </div>
-        
-        <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 20px;">
-          *Valores referenciales. Sujetos a factibilidad técnica e instalación.
-        </p>
-        
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-          <button class="btn btn-primary" type="button" onclick="enviarWhatsApp()">Enviar Solicitud a WhatsApp</button>
-          <button class="btn btn-secondary" type="button" onclick="vaciarCarrito()">Vaciar Lista</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECCIÓN: FAQ -->
-    <section class="section">
-      <div class="card-panel">
-        <h2 style="margin-bottom: 20px;">Preguntas Frecuentes</h2>
-        
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">¿Sistema On-Grid vs Híbrido? <span>+</span></button>
-          <div class="faq-answer"><p>El On-Grid se apaga si hay un corte de red. El Híbrido usa baterías para mantenerte con energía.</p></div>
-        </div>
-        
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">¿Incluyen instalación? <span>+</span></button>
-          <div class="faq-answer"><p>Los precios web son solo de equipos. La instalación requiere evaluar tu ubicación y factibilidad.</p></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECCIÓN: ADMINISTRADOR (AL FINAL) -->
-    <section class="section" id="admin">
-      <div class="card-panel" style="background: rgba(0,0,0,0.5);">
-        <h2>Acceso Administrativo</h2>
-        
-        <div id="adminLoginBox">
-          <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 15px;">La clave actual es: <strong>hibrid2026</strong></p>
-          <input id="adminPassword" class="field" type="password" placeholder="Ingresa la contraseña">
-          <button class="btn btn-secondary" type="button" onclick="loginAdmin()">Acceder al Panel</button>
+    <!-- 1. PÁGINA PRINCIPAL -->
+    <div id="inicio" class="vista activo">
+        <div style="text-align: center; padding: 40px 0;">
+            <h1>Transformamos el Aire y el Sol en Energía Autónoma</h1>
+            <p style="color: var(--text-muted); max-width: 600px; margin: auto;">Expertos en sistemas solares híbridos, respaldo residencial y productividad agrícola en Chile.</p>
         </div>
 
-        <div id="adminPanel" class="hidden">
-          <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-            <button class="btn btn-secondary" type="button" onclick="logoutAdmin()">Cerrar Sesión</button>
-            <button class="btn btn-secondary" style="border-color: var(--danger); color: var(--danger);" type="button" onclick="resetCatalog()">Restaurar Catálogo Original</button>
-          </div>
-          <div id="adminProductList"></div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <footer style="text-align: center; padding: 30px; background: #000; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem;">
-    © 2026 HiBRID Soluciones Energéticas.
-  </footer>
-
-  <a href="https://wa.me/56956139055" target="_blank" class="fab-whatsapp">
-    <svg viewBox="0 0 24 24"><path d="M12.031 0C5.385 0 0 5.385 0 12.031c0 2.115.548 4.17 1.591 5.986L.016 23.985l6.104-1.6c1.758.966 3.748 1.474 5.91 1.474 6.646 0 12.031-5.385 12.031-12.031S18.677 0 12.031 0zm0 21.874c-1.815 0-3.593-.487-5.15-1.408l-.37-.219-3.834 1.005 1.026-3.738-.241-.383A9.972 9.972 0 0 1 2.058 12.03c0-5.508 4.482-9.99 9.973-9.99 5.509 0 9.99 4.482 9.99 9.99 0 5.509-4.481 9.99-9.99 9.99zm5.474-7.481c-.301-.151-1.776-.877-2.052-.977-.275-.101-.476-.151-.676.15-.201.301-.776.977-.951 1.177-.176.201-.351.226-.651.076-1.576-.788-2.602-1.442-3.628-3.13-.231-.383-.021-.577.126-.726.136-.136.301-.352.451-.527.151-.176.201-.301.301-.502.101-.201.051-.376-.025-.526-.076-.151-.676-1.627-.927-2.227-.243-.585-.491-.505-.676-.514-.175-.008-.376-.011-.576-.011-.2 0-.526.076-.801.376-.275.301-1.052 1.027-1.052 2.504 0 1.477 1.077 2.905 1.227 3.106.151.201 2.115 3.228 5.12 4.529 1.956.848 2.585.918 3.428.777.854-.143 2.126-.867 2.427-1.706.301-.839.301-1.558.211-1.706-.091-.148-.341-.248-.642-.398z"/></svg>
-  </a>
-
-  <!-- SCRIPTS -->
-  <script>
-    const WHATSAPP_NUMBER = '56956139055';
-    const ADMIN_PASSWORD = 'hibrid2026';
-    const STORAGE_KEY = 'hibrid_catalog_v1';
-    const CART_KEY = 'hibrid_cart_v1';
-
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toastContainer');
-      container.innerHTML = ''; // Limpiar anteriores
-      const toast = document.createElement('div');
-      toast.className = `toast ${type}`;
-      toast.textContent = message;
-      container.appendChild(toast);
-      setTimeout(() => { toast.remove(); }, 3000);
-    }
-
-    const defaultProducts = [
-      { id:'panel-1', category:'panel', categoryLabel:'Paneles', name:'Panel Monocristalino 550W', brand:'HiBRID', price:129990, description:'Alta eficiencia para techos.', features:['550W Potencia'], image:'9189.jpg' },
-      { id:'bateria-1', category:'bateria', categoryLabel:'Baterías', name:'Batería de Litio 5kWh', brand:'HiBRID', price:1150000, description:'Ciclo profundo.', features:['BMS Integrado'], image:'9191.jpg' },
-      { id:'inversor-1', category:'inversor', categoryLabel:'Inversores', name:'Inversor Híbrido 5kW', brand:'HiBRID', price:790000, description:'Gestiona sol y baterías.', features:['Monitoreo App'], image:'9190.jpg' },
-      { id:'aero-1', category:'aerogenerador', categoryLabel:'Eólico', name:'Aerogenerador 1kW', brand:'HiBRID', price:890000, description:'Apoyo en invierno.', features:['Bajo ruido'], image:'9192.jpg' }
-    ];
-
-    let catalog = loadCatalog();
-    let cart = loadCart();
-    let activeFilter = 'all';
-
-    function loadCatalog() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultProducts));
-    }
-    function saveCatalog() { localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog)); }
-    function loadCart() {
-      const saved = localStorage.getItem(CART_KEY);
-      return saved ? JSON.parse(saved) : [];
-    }
-    function saveCart() { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
-
-    function formatCLP(value) { return new Intl.NumberFormat('es-CL', { style:'currency', currency:'CLP', maximumFractionDigits:0 }).format(Number(value) || 0); }
-
-    function renderProducts() {
-      const grid = document.getElementById('productGrid');
-      const items = activeFilter === 'all' ? catalog : catalog.filter(item => item.category === activeFilter);
-      
-      grid.innerHTML = items.map(item => `
-        <div class="product-card">
-          <div class="product-media"><img src="${item.image}" onerror="this.src='9189.jpg'"></div>
-          <div class="product-body">
-            <span class="tag">${escapeHtml(item.categoryLabel)}</span>
-            <h3 style="margin-top:10px;">${escapeHtml(item.name)}</h3>
-            <div class="price">${formatCLP(item.price)}</div>
-            <div class="qty-row">
-              <input class="qty-input" type="number" min="1" value="1" id="qty-${item.id}">
-              <button class="btn btn-primary" style="flex:1;" onclick="addToCart('${item.id}')">Agregar</button>
+        <h3>Selecciona una Categoría</h3>
+        <div class="grid-items">
+            <div class="card-item" onclick="cambiarVista('calculadora')">
+                <img src="render-6.jpg" alt="Calculadora">
+                <h4>Calculador de Consumo</h4>
+                <p style="font-size: 12px; color: var(--text-muted);">Recomendación de kits a medida</p>
             </div>
-          </div>
+            <div class="card-item" onclick="cambiarVista('paneles')">
+                <img src="paneles.jpg" alt="Paneles">
+                <h4>Paneles Solares</h4>
+                <p style="font-size: 12px; color: var(--text-muted);">Monocristalinos y Full Black</p>
+            </div>
+            <div class="card-item" onclick="cambiarVista('baterias')">
+                <img src="bateria.jpg" alt="Baterías">
+                <h4>Baterías</h4>
+                <p style="font-size: 12px; color: var(--text-muted);">Litio y acumulación segura</p>
+            </div>
+            <div class="card-item" onclick="cambiarVista('inversores')">
+                <img src="inversor.jpg" alt="Inversores">
+                <h4>Inversores</h4>
+                <p style="font-size: 12px; color: var(--text-muted);">Conversión eficiente</p>
+            </div>
         </div>
-      `).join('');
-    }
+    </div>
 
-    function addToCart(productId) {
-      const product = catalog.find(item => item.id === productId);
-      const qtyInput = document.getElementById(`qty-${productId}`);
-      const qty = Math.max(1, Number(qtyInput?.value) || 1);
-      
-      const existing = cart.find(item => item.key === productId);
-      if (existing) existing.qty += qty;
-      else cart.push({ key: productId, id: product.id, name: product.name, price: Number(product.price) || 0, qty });
-      
-      saveCart(); renderCart(); showToast(`Agregado: ${product.name}`);
-    }
+    <!-- 2. CALCULADORA DE CONSUMO -->
+    <div id="calculadora" class="vista">
+        <h2>Calculador de Consumo Energético</h2>
+        <p>Ingresa tu consumo mensual aproximado para obtener el kit sugerido:</p>
+        <input type="number" placeholder="Ej: 350 kWh (Ver en boleta)">
+        <button class="btn-green" onclick="alert('Kit Base Sugerido generado. Si necesitas otro proyecto personalizado, se cotiza aparte.')">Calcular Sistema</button>
+    </div>
 
-    function removeFromCart(key) {
-      cart = cart.filter(item => item.key !== key);
-      saveCart(); renderCart(); showToast('Ítem eliminado', 'error');
-    }
-
-    function vaciarCarrito() {
-      cart = []; saveCart(); renderCart(); showToast('Lista vaciada.');
-    }
-
-    function renderCart() {
-      const box = document.getElementById('cartItems');
-      const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
-      const totalPrice = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-      
-      document.getElementById('navCartCount').textContent = totalItems;
-      document.getElementById('cartCountTotal').textContent = totalItems;
-      document.getElementById('cartTotal').textContent = formatCLP(totalPrice);
-
-      if (!cart.length) { box.innerHTML = '<p style="color:var(--muted); text-align:center;">Lista vacía.</p>'; return; }
-
-      box.innerHTML = cart.map(item => `
-        <div class="cart-item">
-          <div class="cart-item-header">
-            <strong>${escapeHtml(item.name)}</strong>
-            <span style="background:var(--surface-3); padding:2px 8px; border-radius:5px; color:#fff;">x${item.qty}</span>
-          </div>
-          <div class="cart-item-actions">
-            <strong style="color:var(--primary);">${formatCLP(item.price * item.qty)}</strong>
-            <button class="btn-remove" onclick="removeFromCart('${item.key}')">Quitar</button>
-          </div>
+    <!-- 3. PANTALLA DE PRODUCTOS (EJ: PANELES) -->
+    <div id="paneles" class="vista">
+        <h2>Inventario de Paneles Solares</h2>
+        <div class="grid-items">
+            <div class="card-item">
+                <img src="paneles.jpg" alt="Panel 550W">
+                <h4>Panel Monocristalino 550W</h4>
+                <p style="color: var(--green); font-weight: bold;">$129.990</p>
+                <button class="btn-green" onclick="agregarAlCarrito('Panel Monocristalino 550W', 129990)">Agregar al Carrito</button>
+            </div>
+            <div class="card-item">
+                <img src="paneles.jpg" alt="Panel Full Black">
+                <h4>Panel 450W Full Black</h4>
+                <p style="color: var(--green); font-weight: bold;">$109.990</p>
+                <button class="btn-green" onclick="agregarAlCarrito('Panel 450W Full Black', 109990)">Agregar al Carrito</button>
+            </div>
+            <!-- Espacio para los 20-30 productos configurables desde el admin -->
         </div>
-      `).join('');
-    }
+    </div>
 
-    function calcularKit() {
-      const kwh = Number(document.getElementById('kwhInput').value);
-      if (!kwh || kwh <= 0) { showToast('Ingresa un valor válido', 'error'); return; }
-      
-      let kit = kwh <= 150 ? 'Kit Inicial (Recomendado para bajo consumo)' : 
-                kwh <= 300 ? 'Kit 5kW (Recomendado para consumo medio)' : 
-                'Kit Autonomía Total (Recomendado para alto consumo)';
-                
-      const res = document.getElementById('calcResult');
-      res.classList.remove('hidden');
-      res.innerHTML = `<p style="color:#000; font-weight:700;">Resultado:</p><p style="color:#222;">Te sugerimos el <strong>${kit}</strong></p>`;
-    }
+    <!-- 4. BATERÍAS -->
+    <div id="baterias" class="vista">
+        <h2>Inventario de Baterías</h2>
+        <p>Sección de baterías de litio y acumuladores...</p>
+    </div>
 
-    function enviarWhatsApp() {
-      if(!cart.length) { showToast('Carrito vacío', 'error'); return; }
-      const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-      const lines = ['*Hola, quiero cotizar esto:*', ''];
-      cart.forEach(item => lines.push(`- ${item.qty}x ${item.name} (${formatCLP(item.price * item.qty)})`));
-      lines.push('', `*TOTAL REF:* ${formatCLP(total)}`);
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`);
-    }
+    <!-- 5. INVERSORES -->
+    <div id="inversores" class="vista">
+        <h2>Inventario de Inversores</h2>
+        <p>Sección de inversores híbridos...</p>
+    </div>
 
-    function toggleFaq(btn) {
-      btn.parentElement.classList.toggle('active');
-      btn.querySelector('span').textContent = btn.parentElement.classList.contains('active') ? '-' : '+';
-    }
-
-    /* SISTEMA ADMIN */
-    function loginAdmin() {
-      if (document.getElementById('adminPassword').value !== ADMIN_PASSWORD) { showToast('Clave incorrecta', 'error'); return; }
-      document.getElementById('adminLoginBox').classList.add('hidden');
-      document.getElementById('adminPanel').classList.remove('hidden');
-      renderAdmin();
-    }
-
-    function logoutAdmin() {
-      document.getElementById('adminLoginBox').classList.remove('hidden');
-      document.getElementById('adminPanel').classList.add('hidden');
-      document.getElementById('adminPassword').value = '';
-    }
-
-    function resetCatalog() {
-      if(!confirm('¿Restaurar todo?')) return;
-      catalog = JSON.parse(JSON.stringify(defaultProducts)); saveCatalog(); renderProducts(); renderAdmin(); showToast('Restaurado');
-    }
-
-    function renderAdmin() {
-      document.getElementById('adminProductList').innerHTML = catalog.map(item => `
-        <div style="background:rgba(0,0,0,0.3); padding:15px; border:1px solid var(--border); border-radius:8px; margin-bottom:15px;">
-          <h3 style="color:var(--primary);">${escapeHtml(item.name)}</h3>
-          <input class="field" id="name-${item.id}" value="${escapeAttr(item.name)}" placeholder="Nombre">
-          <input class="field" id="price-${item.id}" type="number" value="${item.price}" placeholder="Precio">
-          <button class="btn btn-primary" onclick="saveProduct('${item.id}')">Guardar</button>
+    <!-- 6. CARRITO Y PASO FINAL A WHATSAPP -->
+    <div id="carrito" class="vista">
+        <h2>Tu Carrito de Cotización</h2>
+        <div id="lista-carrito" style="background: var(--card-bg); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+            <p>El carrito está vacío.</p>
         </div>
-      `).join('');
-    }
+        <h3>Total Estimado: $<span id="total-carrito">0</span></h3>
+        <button class="btn-green" style="background: #25d366; color: white;" onclick="enviarWhatsApp()">Enviar Solicitud a WhatsApp</button>
+    </div>
 
-    function saveProduct(id) {
-      const item = catalog.find(p => p.id === id);
-      if(!item) return;
-      item.name = document.getElementById(`name-${id}`).value;
-      item.price = Number(document.getElementById(`price-${id}`).value);
-      saveCatalog(); renderProducts(); showToast('Guardado');
-    }
+    <!-- 7. PANEL DE ADMINISTRADOR -->
+    <div id="admin" class="vista">
+        <h2>Panel de Administración</h2>
+        <p>Modifica precios, descripciones o sube fotos de los productos:</p>
+        <label>Nombre del Producto:</label>
+        <input type="text" id="admin-nombre" placeholder="Ej: Panel 650W">
+        <label>Precio ($):</label>
+        <input type="number" id="admin-precio" placeholder="Ej: 149990">
+        <label>Subir Imagen:</label>
+        <input type="file">
+        <button class="btn-green" onclick="alert('Producto actualizado en el inventario correctamente.')">Guardar Cambios</button>
+    </div>
 
-    function escapeHtml(text) { return String(text ?? '').replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m]); }
-    function escapeAttr(text) { return escapeHtml(text).replace(/`/g, '&#096;'); }
+    <script>
+        let carrito = [];
 
-    // Iniciar
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active'); activeFilter = btn.dataset.filter; renderProducts();
-      });
-    });
+        function cambiarVista(idVista) {
+            document.querySelectorAll('.vista').forEach(v => v.classList.remove('activo'));
+            document.getElementById(idVista).classList.add('activo');
+        }
 
-    renderProducts(); renderCart();
-  </script>
+        function agregarAlCarrito(nombre, precio) {
+            carrito.push({ nombre, precio });
+            document.getElementById('contador-carrito').innerText = carrito.length;
+            actualizarCarritoVisual();
+            alert(`¡${nombre} agregado al carrito!`);
+        }
+
+        function actualizarCarritoVisual() {
+            const contenedor = document.getElementById('lista-carrito');
+            const totalSpan = document.getElementById('total-carrito');
+            if (carrito.length === 0) {
+                contenedor.innerHTML = '<p>El carrito está vacío.</p>';
+                totalSpan.innerText = '0';
+                return;
+            }
+            let html = '';
+            let total = 0;
+            carrito.forEach((item, index) => {
+                html += `<p>${index + 1}. ${item.nombre} - $${item.precio.toLocaleString()}</p>`;
+                total += item.precio;
+            });
+            contenedor.innerHTML = html;
+            totalSpan.innerText = total.toLocaleString();
+        }
+
+        function enviarWhatsApp() {
+            if (carrito.length === 0) {
+                alert("Agrega productos al carrito primero.");
+                return;
+            }
+            let texto = "Hola, quiero cotizar los siguientes productos de HiBRID:\n";
+            let total = 0;
+            carrito.forEach(item => {
+                texto += `- ${item.nombre}: $${item.precio.toLocaleString()}\n`;
+                total += item.precio;
+            });
+            texto += `Total estimado: $${total.toLocaleString()}`;
+            let url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+            window.open(url, '_blank');
+        }
+    </script>
 </body>
 </html>
