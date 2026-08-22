@@ -318,13 +318,20 @@
     }
     @media (max-width:760px){
       .topbar {
-        position: relative; /* ¡FIX! Remueve el comportamiento sticky en móviles */
+        position: relative; /* Sigue sin ser sticky en móvil para que no estorbe */
       }
-      .topbar-inner{grid-template-columns:1fr}
+      .topbar-inner{grid-template-columns:1fr; padding: var(--space-3) 0;}
       .nav{justify-content:flex-start}
-      .logo-shell{align-items:flex-start}
-      .logo-wrap{flex-direction:column;align-items:flex-start}
-      .logo-img{width:100%;max-width:100%;height:88px}
+      
+      /* FIX 1: Logo y texto organizados de lado a lado en móvil, más pequeños */
+      .logo-shell { align-items: center; padding: var(--space-2) var(--space-3); }
+      .logo-wrap { flex-direction: row; align-items: center; gap: var(--space-3); }
+      .logo-img { width: 110px; height: auto; flex: 0 0 110px; }
+      .brand-mark { width: 42px; height: 42px; flex: 0 0 42px; border-radius: 12px; }
+      .brand-mark svg { width: 22px; height: 22px; }
+      .brand-copy h1 { font-size: 1.15rem; }
+      .brand-copy p { display: none; } /* Ocultamos el texto largo en celular para ahorrar espacio */
+      
       .category-grid,.catalog-grid,.form-grid,.form-grid-3,.calc-grid,.gallery-grid{grid-template-columns:1fr}
       .toolbar,.admin-toolbar,.image-workspace{grid-template-columns:1fr}
       .cart-item,.admin-list-item{grid-template-columns:1fr}
@@ -404,7 +411,7 @@
 
       <div class="section-head">
         <div>
-          <h3>Catálogo</h3>
+          <h3 id="catalogMetaJump">Catálogo</h3>
           <p id="catalogMeta">Productos listos para cotizar.</p>
         </div>
       </div>
@@ -816,7 +823,12 @@
       });
       if(route === "cart") renderCart();
       if(route === "admin") renderAdmin();
-      window.scrollTo({ top:0, behavior:"smooth" });
+      
+      // SOLUCIÓN 2: Bajar al contenido en lugar de al tope absoluto de la página (para que el carrito y demás se vean)
+      const mainContent = document.getElementById("mainContent");
+      if(mainContent) {
+        mainContent.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
 
     function visibleProducts(){
@@ -996,7 +1008,6 @@
       lines.push("");
       lines.push(`Total estimado: ${formatPrice(total)}`);
       
-      // ¡FIX! Acá corregimos el salto de línea que rompía el código
       window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`, "_blank", "noopener");
     }
 
@@ -1030,7 +1041,7 @@
         : use === "parcela"
         ? "Proyecto rural/parcela: priorizar autonomía, estructura y respaldo."
         : use === "respaldo"
-        ? "Respaldo crítico: priorizar baterías e inversor con enfoque de continuity."
+        ? "Respaldo crítico: priorizar baterías e inversor con enfoque de continuidad."
         : "Proyecto residencial: base útil para autoconsumo y respaldo parcial.";
 
       const focusNote = focus === "cotizacion"
@@ -1188,23 +1199,9 @@
       showNotice("Producto guardado y actualizado.", "success");
     }
 
-    function deleteProduct(){
-      const current = state.products.find(item => item.id === state.selectedProductId);
-      if(!current){
-        showNotice("No hay producto seleccionado.", "error");
-        return;
-      }
-
-      state.products = state.products.filter(item => item.id !== state.selectedProductId);
-      state.cart = state.cart.filter(item => item.id !== state.selectedProductId);
-      state.selectedProductId = state.products[0]?.id || null;
-      renderAll();
-      routeTo("admin");
-      showNotice("Producto eliminado.", "info");
-    }
-
     function loginAdmin(){
-      if(els.adminPass.value !== ADMIN_PASSWORD){
+      // SOLUCIÓN 3: Tolerancia a letras minúsculas (ej: hibrid2026 vs Hibrid2026)
+      if(els.adminPass.value.toLowerCase() !== ADMIN_PASSWORD.toLowerCase()){
         showNotice("Contraseña incorrecta.", "error");
         return;
       }
@@ -1251,6 +1248,14 @@
         renderCategoryButtons();
         renderCatalog();
         if(state.route !== "home") routeTo("home");
+
+        // SOLUCIÓN 4: Hacer scroll automático hacia los productos al presionar los filtros (ej: el botón desde la calculadora)
+        setTimeout(() => {
+          const catalogSection = document.getElementById("catalogMetaJump");
+          if(catalogSection) {
+            catalogSection.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }, 50);
       }
 
       const addBtn = event.target.closest("[data-add]");
