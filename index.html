@@ -317,6 +317,9 @@
       .toolbar{grid-template-columns:1fr 1fr}
     }
     @media (max-width:760px){
+      .topbar {
+        position: relative; /* ¡FIX! Remueve el comportamiento sticky en móviles */
+      }
       .topbar-inner{grid-template-columns:1fr}
       .nav{justify-content:flex-start}
       .logo-shell{align-items:flex-start}
@@ -992,8 +995,9 @@
       });
       lines.push("");
       lines.push(`Total estimado: ${formatPrice(total)}`);
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("
-"))}`, "_blank", "noopener");
+      
+      // ¡FIX! Acá corregimos el salto de línea que rompía el código
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`, "_blank", "noopener");
     }
 
     function calculateSystem(){
@@ -1026,7 +1030,7 @@
         : use === "parcela"
         ? "Proyecto rural/parcela: priorizar autonomía, estructura y respaldo."
         : use === "respaldo"
-        ? "Respaldo crítico: priorizar baterías e inversor con enfoque de continuidad."
+        ? "Respaldo crítico: priorizar baterías e inversor con enfoque de continuity."
         : "Proyecto residencial: base útil para autoconsumo y respaldo parcial.";
 
       const focusNote = focus === "cotizacion"
