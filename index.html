@@ -1,154 +1,65 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HiBRID | Soluciones Energéticas</title>
   <meta name="description" content="HiBRID - Paneles, baterías, inversores, kits solares y energía eólica con cotización por WhatsApp.">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
-
   <style>
-    :root,[data-theme="light"]{
-      --text-xs:clamp(.75rem,.7rem + .25vw,.875rem);
-      --text-sm:clamp(.875rem,.8rem + .35vw,1rem);
-      --text-base:clamp(1rem,.95rem + .25vw,1.08rem);
-      --text-lg:clamp(1.125rem,1rem + .75vw,1.42rem);
-      --text-xl:clamp(1.45rem,1.2rem + 1.2vw,2rem);
-      --text-hero:clamp(2.55rem,1.3rem + 4.3vw,5rem);
-
-      --space-1:.25rem;
-      --space-2:.5rem;
-      --space-3:.75rem;
-      --space-4:1rem;
-      --space-5:1.25rem;
-      --space-6:1.5rem;
-      --space-8:2rem;
-      --space-10:2.5rem;
-      --space-12:3rem;
-      --space-16:4rem;
-
-      --color-bg:#091118;
-      --color-surface:#101a22;
-      --color-surface-2:#16232d;
-      --color-surface-offset:#1d2b36;
-      --color-surface-dynamic:#243743;
-      --color-border:rgba(235,245,242,.11);
-      --color-divider:rgba(235,245,242,.08);
-
-      --color-text:#f4faf6;
-      --color-text-muted:#9db0b8;
-      --color-text-faint:#72858f;
-      --color-text-inverse:#06120b;
-
-      --color-primary:#28d26d;
-      --color-primary-hover:#1cad58;
-      --color-primary-active:#148444;
-      --color-primary-highlight:rgba(40,210,109,.10);
-
-      --color-success:#47c86f;
-      --color-error:#ff6b6b;
-      --color-warning:#ffbd59;
-      --color-blue:#4b9fff;
-
-      --radius-sm:.5rem;
-      --radius-md:.85rem;
-      --radius-lg:1.15rem;
-      --radius-xl:1.45rem;
-      --radius-full:999px;
-
-      --shadow-sm:0 2px 10px rgba(0,0,0,.16);
-      --shadow-md:0 18px 40px rgba(0,0,0,.26);
-      --shadow-lg:0 24px 60px rgba(0,0,0,.36);
-
-      --font-body:'Satoshi',system-ui,sans-serif;
-      --font-display:'Satoshi',system-ui,sans-serif;
-
-      --max:1240px;
-      --header-h:104px;
-      --transition:180ms cubic-bezier(.16,1,.3,1);
+    :root{
+      --bg:#091118;
+      --surface:#101a22;
+      --surface-2:#16232d;
+      --line:#2b3b47;
+      --text:#f4faf6;
+      --muted:#9db0b8;
+      --green:#28d26d;
+      --green-dark:#1cad58;
+      --danger:#ff6b6b;
+      --max:1200px;
+      --radius:18px;
+      --shadow:0 18px 40px rgba(0,0,0,.26);
     }
 
-    [data-theme="dark"]{
-      --color-bg:#060c10;
-      --color-surface:#0d161d;
-      --color-surface-2:#12202a;
-      --color-surface-offset:#182832;
-      --color-surface-dynamic:#203541;
-      --color-border:rgba(240,248,245,.10);
-      --color-divider:rgba(240,248,245,.07);
-
-      --color-text:#f2faf5;
-      --color-text-muted:#a8bac2;
-      --color-text-faint:#788993;
-
-      --color-primary:#31da76;
-      --color-primary-hover:#24c965;
-      --color-primary-active:#1ca350;
-      --color-primary-highlight:rgba(49,218,118,.12);
-    }
-
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{-webkit-text-size-adjust:none;text-size-adjust:none;scroll-behavior:smooth}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
     body{
-      min-height:100dvh;
-      font-family:var(--font-body);
-      font-size:var(--text-base);
-      line-height:1.6;
-      color:var(--color-text);
+      margin:0;
+      font-family:Arial,sans-serif;
+      color:var(--text);
       background:
         radial-gradient(circle at top right, rgba(40,210,109,.10), transparent 28%),
         linear-gradient(180deg,#071016 0%, #0f1922 100%);
     }
 
-    img,svg{display:block;max-width:100%;height:auto}
-    button,input,textarea,select{font:inherit;color:inherit}
-    button{cursor:pointer;background:none;border:0}
-    a{text-decoration:none;color:inherit}
-    :focus-visible{outline:2px solid var(--color-primary);outline-offset:3px;border-radius:var(--radius-sm)}
-
-    .skip-link{
-      position:absolute;left:-999px;top:var(--space-4);z-index:999;
-      background:var(--color-primary);color:var(--color-text-inverse);
-      padding:var(--space-3) var(--space-4);border-radius:var(--radius-md)
-    }
-    .skip-link:focus{left:var(--space-4)}
+    img{display:block;max-width:100%}
+    button,input,textarea{font:inherit}
+    button{cursor:pointer}
 
     .topbar{
       position:sticky;
       top:0;
-      z-index:50;
-      background:rgba(16,26,34,.94);
-      border-bottom:1px solid var(--color-border);
-      backdrop-filter:blur(12px);
+      z-index:30;
+      background:rgba(16,26,34,.97);
+      border-bottom:1px solid var(--line);
+      backdrop-filter:blur(8px);
     }
 
     .topbar-inner{
       width:min(calc(100% - 24px), var(--max));
       margin:auto;
-      display:grid;
-      grid-template-columns:1fr auto;
+      display:flex;
       align-items:center;
-      gap:var(--space-4);
-      padding:var(--space-4) 0;
-      min-height:var(--header-h);
+      justify-content:space-between;
+      gap:16px;
+      padding:10px 0;
+      flex-wrap:wrap;
     }
 
     .logo-wrap{
-      min-width:0;
-      display:flex;
-      align-items:center;
-      gap:var(--space-4);
-    }
-
-    .brand-mark{
-      width:58px;height:58px;border-radius:18px;
-      display:grid;place-items:center;flex:0 0 auto;
-      background:linear-gradient(145deg,var(--color-primary),#92f1b6);
-      color:var(--color-text-inverse);
-      box-shadow:var(--shadow-md);
+      flex:1 1 340px;
+      min-width:260px;
     }
 
     .logo{
@@ -159,704 +70,384 @@
       object-position:left center;
     }
 
-    .fallback-logo{
-      display:flex;
-      flex-direction:column;
-      min-width:0;
-    }
-
-    .fallback-logo h1{
-      font-family:var(--font-display);
-      font-size:var(--text-xl);
-      line-height:1.02;
-      letter-spacing:-.03em;
-      font-weight:900;
-    }
-
-    .fallback-logo p{
-      color:var(--color-text-muted);
-      font-size:var(--text-sm);
-    }
-
     .nav{
       display:flex;
-      gap:var(--space-2);
+      gap:8px;
       flex-wrap:wrap;
       justify-content:flex-end;
-      align-items:center;
     }
 
-    .btn{
+    .nav button,.btn{
       min-height:44px;
-      padding:.78rem 1rem;
-      border-radius:.85rem;
-      border:1px solid var(--color-border);
-      background:var(--color-surface-2);
-      color:var(--color-text);
-      font-weight:800;
-      font-size:var(--text-sm);
-      transition:background var(--transition),border-color var(--transition),transform var(--transition),color var(--transition),box-shadow var(--transition);
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:.55rem;
+      padding:11px 16px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:var(--surface-2);
+      color:var(--text);
+      font-weight:700;
+      transition:.2s ease;
     }
 
-    .btn:hover{transform:translateY(-1px)}
+    .nav button:hover,
+    .nav button.active,
     .btn.primary{
-      background:var(--color-primary);
-      border-color:var(--color-primary);
-      color:var(--color-text-inverse);
+      background:var(--green);
+      border-color:var(--green);
+      color:#06120b;
     }
-    .btn.primary:hover{background:var(--color-primary-hover);border-color:var(--color-primary-hover)}
-    .btn.secondary{
-      background:var(--color-surface-2);
-      color:var(--color-text);
-    }
-    .btn.secondary:hover{background:var(--color-surface-offset)}
-    .btn.ghost{
-      background:transparent;
-      color:var(--color-text);
-    }
-    .btn.small{
-      min-height:38px;
-      padding:.55rem .8rem;
-      border-radius:.75rem;
-      font-size:var(--text-xs);
-    }
+
+    .btn.primary:hover{background:var(--green-dark)}
     .btn.full{width:100%}
-    .btn.danger{
-      background:rgba(255,107,107,.10);
-      border-color:rgba(255,107,107,.28);
-      color:#ffd0d0;
-    }
-    .btn.success{
-      background:rgba(40,210,109,.12);
-      border-color:rgba(40,210,109,.30);
-      color:#dcffe8;
-    }
+    .btn.ghost{background:transparent}
+    .btn.small{min-height:36px;padding:8px 11px;border-radius:10px}
 
     .page{
       width:min(calc(100% - 24px), var(--max));
       margin:auto;
-      padding:var(--space-8) 0 var(--space-16);
+      padding:28px 0 60px;
     }
 
     .view{display:none}
     .view.active{display:block}
 
     .hero{
-      display:grid;
-      grid-template-columns:1.15fr .85fr;
-      gap:var(--space-6);
-      align-items:stretch;
-      margin-bottom:var(--space-10);
+      padding:28px 0 20px;
+      text-align:center;
     }
 
-    .hero-main,.hero-side,.card,.panel,.product,.admin-card,.summary-card,.login-card{
-      background:rgba(16,26,34,.96);
-      border:1px solid var(--color-border);
-      border-radius:var(--radius-xl);
-      box-shadow:var(--shadow-md);
-    }
-
-    .hero-main{
-      padding:clamp(1.5rem,3vw,2.5rem);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .hero-main::after{
-      content:"";
-      position:absolute;
-      right:-50px;bottom:-50px;
-      width:220px;height:220px;border-radius:50%;
-      background:radial-gradient(circle, rgba(40,210,109,.18), transparent 70%);
-      pointer-events:none;
-    }
-
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:.5rem;
-      padding:.4rem .75rem;
-      border-radius:var(--radius-full);
-      background:var(--color-primary-highlight);
-      color:var(--color-primary);
-      font-size:var(--text-xs);
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-    }
-
-    .hero-main h2{
-      margin:var(--space-4) 0 .6rem;
-      font-size:var(--text-hero);
-      line-height:.98;
-      letter-spacing:-.05em;
-      max-width:11ch;
-    }
-
-    .hero-main p{
-      max-width:62ch;
-      color:var(--color-text-muted);
-    }
-
-    .hero-actions{
-      display:flex;
-      gap:var(--space-3);
-      flex-wrap:wrap;
-      margin-top:var(--space-6);
-    }
-
-    .hero-side{
-      padding:var(--space-5);
-      display:grid;
-      gap:var(--space-4);
-      align-content:start;
-    }
-
-    .kpi-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:var(--space-3);
-    }
-
-    .kpi{
-      padding:var(--space-4);
-      border-radius:var(--radius-lg);
-      border:1px solid var(--color-border);
-      background:rgba(255,255,255,.02);
-    }
-
-    .kpi strong{
-      display:block;
-      font-size:1.9rem;
+    .hero h1{
+      margin:0 0 10px;
+      font-size:clamp(2.4rem, 6vw, 5rem);
       line-height:1;
-      font-weight:900;
-      font-variant-numeric:tabular-nums;
     }
 
-    .kpi span{
-      display:block;
-      margin-top:.4rem;
-      color:var(--color-text-muted);
-      font-size:var(--text-sm);
+    .hero p{
+      max-width:720px;
+      margin:auto;
+      color:var(--muted);
+      font-size:1.05rem;
     }
 
-    .section-head{
-      display:flex;
-      align-items:end;
-      justify-content:space-between;
-      gap:var(--space-4);
-      margin:var(--space-8) 0 var(--space-4);
-    }
-
-    .section-head h3,.section-head h2{
-      font-size:var(--text-lg);
-      font-weight:800;
-      letter-spacing:-.02em;
-      margin:0;
-    }
-
-    .section-head p{
-      color:var(--color-text-muted);
-      font-size:var(--text-sm);
-      margin:0;
+    .section-title{
+      margin:0 0 16px;
+      font-size:1.45rem;
     }
 
     .grid{
       display:grid;
       grid-template-columns:repeat(3,1fr);
-      gap:var(--space-4);
+      gap:18px;
+    }
+
+    .card,.panel,.product,.admin-card{
+      background:rgba(16,26,34,.96);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
     }
 
     .card,.product{
       overflow:hidden;
-      transition:transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .card{
+      cursor:pointer;
+      transition:transform .2s ease, border-color .2s ease;
     }
 
     .card:hover,.product:hover{
       transform:translateY(-3px);
-      border-color:rgba(40,210,109,.32);
-      box-shadow:var(--shadow-lg);
+      border-color:var(--green);
     }
 
     .card img,.product img{
       width:100%;
-      height:210px;
+      height:190px;
       object-fit:cover;
       background:#0a1319;
     }
 
     .content{
-      padding:var(--space-4);
+      padding:16px;
     }
 
-    .content h3,.content h4{
-      margin:0 0 .5rem;
-      font-size:var(--text-base);
-      line-height:1.15;
+    .content h3{
+      margin:0 0 8px;
+      font-size:1.18rem;
     }
 
     .muted{
-      color:var(--color-text-muted);
+      color:var(--muted);
       line-height:1.55;
     }
 
-    .tiny{font-size:var(--text-xs)}
-    .small{font-size:var(--text-sm)}
-    .helper{font-size:var(--text-xs);color:var(--color-text-muted)}
-
-    .panel,.summary-card,.login-card{
-      padding:var(--space-5);
+    .panel{
+      padding:22px;
     }
 
-    .panel h2,.panel h3,.summary-card h2,.summary-card h3,.login-card h2{
+    .panel h2,.panel h3{
       margin-top:0;
-      margin-bottom:.5rem;
     }
 
     .two{
       display:grid;
       grid-template-columns:.92fr 1.08fr;
-      gap:var(--space-5);
+      gap:22px;
     }
 
     .three{
       display:grid;
-      grid-template-columns:1.15fr .85fr;
-      gap:var(--space-5);
+      grid-template-columns:1.2fr .8fr;
+      gap:22px;
     }
 
     .bill{
       width:100%;
-      max-height:440px;
+      max-height:430px;
       object-fit:contain;
       background:#091118;
-      border:1px solid var(--color-border);
-      border-radius:var(--radius-lg);
-      margin-top:var(--space-4);
+      border:1px solid var(--line);
+      border-radius:14px;
     }
 
     label{
       display:block;
-      margin:var(--space-4) 0 .45rem;
-      font-weight:800;
+      margin:14px 0 7px;
+      font-weight:700;
     }
 
-    input,textarea,select{
+    input,textarea{
       width:100%;
-      padding:.9rem 1rem;
-      border-radius:.85rem;
-      border:1px solid var(--color-border);
+      padding:13px;
+      border-radius:12px;
+      border:1px solid var(--line);
       background:#1a2934;
-      color:var(--color-text);
+      color:var(--text);
       outline:none;
     }
 
     textarea{
-      min-height:104px;
+      min-height:94px;
       resize:vertical;
     }
 
-    input:focus,textarea:focus,select:focus{
-      border-color:var(--color-primary);
+    input:focus,textarea:focus{
+      border-color:var(--green);
       box-shadow:0 0 0 3px rgba(40,210,109,.12);
     }
 
     .price{
-      color:var(--color-primary);
-      font-size:var(--text-lg);
-      font-weight:900;
-      margin:.9rem 0;
+      color:var(--green);
+      font-size:1.14rem;
+      font-weight:800;
+      margin:12px 0;
     }
 
     .empty{
-      padding:var(--space-6);
+      padding:24px;
       text-align:center;
-      color:var(--color-text-muted);
-      border:1px dashed var(--color-border);
-      border-radius:var(--radius-lg);
-      background:rgba(255,255,255,.02);
+      color:var(--muted);
+      border:1px dashed var(--line);
+      border-radius:14px;
     }
 
     .result{
-      margin-top:var(--space-4);
-      padding:var(--space-4);
-      border-radius:var(--radius-lg);
-      border:1px solid rgba(40,210,109,.35);
+      margin-top:18px;
+      padding:18px;
+      border-radius:14px;
+      border:1px solid rgba(40,210,109,.45);
       background:rgba(40,210,109,.08);
     }
 
     .toolbar{
       display:flex;
       flex-wrap:wrap;
-      gap:var(--space-2);
-      margin:var(--space-4) 0;
+      gap:8px;
+      margin:16px 0;
     }
 
-    .toolbar button,.toolbar .filter-pill{
+    .toolbar button{
       min-height:40px;
-      padding:.65rem .8rem;
-      border-radius:.75rem;
-      border:1px solid var(--color-border);
-      background:var(--color-surface-2);
-      color:var(--color-text);
-      font-weight:800;
-      font-size:var(--text-sm);
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:var(--surface-2);
+      color:var(--text);
+      font-weight:700;
     }
 
-    .toolbar button.active,.toolbar .filter-pill.active{
-      background:var(--color-primary);
-      border-color:var(--color-primary);
-      color:var(--color-text-inverse);
-    }
-
-    .catalog-toolbar{
-      display:grid;
-      grid-template-columns:1.2fr .7fr .7fr auto;
-      gap:var(--space-3);
-      margin:0 0 var(--space-5);
-    }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      padding:.3rem .7rem;
-      border-radius:var(--radius-full);
-      background:var(--color-primary-highlight);
-      color:var(--color-primary);
-      font-size:var(--text-xs);
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:.06em;
-    }
-
-    .meta{
-      display:flex;
-      justify-content:space-between;
-      gap:var(--space-2);
-      color:var(--color-text-muted);
-      font-size:var(--text-xs);
-      margin-top:.6rem;
+    .toolbar button.active{
+      background:var(--green);
+      border-color:var(--green);
+      color:#06120b;
     }
 
     .cart-row{
-      display:grid;
-      grid-template-columns:96px 1fr auto;
-      gap:var(--space-4);
-      padding:var(--space-4);
-      border-radius:var(--radius-lg);
-      border:1px solid var(--color-border);
-      background:rgba(255,255,255,.02);
-      margin-bottom:var(--space-4);
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      padding:15px 0;
+      border-bottom:1px solid var(--line);
     }
 
-    .cart-row:last-child{margin-bottom:0}
-
-    .cart-thumb{
-      width:96px;height:96px;border-radius:var(--radius-md);overflow:hidden;background:#091118;
-    }
-
-    .cart-thumb img{
-      width:100%;height:100%;object-fit:cover;
-    }
+    .cart-row:last-child{border-bottom:0}
 
     .qty{
       display:flex;
-      gap:var(--space-2);
+      gap:6px;
       flex-wrap:wrap;
-      margin-top:var(--space-3);
+      margin-top:8px;
     }
 
-    .summary-line{
-      display:flex;
-      justify-content:space-between;
-      gap:var(--space-3);
-      padding:var(--space-3) 0;
-      border-bottom:1px solid var(--color-divider);
-    }
-
-    .summary-line:last-child{
-      border-bottom:0;
-      font-size:var(--text-lg);
-      font-weight:900;
-      padding-top:var(--space-4);
-    }
-
-    .admin-layout{
-      display:grid;
-      grid-template-columns:360px 1fr;
-      gap:var(--space-5);
-      align-items:start;
-    }
-
-    .admin-list{
-      display:grid;
-      gap:var(--space-3);
-    }
-
-    .admin-item{
-      display:grid;
-      grid-template-columns:84px 1fr auto;
-      gap:var(--space-3);
-      padding:var(--space-3);
-      border-radius:var(--radius-lg);
-      border:1px solid var(--color-border);
-      background:rgba(255,255,255,.02);
-    }
-
-    .admin-item.active{
-      border-color:rgba(40,210,109,.35);
-      background:rgba(40,210,109,.06);
-    }
-
-    .admin-item img{
-      width:84px;height:84px;object-fit:cover;border-radius:var(--radius-md);background:#091118;
+    .admin-card{
+      margin-top:14px;
+      padding:16px;
     }
 
     .admin-preview{
       display:grid;
-      grid-template-columns:180px 1fr;
-      gap:var(--space-4);
+      grid-template-columns:140px 1fr;
+      gap:16px;
       align-items:start;
     }
 
-    .admin-preview-box{
+    .admin-preview img{
       width:100%;
-      aspect-ratio:1/1;
-      overflow:hidden;
-      border-radius:var(--radius-lg);
-      border:1px solid var(--color-border);
+      height:120px;
+      object-fit:cover;
+      border-radius:12px;
+      border:1px solid var(--line);
       background:#091118;
     }
 
-    .admin-preview-box img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-    }
-
-    .admin-form{
-      display:grid;
-      gap:var(--space-4);
-    }
-
-    .form-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:var(--space-4);
-    }
-
-    .form-grid-3{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:var(--space-4);
-    }
-
-    .notice-stack{
-      position:fixed;
-      top:calc(var(--header-h) + 10px);
-      right:var(--space-4);
-      z-index:80;
-      display:grid;
-      gap:var(--space-3);
-      width:min(360px,calc(100vw - 2rem));
-    }
-
-    .notice{
-      padding:var(--space-4);
-      border-radius:var(--radius-lg);
-      box-shadow:var(--shadow-lg);
-      background:var(--color-surface);
-      border:1px solid var(--color-border);
-    }
-
-    .notice.success{border-color:rgba(40,210,109,.35)}
-    .notice.error{border-color:rgba(255,107,107,.35)}
-    .notice.info{border-color:rgba(75,159,255,.28)}
-
-    .sticky-cart{
-      position:fixed;
-      right:var(--space-4);
-      bottom:var(--space-4);
-      z-index:60;
+    .check{
       display:flex;
-      gap:var(--space-3);
       align-items:center;
-      background:rgba(16,26,34,.96);
-      border:1px solid var(--color-border);
-      border-radius:var(--radius-full);
-      padding:.7rem .8rem .7rem 1rem;
-      box-shadow:var(--shadow-lg);
-      backdrop-filter:blur(10px);
+      gap:8px;
+      margin:14px 0;
+      color:var(--green);
     }
 
-    .sticky-cart strong{display:block;font-size:var(--text-sm)}
-    .sticky-cart span{display:block;font-size:var(--text-xs);color:var(--color-text-muted)}
+    .check input{
+      width:auto;
+      margin:0;
+    }
 
-    .hidden{display:none!important}
+    .helper{
+      font-size:.92rem;
+      color:var(--muted);
+    }
 
-    @media (max-width:1100px){
-      .hero,.two,.three,.admin-layout{grid-template-columns:1fr}
+    @media (max-width: 900px){
       .grid{grid-template-columns:repeat(2,1fr)}
-      .catalog-toolbar{grid-template-columns:1fr 1fr}
+      .two,.three{grid-template-columns:1fr}
     }
 
-    @media (max-width:760px){
-      .topbar-inner{grid-template-columns:1fr}
-      .nav{justify-content:flex-start}
-      .logo{max-width:none;height:88px;object-position:left center}
-      .grid,.catalog-toolbar,.form-grid,.form-grid-3{grid-template-columns:1fr}
-      .cart-row,.admin-preview,.admin-item{grid-template-columns:1fr}
-      .cart-thumb,.admin-item img{width:100%;height:auto;aspect-ratio:4/3}
-      .sticky-cart{
-        left:var(--space-3);
-        right:var(--space-3);
-        bottom:var(--space-3);
-        justify-content:space-between;
-        border-radius:var(--radius-xl);
+    @media (max-width: 580px){
+      .logo{
+        max-width:none;
+        height:92px;
+        object-position:center;
       }
-      .notice-stack{
-        left:var(--space-3);
-        right:var(--space-3);
-        width:auto;
-      }
-    }
 
-    @media (max-width:580px){
-      .topbar-inner{justify-content:center}
-      .nav{width:100%;justify-content:center}
+      .topbar-inner{
+        justify-content:center;
+      }
+
+      .nav{
+        width:100%;
+        justify-content:center;
+      }
+
       .grid{grid-template-columns:1fr}
-      .hero-main h2{max-width:12ch}
-    }
-
-    @media (prefers-reduced-motion:reduce){
-      *,*::before,*::after{
-        animation-duration:.01ms!important;
-        animation-iteration-count:1!important;
-        transition-duration:.01ms!important;
-        scroll-behavior:auto!important;
-      }
+      .cart-row{flex-direction:column}
+      .admin-preview{grid-template-columns:1fr}
     }
   </style>
 </head>
 <body>
-  <a class="skip-link" href="#mainContent">Saltar al contenido</a>
-
   <header class="topbar">
     <div class="topbar-inner">
       <div class="logo-wrap">
-        <div class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 64 64" width="30" height="30" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10 36 32 10l22 26"/>
-            <path d="M18 36h28"/>
-            <path d="M24 36l8 18 8-18"/>
-          </svg>
-        </div>
-        <img src="logohi.jpg" alt="Logo HiBRID" class="logo" onerror="this.style.display='none';document.getElementById('fallbackLogo').classList.remove('hidden')">
-        <div id="fallbackLogo" class="fallback-logo hidden">
-          <h1>HiBRID</h1>
-          <p>Soluciones energéticas con aire y sol.</p>
-        </div>
+        <img src="logohi.jpg" alt="Logo HiBRID" class="logo" onerror="this.style.display='none'">
       </div>
 
-      <nav class="nav" aria-label="Principal">
-        <button class="btn secondary nav-btn" data-route="home" type="button">Inicio</button>
-        <button class="btn secondary nav-btn" data-route="cart" type="button">🛒 Carrito (<span id="cartCount">0</span>)</button>
-        <button class="btn secondary nav-btn" data-route="calculator" type="button">Calculadora</button>
-        <button class="btn secondary nav-btn" data-route="admin-login" type="button">⚙️ Administrador</button>
-        <button class="btn secondary" data-theme-toggle type="button" aria-label="Cambiar tema">◐</button>
+      <nav class="nav">
+        <button data-nav="home" onclick="go('home')">Inicio</button>
+        <button data-nav="cart" onclick="go('cart')">🛒 Carrito (<span id="cartCount">0</span>)</button>
+        <button data-nav="admin-login" onclick="go('admin-login')">⚙️ Administrador</button>
       </nav>
     </div>
   </header>
 
-  <main id="mainContent" class="page">
+  <main class="page">
     <section id="home" class="view active">
       <div class="hero">
-        <article class="hero-main">
-          <span class="eyebrow">Catálogo + cotizador</span>
-          <h2>Soluciones energéticas claras, funcionales y listas para vender.</h2>
-          <p>Revisa categorías, filtra productos, calcula consumo, arma tu carrito y envía el resumen a WhatsApp. Todo en una sola interfaz y con edición directa desde administrador.</p>
-          <div class="hero-actions">
-            <button class="btn primary" type="button" data-route="calculator">Ir a calculadora</button>
-            <button class="btn secondary" type="button" data-filter="all">Ver todo</button>
+        <h1>HiBRID</h1>
+        <p>Soluciones energéticas con aire y sol. Revisa categorías, calcula tu consumo y cotiza por WhatsApp.</p>
+      </div>
+
+      <h2 class="section-title">Áreas principales</h2>
+
+      <div class="grid">
+        <article class="card" onclick="go('calculator')">
+          <img src="boleta.jpg" alt="Calculadora de consumo" onerror="this.src='kitsolar.jpg'">
+          <div class="content">
+            <h3>Calculadora</h3>
+            <p class="muted">Usa tu boleta para estimar qué kit te conviene.</p>
           </div>
         </article>
 
-        <aside class="hero-side">
-          <div class="kpi-grid">
-            <div class="kpi">
-              <strong id="kpiProducts">0</strong>
-              <span>Productos visibles</span>
-            </div>
-            <div class="kpi">
-              <strong id="kpiCart">0</strong>
-              <span>Ítems en carrito</span>
-            </div>
-            <div class="kpi">
-              <strong>6</strong>
-              <span>Categorías activas</span>
-            </div>
-            <div class="kpi">
-              <strong>24/7</strong>
-              <span>Cotización rápida</span>
-            </div>
+        <article class="card" onclick="openCategory('paneles')">
+          <img src="paneles.jpg" alt="Paneles solares" onerror="this.src='logohi.jpg'">
+          <div class="content">
+            <h3>Paneles</h3>
+            <p class="muted">Paneles solares para distintos proyectos.</p>
           </div>
+        </article>
 
-          <div class="panel">
-            <h3>Incluye</h3>
-            <p class="muted small">Catálogo con imágenes, categorías, carrito, calculadora referencial, resumen, envío por WhatsApp y panel admin con creación, edición, visibilidad y borrado de productos.</p>
+        <article class="card" onclick="openCategory('baterias')">
+          <img src="bateria.jpg" alt="Baterías" onerror="this.src='logohi.jpg'">
+          <div class="content">
+            <h3>Baterías</h3>
+            <p class="muted">Respaldo y almacenamiento energético.</p>
           </div>
-        </aside>
+        </article>
+
+        <article class="card" onclick="openCategory('inversores')">
+          <img src="inversor.jpg" alt="Inversores" onerror="this.src='logohi.jpg'">
+          <div class="content">
+            <h3>Inversores</h3>
+            <p class="muted">Conversión y control del sistema.</p>
+          </div>
+        </article>
+
+        <article class="card" onclick="openCategory('kits')">
+          <img src="kitsolar.jpg" alt="Kits solares" onerror="this.src='logohi.jpg'">
+          <div class="content">
+            <h3>Kits Solar</h3>
+            <p class="muted">Sistemas completos para consumo residencial y mayor autonomía.</p>
+          </div>
+        </article>
+
+        <article class="card" onclick="openCategory('eolico')">
+          <img src="eolica.jpg" alt="Energía eólica" onerror="this.src='logohi.jpg'">
+          <div class="content">
+            <h3>Eólica</h3>
+            <p class="muted">Equipos para complementar con energía del viento.</p>
+          </div>
+        </article>
       </div>
-
-      <div class="section-head">
-        <div>
-          <h2>Categorías principales</h2>
-          <p>Acceso directo por línea de producto.</p>
-        </div>
-      </div>
-
-      <div id="categoryGrid" class="grid"></div>
-
-      <div class="section-head">
-        <div>
-          <h2>Catálogo</h2>
-          <p id="catalogInfo">Todos los productos visibles listos para cotizar.</p>
-        </div>
-      </div>
-
-      <div class="catalog-toolbar">
-        <input id="searchInput" type="search" placeholder="Buscar producto, categoría o ID">
-        <select id="categorySelect"></select>
-        <select id="sortSelect">
-          <option value="featured">Orden recomendado</option>
-          <option value="price-asc">Precio menor a mayor</option>
-          <option value="price-desc">Precio mayor a menor</option>
-          <option value="name-asc">Nombre A-Z</option>
-        </select>
-        <button id="clearFiltersBtn" class="btn secondary" type="button">Limpiar</button>
-      </div>
-
-      <div id="catalogGrid" class="grid"></div>
     </section>
 
     <section id="calculator" class="view">
-      <div class="section-head" style="margin-top:0">
-        <div>
-          <h2>Calculadora de consumo</h2>
-          <p>Estimación referencial para orientar la cotización.</p>
-        </div>
-        <button class="btn ghost" type="button" data-route="home">← Volver al inicio</button>
-      </div>
+      <button class="btn ghost" onclick="go('home')">← Volver al inicio</button>
 
       <div class="two">
         <div class="panel">
           <h2>¿Dónde ver tu consumo?</h2>
           <p class="muted">Busca en tu boleta el consumo mensual en kWh. Esa cifra sirve como referencia inicial para recomendar un kit.</p>
-          <img src="boleta.jpg" alt="Ejemplo de boleta de luz" class="bill" width="900" height="1200" loading="lazy" onerror="this.style.display='none'">
+          <img src="boleta.jpg" alt="Ejemplo de boleta de luz" class="bill" onerror="this.style.display='none'">
         </div>
 
         <div class="panel">
@@ -866,510 +457,269 @@
           <label for="kwh">Consumo mensual (kWh)</label>
           <input id="kwh" type="number" min="1" placeholder="Ejemplo: 320">
 
-          <label for="usageType">Uso principal</label>
-          <select id="usageType">
-            <option value="hogar">Hogar</option>
-            <option value="negocio">Negocio</option>
-            <option value="campo">Campo / parcela</option>
-            <option value="respaldo">Respaldo crítico</option>
-          </select>
-
-          <div style="margin-top:var(--space-4)">
-            <button class="btn primary full" type="button" id="calcBtn">Calcular recomendación</button>
-          </div>
-
+          <button class="btn primary full" onclick="calculate()">Calcular recomendación</button>
           <div id="calcResult"></div>
         </div>
       </div>
     </section>
 
-    <section id="cart" class="view">
-      <div class="section-head" style="margin-top:0">
-        <div>
-          <h2>Tu carrito</h2>
-          <p>Resumen listo para cotizar y enviar.</p>
-        </div>
-        <button class="btn ghost" type="button" data-route="home">← Seguir viendo productos</button>
+    <section id="category" class="view">
+      <button class="btn ghost" onclick="go('home')">← Volver al inicio</button>
+
+      <div class="panel">
+        <h2 id="catTitle">Categoría</h2>
+        <p id="catDesc" class="muted"></p>
+        <div id="productGrid" class="grid"></div>
       </div>
+    </section>
+
+    <section id="cart" class="view">
+      <button class="btn ghost" onclick="go('home')">← Seguir viendo productos</button>
 
       <div class="three">
         <div class="panel">
+          <h2>Tu carrito</h2>
           <div id="cartList"></div>
         </div>
 
-        <div class="summary-card">
+        <div class="panel">
           <h2>Resumen de cotización</h2>
-          <div id="summaryBox"></div>
-          <div style="display:grid;gap:var(--space-3);margin-top:var(--space-5)">
-            <button class="btn primary full" type="button" id="sendWaBtn">Enviar a WhatsApp</button>
-            <button class="btn secondary full" type="button" id="clearCartBtn">Vaciar carrito</button>
-          </div>
+          <p>Total estimado: <strong>$<span id="cartTotal">0</span></strong></p>
+
+          <button class="btn primary full" onclick="sendWhatsApp()">Enviar a WhatsApp</button>
+          <button class="btn full" onclick="clearCart()">Vaciar carrito</button>
         </div>
       </div>
     </section>
 
     <section id="admin-login" class="view">
-      <div class="section-head" style="margin-top:0">
-        <div>
-          <h2>Administrador</h2>
-          <p>Acceso para editar catálogo y productos.</p>
-        </div>
-        <button class="btn ghost" type="button" data-route="home">← Volver al inicio</button>
-      </div>
+      <button class="btn ghost" onclick="go('home')">← Volver al inicio</button>
 
-      <div class="login-card" style="max-width:460px;margin:auto;">
+      <div class="panel" style="max-width:460px;margin:auto;">
         <h2>Administrador</h2>
         <p class="muted">Ingresa para editar productos, textos, precios, imágenes y visibilidad.</p>
 
         <label for="adminPass">Contraseña</label>
         <input id="adminPass" type="password" placeholder="Contraseña">
 
-        <div style="margin-top:var(--space-4)">
-          <button class="btn primary full" type="button" id="loginBtn">Entrar al administrador</button>
-        </div>
-        <div class="helper" style="margin-top:.6rem">Contraseña por defecto: Hibrid2026</div>
+        <button class="btn primary full" onclick="loginAdmin()">Entrar al administrador</button>
       </div>
     </section>
 
     <section id="admin" class="view">
-      <div class="section-head" style="margin-top:0">
-        <div>
-          <h2>Panel de administración</h2>
-          <p>Foto, datos, visibilidad, edición y creación de productos en la misma interfaz.</p>
-        </div>
-        <button class="btn ghost" type="button" data-route="home">← Salir del administrador</button>
-      </div>
+      <button class="btn ghost" onclick="go('home')">← Salir del administrador</button>
 
-      <div class="admin-layout">
-        <aside class="panel">
-          <div class="toolbar">
-            <select id="adminCategoryFilter"></select>
-            <button class="btn primary" type="button" id="newProductBtn">+ Nuevo producto</button>
-          </div>
-          <div id="adminList" class="admin-list"></div>
-        </aside>
+      <div class="panel">
+        <h2>Panel de administración</h2>
+        <p class="muted">Aquí ves la foto con los datos del producto y puedes editar nombre, precio, descripción, archivo de imagen y visibilidad.</p>
 
-        <section class="panel">
-          <form id="adminForm" class="admin-form">
-            <div class="form-grid-3">
-              <div>
-                <label for="productId">ID</label>
-                <input id="productId" type="text" placeholder="prod-001">
-              </div>
-              <div>
-                <label for="productCategory">Categoría</label>
-                <select id="productCategory"></select>
-              </div>
-              <div>
-                <label for="productVisible">Visible</label>
-                <select id="productVisible">
-                  <option value="true">Sí</option>
-                  <option value="false">No</option>
-                </select>
-              </div>
-            </div>
+        <div id="adminTabs" class="toolbar"></div>
 
-            <div class="form-grid">
-              <div>
-                <label for="productName">Nombre del producto</label>
-                <input id="productName" type="text" placeholder="Nombre del producto">
-              </div>
-              <div>
-                <label for="productPrice">Precio</label>
-                <input id="productPrice" type="number" min="0" step="1000" placeholder="0">
-              </div>
-            </div>
+        <button class="btn primary full" onclick="newProduct()">+ Agregar producto a esta categoría</button>
 
-            <div>
-              <label for="productDescription">Descripción</label>
-              <textarea id="productDescription" placeholder="Descripción del producto"></textarea>
-            </div>
-
-            <div class="admin-preview">
-              <div class="admin-preview-box">
-                <img id="previewImage" src="paneles.jpg" alt="Vista previa del producto" width="600" height="600" loading="lazy" onerror="this.src='https://picsum.photos/seed/hibrid-preview/600/600'">
-              </div>
-
-              <div>
-                <label for="productImage">Imagen</label>
-                <input id="productImage" type="text" placeholder="paneles.jpg o URL completa">
-                <div class="helper" style="margin-top:.4rem">Ejemplo: paneles.jpg, bateria.jpg, inversor.jpg, kitsolar.jpg, eolica.jpg</div>
-
-                <label for="productImageFile">Preview local opcional</label>
-                <input id="productImageFile" type="file" accept="image/*">
-                <div class="helper" style="margin-top:.4rem">Solo para previsualizar en el navegador.</div>
-              </div>
-            </div>
-
-            <div class="form-grid">
-              <button class="btn primary full" type="submit">Guardar cambios</button>
-              <button class="btn danger full" type="button" id="deleteProductBtn">Eliminar producto</button>
-            </div>
-          </form>
-        </section>
+        <div id="adminList"></div>
       </div>
     </section>
   </main>
 
-  <div class="sticky-cart" id="stickyCart">
-    <div>
-      <strong id="stickyCartCount">0 productos</strong>
-      <span id="stickyCartTotal">$0</span>
-    </div>
-    <button class="btn primary" type="button" data-route="cart">Ver carrito</button>
-  </div>
-
-  <div id="noticeStack" class="notice-stack" aria-live="polite" aria-atomic="true"></div>
-
   <script>
-    const PASS = "Hibrid2026";
+    const PASS = "hibrid2026";
     const PHONE = "56956139055";
+    const STORAGE_KEY = "hibrid_catalog_final_v1";
 
-    const categories = [
-      { key: "principales", label: "Principales", desc: "Equipos destacados y soluciones base" },
-      { key: "paneles", label: "Paneles", desc: "Paneles solares para distintos proyectos" },
-      { key: "baterias", label: "Baterías", desc: "Respaldo y almacenamiento energético" },
-      { key: "inversores", label: "Inversores", desc: "Conversión y control del sistema" },
-      { key: "kits", label: "Kits Solar", desc: "Sistemas completos listos para instalar" },
-      { key: "eolico", label: "Eólica", desc: "Equipos para energía del viento" },
-      { key: "all", label: "Ver todos", desc: "Todo el catálogo disponible" }
-    ];
+    let activeCategory = "paneles";
+    let cart = [];
 
-    const initialProducts = [
-      { id:"pri-001", name:"Kit Hogar Híbrido 3kW", price:1899000, description:"Sistema base para vivienda con paneles, inversor híbrido y batería. Ideal para consumo medio.", category:"principales", image:"kitsolar.jpg", visible:true },
-      { id:"pri-002", name:"Kit Negocio 5kW Pro", price:3290000, description:"Solución orientativa para locales y oficinas con mejor capacidad de generación.", category:"principales", image:"kitsolar.jpg", visible:true },
-      { id:"pri-003", name:"Respaldo Crítico 48V", price:2590000, description:"Banco de respaldo con batería de litio e inversor de onda pura para equipos sensibles.", category:"principales", image:"bateria.jpg", visible:true },
-      { id:"pri-004", name:"Solución Parcela 6kW", price:4490000, description:"Paquete mixto para parcela con mayor autonomía y uso intermitente.", category:"principales", image:"kitsolar.jpg", visible:true },
-      { id:"pri-005", name:"Sistema Comercio 8kW", price:5890000, description:"Configuración robusta para alto consumo diurno con enfoque comercial.", category:"principales", image:"kitsolar.jpg", visible:true },
-
-      { id:"pan-001", name:"Panel Monocristalino 550W", price:129990, description:"Panel solar de alto rendimiento para uso residencial.", category:"paneles", image:"paneles.jpg", visible:true },
-      { id:"pan-002", name:"Panel Jinko 565W", price:139900, description:"Módulo solar de alta eficiencia para proyectos residenciales y comerciales.", category:"paneles", image:"paneles.jpg", visible:true },
-      { id:"pan-003", name:"Panel Bifacial 610W", price:179900, description:"Panel bifacial orientado a estructuras de mayor captación y rendimiento.", category:"paneles", image:"paneles.jpg", visible:true },
-      { id:"pan-004", name:"Panel 450W Residencial", price:94900, description:"Alternativa compacta para techos pequeños y proyectos domiciliarios.", category:"paneles", image:"paneles.jpg", visible:true },
-      { id:"pan-005", name:"Panel 580W N-Type", price:149900, description:"Mejor estabilidad y menor degradación anual.", category:"paneles", image:"paneles.jpg", visible:true },
-
-      { id:"bat-001", name:"Batería Litio 5kWh", price:990000, description:"Respaldo energético para sistemas híbridos.", category:"baterias", image:"bateria.jpg", visible:true },
-      { id:"bat-002", name:"Batería Felicity 5.12kWh", price:1490000, description:"Batería mural para respaldo y sistemas híbridos residenciales.", category:"baterias", image:"bateria.jpg", visible:true },
-      { id:"bat-003", name:"Batería Deye 5kWh", price:1690000, description:"Módulo escalable para sistemas con alta estabilidad.", category:"baterias", image:"bateria.jpg", visible:true },
-      { id:"bat-004", name:"Batería Rack 10kWh", price:2890000, description:"Formato rack para instalaciones técnicas y mayor capacidad de respaldo.", category:"baterias", image:"bateria.jpg", visible:true },
-      { id:"bat-005", name:"Batería 48V 200Ah", price:1890000, description:"Unidad de litio orientada a autonomía extendida.", category:"baterias", image:"bateria.jpg", visible:true },
-
-      { id:"inv-001", name:"Inversor Híbrido 5kW", price:790000, description:"Control y conversión para instalaciones solares.", category:"inversores", image:"inversor.jpg", visible:true },
-      { id:"inv-002", name:"Inversor Deye Híbrido 5kW", price:1499000, description:"Equipo monofásico con soporte para baterías y monitoreo.", category:"inversores", image:"inversor.jpg", visible:true },
-      { id:"inv-003", name:"Inversor Deye 8kW", price:2390000, description:"Modelo trifásico para proyectos comerciales.", category:"inversores", image:"inversor.jpg", visible:true },
-      { id:"inv-004", name:"Inversor Off-Grid 6kW", price:1129000, description:"Solución de onda pura para independencia energética.", category:"inversores", image:"inversor.jpg", visible:true },
-      { id:"inv-005", name:"Microinversor 2MPPT", price:389000, description:"Alternativa compacta para matrices pequeñas.", category:"inversores", image:"inversor.jpg", visible:true },
-
-      { id:"kit-001", name:"Kit Residencial 5kW", price:2490000, description:"Solución pensada para consumo medio residencial.", category:"kits", image:"kitsolar.jpg", visible:true },
-      { id:"kit-002", name:"Kit Autonomía Total", price:4290000, description:"Sistema de mayor capacidad para alto consumo.", category:"kits", image:"kitsolar.jpg", visible:true },
-      { id:"kit-003", name:"Kit Solar 1.5kW Básico", price:1099000, description:"Kit inicial con paneles, estructura e inversor.", category:"kits", image:"kitsolar.jpg", visible:true },
-      { id:"kit-004", name:"Kit Solar 3kW Familiar", price:1890000, description:"Paquete pensado para hogares con cargas diarias.", category:"kits", image:"kitsolar.jpg", visible:true },
-      { id:"kit-005", name:"Kit Solar 8kW Comercio", price:5390000, description:"Solución mayor para negocios con consumos diurnos relevantes.", category:"kits", image:"kitsolar.jpg", visible:true },
-
-      { id:"eol-001", name:"Aerogenerador 1kW", price:890000, description:"Equipo eólico complementario.", category:"eolico", image:"eolica.jpg", visible:true },
-      { id:"eol-002", name:"Aerogenerador 2kW Híbrido", price:2190000, description:"Pensado para combinar con banco de baterías e integración solar.", category:"eolico", image:"eolica.jpg", visible:true },
-      { id:"eol-003", name:"Turbina 3kW", price:3290000, description:"Alternativa de mayor potencia para parcelas o respaldo.", category:"eolico", image:"eolica.jpg", visible:true },
-      { id:"eol-004", name:"Controlador Eólico 48V", price:289000, description:"Complemento para gestión segura de carga.", category:"eolico", image:"eolica.jpg", visible:true },
-      { id:"eol-005", name:"Kit Eólico-Solar Mixto", price:4190000, description:"Configuración demostrativa para proyectos híbridos.", category:"eolico", image:"eolica.jpg", visible:true }
-    ];
-
-    const state = {
-      route: "home",
-      products: structuredClone(initialProducts),
-      cart: [],
-      search: "",
-      category: "all",
-      sort: "featured",
-      adminUnlocked: false,
-      selectedAdminId: initialProducts[0].id,
-      theme: "light"
+    const defaultCatalog = {
+      paneles: [
+        { id: 1, name: "Panel Monocristalino 550W", price: 129990, description: "Panel solar de alto rendimiento para uso residencial.", image: "paneles.jpg", visible: true }
+      ],
+      baterias: [
+        { id: 2, name: "Batería Litio 5kWh", price: 990000, description: "Respaldo energético para sistemas híbridos.", image: "bateria.jpg", visible: true }
+      ],
+      inversores: [
+        { id: 3, name: "Inversor Híbrido 5kW", price: 790000, description: "Control y conversión para instalaciones solares.", image: "inversor.jpg", visible: true }
+      ],
+      kits: [
+        { id: 4, name: "Kit Residencial 5kW", price: 2490000, description: "Solución pensada para consumo medio residencial.", image: "kitsolar.jpg", visible: true },
+        { id: 5, name: "Kit Autonomía Total", price: 4290000, description: "Sistema de mayor capacidad para alto consumo.", image: "kitsolar.jpg", visible: true }
+      ],
+      eolico: [
+        { id: 6, name: "Aerogenerador 1kW", price: 890000, description: "Equipo eólico complementario.", image: "eolica.jpg", visible: true }
+      ]
     };
 
-    const $ = (selector, parent = document) => parent.querySelector(selector);
-    const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector)];
+    let catalog = loadCatalog();
 
-    function formatPrice(value){
-      return new Intl.NumberFormat("es-CL", {
-        style: "currency",
-        currency: "CLP",
-        maximumFractionDigits: 0
-      }).format(Number(value || 0));
+    function cloneData(data) {
+      return JSON.parse(JSON.stringify(data));
     }
 
-    function escapeHtml(value){
-      return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    function loadCatalog() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+
+      if (!saved) return cloneData(defaultCatalog);
+
+      try {
+        return JSON.parse(saved);
+      } catch (error) {
+        return cloneData(defaultCatalog);
+      }
     }
 
-    function slugify(text){
-      return String(text || "")
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "")
-        .slice(0, 48) || `prod-${Date.now()}`;
+    function saveCatalog() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog));
     }
 
-    function showNotice(message, type = "info"){
-      const stack = $("#noticeStack");
-      const box = document.createElement("div");
-      box.className = `notice ${type}`;
-      box.innerHTML = `<strong>${type === "success" ? "Listo" : type === "error" ? "Revisa" : "Info"}</strong><div class="small muted" style="margin-top:.25rem">${escapeHtml(message)}</div>`;
-      stack.appendChild(box);
-      setTimeout(() => {
-        box.style.opacity = "0";
-        box.style.transform = "translateY(-6px)";
-      }, 2600);
-      setTimeout(() => box.remove(), 3200);
-    }
+    function go(viewId) {
+      document.querySelectorAll(".view").forEach(view => view.classList.remove("active"));
+      const target = document.getElementById(viewId) || document.getElementById("home");
+      target.classList.add("active");
 
-    function getVisibleProducts(){
-      return state.products.filter(item => item.visible);
-    }
-
-    function getCategoryLabel(key){
-      return categories.find(cat => cat.key === key)?.label || key;
-    }
-
-    function getProductById(id){
-      return state.products.find(item => item.id === id);
-    }
-
-    function routeTo(viewId){
-      state.route = viewId;
-      $$(".view").forEach(view => view.classList.toggle("active", view.id === viewId));
-      $$(".nav-btn").forEach(button => {
-        const active = button.dataset.route === viewId;
-        button.classList.toggle("primary", active);
-        button.classList.toggle("secondary", !active);
+      document.querySelectorAll("[data-nav]").forEach(button => {
+        button.classList.toggle("active", button.dataset.nav === viewId);
       });
-      if(viewId === "cart") renderCart();
-      if(viewId === "admin") renderAdmin();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      window.scrollTo(0, 0);
     }
 
-    function initTheme(){
-      state.theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      document.documentElement.setAttribute("data-theme", state.theme);
-      updateThemeToggle();
+    function openCategory(category) {
+      activeCategory = category;
+
+      const data = {
+        paneles: ["Paneles", "Listado de paneles solares disponibles."],
+        baterias: ["Baterías", "Listado de baterías y soluciones de almacenamiento."],
+        inversores: ["Inversores", "Listado de inversores híbridos disponibles."],
+        kits: ["Kits Solar", "Listado de kits energéticos completos."],
+        eolico: ["Eólica", "Listado de productos para energía eólica."]
+      };
+
+      document.getElementById("catTitle").textContent = data[category][0];
+      document.getElementById("catDesc").textContent = data[category][1];
+      renderProducts();
+      go("category");
     }
 
-    function updateThemeToggle(){
-      const btn = $("[data-theme-toggle]");
-      if(!btn) return;
-      btn.textContent = state.theme === "dark" ? "☀" : "◐";
-    }
+    function renderProducts() {
+      const grid = document.getElementById("productGrid");
+      grid.innerHTML = "";
 
-    function toggleTheme(){
-      state.theme = state.theme === "dark" ? "light" : "dark";
-      document.documentElement.setAttribute("data-theme", state.theme);
-      updateThemeToggle();
-    }
+      const list = (catalog[activeCategory] || []).filter(item => item.visible);
 
-    function renderCategoryCards(){
-      const wrap = $("#categoryGrid");
-      wrap.innerHTML = categories.map(cat => {
-        const count = cat.key === "all"
-          ? getVisibleProducts().length
-          : state.products.filter(item => item.category === cat.key && item.visible).length;
-
-        return `
-          <button class="card" type="button" data-filter="${cat.key}" style="text-align:left;padding:var(--space-5)">
-            <div class="content" style="padding:0">
-              <div class="badge">${escapeHtml(cat.label)}</div>
-              <h3 style="margin-top:1rem">${escapeHtml(cat.label)}</h3>
-              <p class="muted">${escapeHtml(cat.desc)}</p>
-              <div class="price" style="margin-top:1rem">${count} productos</div>
-            </div>
-          </button>
-        `;
-      }).join("");
-
-      const categorySelect = $("#categorySelect");
-      const adminCategoryFilter = $("#adminCategoryFilter");
-      const productCategory = $("#productCategory");
-
-      categorySelect.innerHTML = categories.map(cat => `<option value="${cat.key}">${cat.label}</option>`).join("");
-      categorySelect.value = state.category;
-
-      adminCategoryFilter.innerHTML = `<option value="all">Todas las categorías</option>` +
-        categories.filter(cat => cat.key !== "all").map(cat => `<option value="${cat.key}">${cat.label}</option>`).join("");
-
-      productCategory.innerHTML = categories
-        .filter(cat => cat.key !== "all")
-        .map(cat => `<option value="${cat.key}">${cat.label}</option>`).join("");
-    }
-
-    function getFilteredCatalog(){
-      const term = state.search.trim().toLowerCase();
-      let products = getVisibleProducts().filter(item => state.category === "all" ? true : item.category === state.category);
-
-      if(term){
-        products = products.filter(item =>
-          [item.id, item.name, item.description, item.category].join(" ").toLowerCase().includes(term)
-        );
-      }
-
-      if(state.sort === "price-asc") products.sort((a,b) => a.price - b.price);
-      if(state.sort === "price-desc") products.sort((a,b) => b.price - a.price);
-      if(state.sort === "name-asc") products.sort((a,b) => a.name.localeCompare(b.name, "es"));
-
-      return products;
-    }
-
-    function renderCatalog(){
-      const list = getFilteredCatalog();
-      const grid = $("#catalogGrid");
-      const info = $("#catalogInfo");
-
-      info.textContent = state.category === "all"
-        ? `Mostrando ${list.length} productos visibles del catálogo completo.`
-        : `Mostrando ${list.length} productos en ${getCategoryLabel(state.category)}.`;
-
-      if(!list.length){
-        grid.innerHTML = '<div class="empty" style="grid-column:1/-1">No hay productos visibles para este filtro.</div>';
-      } else {
-        grid.innerHTML = list.map(item => `
-          <article class="product">
-            <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" width="900" height="700" loading="lazy" onerror="this.src='logohi.jpg'">
-            <div class="content">
-              <div class="badge">${escapeHtml(getCategoryLabel(item.category))}</div>
-              <h3 style="margin-top:.8rem">${escapeHtml(item.name)}</h3>
-              <p class="muted">${escapeHtml(item.description)}</p>
-              <div class="meta">
-                <span>ID: ${escapeHtml(item.id)}</span>
-                <span>${item.visible ? "Visible" : "Oculto"}</span>
-              </div>
-              <div class="price">${formatPrice(item.price)}</div>
-              <button class="btn primary full" type="button" data-add="${escapeHtml(item.id)}">Agregar al carrito</button>
-            </div>
-          </article>
-        `).join("");
-      }
-
-      $("#kpiProducts").textContent = getVisibleProducts().length;
-    }
-
-    function syncCart(){
-      state.cart = state.cart.filter(item => getProductById(item.id));
-    }
-
-    function getDetailedCart(){
-      syncCart();
-      return state.cart.map(item => {
-        const product = getProductById(item.id);
-        return {
-          ...item,
-          product,
-          subtotal: (product?.price || 0) * item.quantity
-        };
-      }).filter(item => item.product);
-    }
-
-    function addToCart(id){
-      const existing = state.cart.find(item => item.id === id);
-      if(existing){
-        existing.quantity += 1;
-      } else {
-        state.cart.push({ id, quantity: 1 });
-      }
-      updateCartIndicators();
-      showNotice("Producto agregado al carrito.", "success");
-    }
-
-    function changeQty(id, amount){
-      const item = state.cart.find(row => row.id === id);
-      if(!item) return;
-      item.quantity += amount;
-      if(item.quantity <= 0){
-        state.cart = state.cart.filter(row => row.id !== id);
-      }
-      renderCart();
-      updateCartIndicators();
-    }
-
-    function removeFromCart(id){
-      state.cart = state.cart.filter(item => item.id !== id);
-      renderCart();
-      updateCartIndicators();
-      showNotice("Producto quitado del carrito.", "info");
-    }
-
-    function clearCart(){
-      state.cart = [];
-      renderCart();
-      updateCartIndicators();
-      showNotice("Carrito vaciado.", "info");
-    }
-
-    function renderCart(){
-      const list = $("#cartList");
-      const summary = $("#summaryBox");
-      const items = getDetailedCart();
-
-      if(!items.length){
-        list.innerHTML = '<div class="empty">Tu carrito está vacío.</div>';
-        summary.innerHTML = `
-          <div class="summary-line"><span>Productos</span><strong>0</strong></div>
-          <div class="summary-line"><span>Total</span><strong>${formatPrice(0)}</strong></div>
-        `;
+      if (!list.length) {
+        grid.innerHTML = '<div class="empty">No hay productos visibles en esta categoría.</div>';
         return;
       }
 
-      list.innerHTML = items.map(item => `
-        <div class="cart-row">
-          <div class="cart-thumb">
-            <img src="${escapeHtml(item.product.image)}" alt="${escapeHtml(item.product.name)}" width="300" height="300" loading="lazy" onerror="this.src='logohi.jpg'">
+      list.forEach(item => {
+        const card = document.createElement("article");
+        card.className = "product";
+
+        card.innerHTML = `
+          <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" onerror="this.src='logohi.jpg'">
+          <div class="content">
+            <h3>${escapeHtml(item.name)}</h3>
+            <p class="muted">${escapeHtml(item.description)}</p>
+            <div class="price">$${Number(item.price).toLocaleString("es-CL")}</div>
+            <button class="btn primary full">Agregar al carrito</button>
           </div>
+        `;
+
+        card.querySelector("button").onclick = () => addToCart(item);
+        grid.appendChild(card);
+      });
+    }
+
+    function addToCart(item) {
+      const existing = cart.find(x => x.id === item.id);
+
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cart.push({
+          id: item.id,
+          name: item.name,
+          price: Number(item.price),
+          quantity: 1
+        });
+      }
+
+      renderCart();
+      alert("Producto agregado al carrito.");
+    }
+
+    function renderCart() {
+      const list = document.getElementById("cartList");
+      const totalNode = document.getElementById("cartTotal");
+      const countNode = document.getElementById("cartCount");
+
+      countNode.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+      if (!cart.length) {
+        list.innerHTML = '<div class="empty">Tu carrito está vacío.</div>';
+        totalNode.textContent = "0";
+        return;
+      }
+
+      list.innerHTML = "";
+      let total = 0;
+
+      cart.forEach(item => {
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
+
+        const row = document.createElement("div");
+        row.className = "cart-row";
+
+        row.innerHTML = `
           <div>
-            <div class="badge">${escapeHtml(getCategoryLabel(item.product.category))}</div>
-            <h3 style="margin-top:.7rem">${escapeHtml(item.product.name)}</h3>
-            <p class="muted small">${escapeHtml(item.product.description)}</p>
+            <strong>${escapeHtml(item.name)}</strong>
+            <div class="muted">Cantidad: ${item.quantity}</div>
             <div class="qty">
-              <button class="btn small secondary" type="button" data-qty="minus" data-id="${escapeHtml(item.id)}">−</button>
-              <button class="btn small secondary" type="button" data-qty="plus" data-id="${escapeHtml(item.id)}">+</button>
-              <button class="btn small ghost" type="button" data-remove="${escapeHtml(item.id)}">Quitar</button>
+              <button class="btn small" data-act="minus">−</button>
+              <button class="btn small" data-act="plus">+</button>
+              <button class="btn small" data-act="remove">Quitar</button>
             </div>
           </div>
-          <div style="text-align:right">
-            <div class="small muted">Cantidad: ${item.quantity}</div>
-            <div class="small muted">Unitario: ${formatPrice(item.product.price)}</div>
-            <strong style="display:block;margin-top:.5rem">${formatPrice(item.subtotal)}</strong>
-          </div>
-        </div>
-      `).join("");
+          <strong>$${subtotal.toLocaleString("es-CL")}</strong>
+        `;
 
-      const totalUnits = items.reduce((sum, item) => sum + item.quantity, 0);
-      const totalAmount = items.reduce((sum, item) => sum + item.subtotal, 0);
+        row.querySelector('[data-act="minus"]').onclick = () => changeQty(item.id, -1);
+        row.querySelector('[data-act="plus"]').onclick = () => changeQty(item.id, 1);
+        row.querySelector('[data-act="remove"]').onclick = () => removeFromCart(item.id);
 
-      summary.innerHTML = `
-        <div class="summary-line"><span>Líneas cotizadas</span><strong>${items.length}</strong></div>
-        <div class="summary-line"><span>Unidades totales</span><strong>${totalUnits}</strong></div>
-        <div class="summary-line"><span>Total estimado</span><strong>${formatPrice(totalAmount)}</strong></div>
-      `;
+        list.appendChild(row);
+      });
+
+      totalNode.textContent = total.toLocaleString("es-CL");
     }
 
-    function updateCartIndicators(){
-      const items = getDetailedCart();
-      const quantity = items.reduce((sum, item) => sum + item.quantity, 0);
-      const total = items.reduce((sum, item) => sum + item.subtotal, 0);
+    function changeQty(id, amount) {
+      const item = cart.find(x => x.id === id);
+      if (!item) return;
 
-      $("#cartCount").textContent = quantity;
-      $("#stickyCartCount").textContent = `${quantity} ${quantity === 1 ? "producto" : "productos"}`;
-      $("#stickyCartTotal").textContent = formatPrice(total);
-      $("#kpiCart").textContent = quantity;
+      item.quantity += amount;
+      if (item.quantity <= 0) {
+        removeFromCart(id);
+        return;
+      }
+
+      renderCart();
     }
 
-    function sendWhatsApp(){
-      const items = getDetailedCart();
+    function removeFromCart(id) {
+      cart = cart.filter(item => item.id !== id);
+      renderCart();
+    }
 
-      if(!items.length){
-        showNotice("Primero agrega productos al carrito.", "error");
+    function clearCart() {
+      cart = [];
+      renderCart();
+    }
+
+    function sendWhatsApp() {
+      if (!cart.length) {
+        alert("Primero agrega productos al carrito.");
         return;
       }
 
@@ -1379,175 +729,139 @@
         ""
       ];
 
-      items.forEach((item, index) => {
-        total += item.subtotal;
-        lines.push(`${index + 1}. ${item.product.name} | Cantidad: ${item.quantity} | Unitario: ${formatPrice(item.product.price)} | Subtotal: ${formatPrice(item.subtotal)}`);
+      cart.forEach(item => {
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
+        lines.push(`- ${item.name} x${item.quantity}: $${subtotal.toLocaleString("es-CL")}`);
       });
 
       lines.push("");
-      lines.push(`Total estimado: ${formatPrice(total)}`);
+      lines.push(`Total estimado: $${total.toLocaleString("es-CL")}`);
 
-      const url = `https://wa.me/${PHONE}?text=${encodeURIComponent(lines.join("
+      const url = `https://wa.me/${PHONE}?text=${encodeURIComponent(lines.join("\
 "))}`;
-      window.open(url, "_blank", "noopener");
+      window.open(url, "_blank");
     }
 
-    function calculate(){
-      const kwh = Number($("#kwh").value);
-      const usageType = $("#usageType").value;
-      const result = $("#calcResult");
+    function calculate() {
+      const kwh = Number(document.getElementById("kwh").value);
+      const result = document.getElementById("calcResult");
 
-      if(!kwh || kwh <= 0){
-        result.innerHTML = '<p class="muted" style="color:#ffb0b0;margin-top:14px;">Ingresa un consumo mensual válido.</p>';
+      if (!kwh || kwh <= 0) {
+        result.innerHTML = '<p class="muted" style="color:#ff9b9b;margin-top:14px;">Ingresa un consumo mensual válido.</p>';
         return;
       }
 
       let kit = "";
       let note = "";
-      let panels = 0;
-      let battery = "";
 
-      if(kwh <= 150){
+      if (kwh <= 150) {
         kit = "Kit Inicial Residencial";
         note = "Pensado para consumos bajos y respaldo parcial.";
-        panels = 4;
-        battery = "Batería 2.56kWh";
-      } else if(kwh <= 300){
+      } else if (kwh <= 300) {
         kit = "Kit Residencial 5kW";
         note = "Alternativa inicial para consumo medio residencial.";
-        panels = 6;
-        battery = "Batería 5.12kWh";
-      } else if(kwh <= 600){
-        kit = "Kit Pro 5kW+";
-        note = "Conviene evaluar una solución con más potencia y almacenamiento.";
-        panels = 10;
-        battery = "Batería 10kWh";
       } else {
         kit = "Kit Autonomía Total";
-        note = "Recomendado para cargas más altas o mayor autonomía.";
-        panels = 14;
-        battery = "Banco 10kWh a 15kWh";
+        note = "Conviene evaluar una solución con más potencia y almacenamiento.";
       }
-
-      let extra = "Base orientativa para autoconsumo residencial.";
-      if(usageType === "negocio") extra = "Conviene revisar horario de operación y demanda punta.";
-      if(usageType === "campo") extra = "Ideal reforzar autonomía y estructura.";
-      if(usageType === "respaldo") extra = "Conviene priorizar batería e inversor de respaldo.";
 
       result.innerHTML = `
         <div class="result">
           <h3>Resultado estimado</h3>
           <p><strong>Consumo:</strong> ${kwh} kWh mensuales</p>
           <p><strong>Kit recomendado:</strong> ${kit}</p>
-          <p><strong>Paneles sugeridos:</strong> ${panels}</p>
-          <p><strong>Batería sugerida:</strong> ${battery}</p>
-          <p class="muted small">${note} ${extra}</p>
-          <div style="margin-top:1rem">
-            <button class="btn primary full" type="button" data-open-kits="true">Ver kits</button>
-          </div>
+          <p>${note}</p>
+          <button class="btn primary full" onclick="openCategory('kits')">Ver kits</button>
         </div>
       `;
     }
 
-    function renderAdminList(){
-      const filter = $("#adminCategoryFilter").value || "all";
-      const list = filter === "all" ? state.products : state.products.filter(item => item.category === filter);
-      const wrap = $("#adminList");
+    function loginAdmin() {
+      const pass = document.getElementById("adminPass").value;
 
-      if(!state.selectedAdminId && list.length) state.selectedAdminId = list[0].id;
-      if(state.selectedAdminId && !state.products.find(item => item.id === state.selectedAdminId)){
-        state.selectedAdminId = list[0]?.id || null;
-      }
-
-      wrap.innerHTML = list.length ? list.map(item => `
-        <button class="admin-item ${state.selectedAdminId === item.id ? "active" : ""}" type="button" data-admin-select="${escapeHtml(item.id)}">
-          <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" width="200" height="200" loading="lazy" onerror="this.src='logohi.jpg'">
-          <div style="text-align:left">
-            <strong style="display:block">${escapeHtml(item.name)}</strong>
-            <div class="tiny muted" style="margin-top:.25rem">${escapeHtml(item.id)}</div>
-            <div class="small muted" style="margin-top:.25rem">${escapeHtml(getCategoryLabel(item.category))} · ${formatPrice(item.price)}</div>
-            <div class="tiny" style="margin-top:.35rem;color:${item.visible ? '#98f1b9' : '#ffb0b0'}">${item.visible ? "Visible" : "Oculto"}</div>
-          </div>
-          <span class="badge">Editar</span>
-        </button>
-      `).join("") : `<div class="empty">No hay productos en esta categoría.</div>`;
-    }
-
-    function fillAdminForm(){
-      const item = getProductById(state.selectedAdminId);
-      if(!item) return;
-
-      $("#productId").value = item.id;
-      $("#productCategory").value = item.category;
-      $("#productVisible").value = String(item.visible);
-      $("#productName").value = item.name;
-      $("#productPrice").value = item.price;
-      $("#productDescription").value = item.description;
-      $("#productImage").value = item.image;
-      $("#previewImage").src = item.image;
-    }
-
-    function renderAdmin(){
-      if(!state.adminUnlocked){
-        routeTo("admin-login");
+      if (pass !== PASS) {
+        alert("Contraseña incorrecta.");
         return;
       }
-      renderAdminList();
-      fillAdminForm();
-    }
 
-    function loginAdmin(){
-      const pass = $("#adminPass").value;
-      if(pass !== PASS){
-        showNotice("Contraseña incorrecta.", "error");
-        return;
-      }
-      $("#adminPass").value = "";
-      state.adminUnlocked = true;
+      document.getElementById("adminPass").value = "";
       renderAdmin();
-      routeTo("admin");
-      showNotice("Acceso de administrador concedido.", "success");
+      go("admin");
     }
 
-    function saveAdminProduct(event){
-      event.preventDefault();
+    function renderAdmin() {
+      const tabs = document.getElementById("adminTabs");
+      const list = document.getElementById("adminList");
 
-      const current = getProductById(state.selectedAdminId);
-      if(!current) return;
+      tabs.innerHTML = "";
+      list.innerHTML = "";
 
-      const newId = $("#productId").value.trim() || slugify($("#productName").value);
-      const duplicate = state.products.find(item => item.id === newId && item.id !== current.id);
+      Object.keys(catalog).forEach(category => {
+        const button = document.createElement("button");
+        button.textContent = category;
+        button.classList.toggle("active", category === activeCategory);
 
-      if(duplicate){
-        showNotice("Ya existe otro producto con ese ID.", "error");
-        return;
-      }
+        button.onclick = () => {
+          activeCategory = category;
+          renderAdmin();
+        };
 
-      current.id = newId;
-      current.category = $("#productCategory").value;
-      current.visible = $("#productVisible").value === "true";
-      current.name = $("#productName").value.trim() || "Producto sin nombre";
-      current.price = Number($("#productPrice").value || 0);
-      current.description = $("#productDescription").value.trim() || "Sin descripción";
-      current.image = $("#productImage").value.trim() || "paneles.jpg";
-
-      state.cart.forEach(item => {
-        if(item.id === state.selectedAdminId) item.id = newId;
+        tabs.appendChild(button);
       });
 
-      state.selectedAdminId = newId;
-      renderAll();
-      routeTo("admin");
-      showNotice("Producto actualizado.", "success");
+      (catalog[activeCategory] || []).forEach(item => {
+        const box = document.createElement("div");
+        box.className = "admin-card";
+
+        box.innerHTML = `
+          <div class="admin-preview">
+            <div>
+              <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" onerror="this.src='logohi.jpg'">
+            </div>
+
+            <div>
+              <label>Nombre del producto</label>
+              <input data-field="name" value="${escapeHtml(item.name)}">
+
+              <label>Precio</label>
+              <input data-field="price" type="number" value="${Number(item.price)}">
+
+              <label>Descripción</label>
+              <textarea data-field="description">${escapeHtml(item.description)}</textarea>
+
+              <label>Archivo de imagen</label>
+              <input data-field="image" value="${escapeHtml(item.image)}">
+              <div class="helper">Ejemplo: paneles.jpg, bateria.jpg, kitsolar.jpg</div>
+
+              <label class="check">
+                <input data-field="visible" type="checkbox" ${item.visible ? "checked" : ""}>
+                Mostrar producto al público
+              </label>
+
+              <button class="btn primary full">Guardar cambios</button>
+            </div>
+          </div>
+        `;
+
+        box.querySelector("button").onclick = () => {
+          item.name = box.querySelector('[data-field="name"]').value.trim();
+          item.price = Number(box.querySelector('[data-field="price"]').value) || 0;
+          item.description = box.querySelector('[data-field="description"]').value.trim();
+          item.image = box.querySelector('[data-field="image"]').value.trim();
+          item.visible = box.querySelector('[data-field="visible"]').checked;
+
+          saveCatalog();
+          renderAdmin();
+          alert("Producto actualizado.");
+        };
+
+        list.appendChild(box);
+      });
     }
 
-    function newProduct(){
-      const currentFilter = $("#adminCategoryFilter").value && $("#adminCategoryFilter").value !== "all"
-        ? $("#adminCategoryFilter").value
-        : "principales";
-
+    function newProduct() {
       const imageMap = {
-        principales: "kitsolar.jpg",
         paneles: "paneles.jpg",
         baterias: "bateria.jpg",
         inversores: "inversor.jpg",
@@ -1555,146 +869,31 @@
         eolico: "eolica.jpg"
       };
 
-      const product = {
-        id: `prod-${Date.now()}`,
+      catalog[activeCategory].push({
+        id: Date.now(),
         name: "Nuevo producto",
         price: 0,
         description: "Agrega una descripción del producto.",
-        image: imageMap[currentFilter] || "paneles.jpg",
-        category: currentFilter,
+        image: imageMap[activeCategory],
         visible: false
-      };
+      });
 
-      state.products.unshift(product);
-      state.selectedAdminId = product.id;
-      $("#adminCategoryFilter").value = currentFilter;
+      saveCatalog();
       renderAdmin();
-      fillAdminForm();
-      showNotice("Producto creado en modo borrador.", "info");
     }
 
-    function deleteProduct(){
-      const product = getProductById(state.selectedAdminId);
-      if(!product){
-        showNotice("No hay producto seleccionado.", "error");
-        return;
-      }
-
-      state.products = state.products.filter(item => item.id !== state.selectedAdminId);
-      state.cart = state.cart.filter(item => item.id !== state.selectedAdminId);
-      state.selectedAdminId = state.products[0]?.id || null;
-      renderAll();
-      routeTo("admin");
-      showNotice("Producto eliminado.", "info");
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
-    function previewImageFromInput(){
-      const value = $("#productImage").value.trim();
-      if(value) $("#previewImage").src = value;
-    }
-
-    function previewImageFromFile(event){
-      const file = event.target.files?.[0];
-      if(!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        $("#previewImage").src = reader.result;
-        $("#productImage").value = reader.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function renderAll(){
-      renderCategoryCards();
-      renderCatalog();
-      renderCart();
-      renderAdmin();
-      updateCartIndicators();
-    }
-
-    document.addEventListener("click", (event) => {
-      const routeBtn = event.target.closest("[data-route]");
-      if(routeBtn) routeTo(routeBtn.dataset.route);
-
-      const addBtn = event.target.closest("[data-add]");
-      if(addBtn) addToCart(addBtn.dataset.add);
-
-      const qtyBtn = event.target.closest("[data-qty]");
-      if(qtyBtn) changeQty(qtyBtn.dataset.id, qtyBtn.dataset.qty === "plus" ? 1 : -1);
-
-      const removeBtn = event.target.closest("[data-remove]");
-      if(removeBtn) removeFromCart(removeBtn.dataset.remove);
-
-      const filterBtn = event.target.closest("[data-filter]");
-      if(filterBtn){
-        state.category = filterBtn.dataset.filter;
-        $("#categorySelect").value = state.category;
-        renderCatalog();
-      }
-
-      const adminSelectBtn = event.target.closest("[data-admin-select]");
-      if(adminSelectBtn){
-        state.selectedAdminId = adminSelectBtn.dataset.adminSelect;
-        renderAdmin();
-      }
-
-      const openKitsBtn = event.target.closest("[data-open-kits]");
-      if(openKitsBtn){
-        state.category = "kits";
-        $("#categorySelect").value = "kits";
-        renderCatalog();
-        routeTo("home");
-      }
-
-      const themeBtn = event.target.closest("[data-theme-toggle]");
-      if(themeBtn) toggleTheme();
-    });
-
-    $("#searchInput").addEventListener("input", (event) => {
-      state.search = event.target.value;
-      renderCatalog();
-    });
-
-    $("#categorySelect").addEventListener("change", (event) => {
-      state.category = event.target.value;
-      renderCatalog();
-    });
-
-    $("#sortSelect").addEventListener("change", (event) => {
-      state.sort = event.target.value;
-      renderCatalog();
-    });
-
-    $("#clearFiltersBtn").addEventListener("click", () => {
-      state.search = "";
-      state.category = "all";
-      state.sort = "featured";
-      $("#searchInput").value = "";
-      $("#categorySelect").value = "all";
-      $("#sortSelect").value = "featured";
-      renderCatalog();
-    });
-
-    $("#calcBtn").addEventListener("click", calculate);
-    $("#sendWaBtn").addEventListener("click", sendWhatsApp);
-    $("#clearCartBtn").addEventListener("click", clearCart);
-    $("#loginBtn").addEventListener("click", loginAdmin);
-    $("#adminPass").addEventListener("keydown", (event) => {
-      if(event.key === "Enter") loginAdmin();
-    });
-    $("#adminCategoryFilter").addEventListener("change", renderAdminList);
-    $("#newProductBtn").addEventListener("click", newProduct);
-    $("#adminForm").addEventListener("submit", saveAdminProduct);
-    $("#deleteProductBtn").addEventListener("click", deleteProduct);
-    $("#productImage").addEventListener("input", previewImageFromInput);
-    $("#productImageFile").addEventListener("change", previewImageFromFile);
-
-    initTheme();
-    renderCategoryCards();
-    renderCatalog();
     renderCart();
-    updateCartIndicators();
-    routeTo("home");
+    renderAdmin();
+    go("home");
   </script>
 </body>
 </html>
