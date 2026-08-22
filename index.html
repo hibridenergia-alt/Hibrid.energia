@@ -39,25 +39,23 @@
     button { cursor: pointer; border: none; }
 
     /* =========================================
-       2. HEADER Y LOGO PROTAGONISTA
+       2. HEADER Y LOGO (Sin posición fija/sticky)
        ========================================= */
     .topbar {
-      position: sticky; top: 0; z-index: 100;
+      /* Se eliminó el "position: sticky" para que desaparezca al hacer scroll */
       background: rgba(6,13,19,0.85);
       border-bottom: 1px solid var(--line);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
       padding: 15px 0;
     }
     .topbar-inner {
       width: min(calc(100% - 24px), var(--max)); margin: auto;
       display: flex; flex-direction: column; align-items: center; gap: 15px;
     }
-    /* LOGO GIGANTE Y CENTRADO */
+    /* LOGO APAISADO Y PROTAGONISTA */
     .logo {
       width: 100%;
-      max-width: 260px;
-      height: auto;
+      max-width: 320px; /* Más ancho */
+      height: 80px; /* Menos alto para forzar formato horizontal */
       object-fit: contain;
       filter: drop-shadow(0 4px 15px rgba(0,0,0,0.5));
     }
@@ -192,7 +190,7 @@
 </head>
 <body>
 
-  <!-- ENCABEZADO -->
+  <!-- ENCABEZADO (Fluye con la página) -->
   <header class="topbar">
     <div class="topbar-inner">
       <img src="logohi.jpg" alt="HiBRID" class="logo" onerror="this.src='https://via.placeholder.com/400x150/101a22/28d26d?text=HiBRID'">
@@ -208,12 +206,11 @@
   <main class="page">
     
     <!-- =========================================
-         VISTA: INICIO (SEPARADO DEL CATÁLOGO)
+         VISTA: INICIO
          ========================================= -->
     <section id="home" class="view active">
       
       <div class="hero-grid">
-        <!-- Tarjeta Ver Todo -->
         <article class="hero-card" onclick="abrirCat('todos')">
           <img src="kitsolar.jpg" alt="Catálogo Completo" onerror="this.src='https://via.placeholder.com/600x400/0f1821/28d26d?text=Falta+Imagen'">
           <div class="overlay">
@@ -222,7 +219,6 @@
           </div>
         </article>
         
-        <!-- Tarjeta Calculadora -->
         <article class="hero-card" onclick="irA('calculator')">
           <img src="boleta.jpg" alt="Calculadora Técnica" onerror="this.src='https://via.placeholder.com/600x400/0f1821/28d26d?text=Falta+Imagen'">
           <div class="overlay">
@@ -254,7 +250,7 @@
     </section>
 
     <!-- =========================================
-         VISTA: CATÁLOGO (LA VITRINA)
+         VISTA: CATÁLOGO
          ========================================= -->
     <section id="category" class="view">
       <button class="btn ghost" onclick="irA('home')">← Volver al Menú Principal</button>
@@ -309,7 +305,7 @@
           <div id="cartItems"></div>
         </div>
         
-        <div class="panel" style="height: fit-content; position: sticky; top: 100px;">
+        <div class="panel" style="height: fit-content;">
           <h2 style="margin-bottom: 10px;">Resumen Comercial</h2>
           <div style="margin: 20px 0; padding: 25px; background: var(--surface-2); border-radius: 12px; border: 1px solid var(--line);">
             <span class="muted">Subtotal estimado de equipos:</span>
@@ -371,10 +367,8 @@
     // 1. BASE DE DATOS Y CONFIGURACIÓN
     // =========================================
     const TELEFONO = "56956139055";
-    const CLAVE = "Hibrid2026"; // Clave solicitada
     const STORAGE_KEY = "hibrid_premium_v1";
 
-    // Nombres exactos de las imágenes en tu repositorio
     const repoImages = [
       "aerogeneradorcatalogo1.jpg",
       "aerogeneradorcatalogo2.jpg",
@@ -394,7 +388,6 @@
       "panelescatalago.jpg"
     ];
 
-    // Productos Demo Asignados a imágenes Reales
     const baseCat = {
       principales: [
         { id: "pr1", cat: "principales", nombre: "Kit Híbrido Premium 5kW", precio: 3290000, desc: "Kit completo llave en mano. Listo para instalar y operar.", img: "kitsolar.jpg", visible: true }
@@ -431,7 +424,7 @@
     }
 
     // =========================================
-    // 2. SISTEMA TOAST (Sin alertas invasivas)
+    // 2. SISTEMA TOAST
     // =========================================
     function toast(msj) {
       const c = document.getElementById('toast-container');
@@ -530,11 +523,11 @@
     }
 
     function vaciarCarrito() {
-      if(confirm("¿Seguro que deseas eliminar todos los productos?")) {
-        carrito = [];
-        guardarBD();
-        renderCarrito();
-      }
+      // Se eliminó la alerta molesta. Se limpia al instante.
+      carrito = [];
+      guardarBD();
+      renderCarrito();
+      toast("El carrito ha sido vaciado");
     }
 
     function renderCarrito() {
@@ -652,7 +645,9 @@
     // 7. SÚPER ADMIN
     // =========================================
     function loginAdmin() {
-      if(document.getElementById('adminPass').value === CLAVE) {
+      // Modificado para que acepte tanto mayúsculas como minúsculas
+      const claveIngresada = document.getElementById('adminPass').value.toLowerCase();
+      if(claveIngresada === "hibrid2026") {
         document.getElementById('adminPass').value = '';
         irA('admin');
         renderAdmin();
