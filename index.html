@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es" data-theme="dark">
 <head>
@@ -529,6 +530,7 @@
     </section>
   </main>
 
+  <!-- MODAL DE FORMULARIO -->
   <div id="productModal" class="modal-overlay">
     <div class="modal-content">
       <button id="btnCloseModal" class="btn-close-modal">&times;</button>
@@ -563,6 +565,12 @@
         <div class="gallery-panel">
           <strong style="display:block;margin-bottom:var(--space-2)">Selecciona una imagen del catálogo:</strong>
           <div id="modalGalleryGrid" class="gallery-grid"></div>
+          
+          <div style="margin-top:var(--space-4); border-top: 1px solid var(--color-border); padding-top: var(--space-3);">
+            <label for="modalProductImageUrl" style="display:block;margin-bottom:.45rem;font-weight:800;font-size:var(--text-sm);">URL personalizada de imagen</label>
+            <input id="modalProductImageUrl" class="field" type="url" placeholder="https://ejemplo.com/imagen.jpg">
+            <p class="tiny muted" style="margin-top:.4rem">Opcional. Si la completas, tendrá prioridad sobre la imagen de la galería.</p>
+          </div>
         </div>
 
         <div style="margin-top:var(--space-5); display:flex; gap:var(--space-3);">
@@ -632,8 +640,8 @@
       adminUnlocked: false
     };
 
-    const $ = (selector, parent=document) => parent.querySelector(selector);
-    const $$ = (selector, parent=document) => Array.from(parent.querySelectorAll(selector));
+    const $ = (selector, parent = document) => parent.querySelector(selector);
+    const $$ = (selector, parent = document) => Array.from(parent.querySelectorAll(selector));
 
     const els = {
       categoryGrid: $("#categoryGrid"),
@@ -667,6 +675,7 @@
       modalProductPrice: $("#modalProductPrice"),
       modalProductDesc: $("#modalProductDesc"),
       modalProductImage: $("#modalProductImage"),
+      modalProductImageUrl: $("#modalProductImageUrl"),
       modalGalleryGrid: $("#modalGalleryGrid"),
       statTotal: $("#statTotal"),
       statVisible: $("#statVisible"),
@@ -686,7 +695,11 @@
     function showNotice(message, type="info"){
       const node = document.createElement("div");
       node.className = "notice " + type;
-      const title = type === "success" ? "Listo" : type === "error" ? "Revisa" : "Info";
+      
+      let title = "Info";
+      if(type === "success") title = "Listo";
+      if(type === "error") title = "Revisa";
+
       node.innerHTML = "<div><strong>" + title + "</strong><div class='small muted' style='margin-top:.15rem'>" + escapeHtml(message) + "</div></div>";
       
       if(els.noticeStack){
@@ -698,7 +711,9 @@
         node.style.transform = "translateY(-4px)";
       }, 2800);
 
-      setTimeout(() => node.remove(), 3400);
+      setTimeout(() => {
+         if(node.parentNode) node.parentNode.removeChild(node);
+      }, 3400);
     }
 
     function loadData(){
@@ -1112,6 +1127,8 @@
        
        if(productId){
           const item = state.products.find(p => p.id === productId);
+          if(!item) return;
+
           els.modalTitle.textContent = "Editar Producto";
           els.modalProductId.value = item.id;
           els.modalProductName.value = item.name;
@@ -1119,6 +1136,15 @@
           els.modalProductPrice.value = item.price;
           els.modalProductDesc.value = item.description;
           els.modalProductImage.value = productImage(item);
+          
+          if(els.modalProductImageUrl){
+             const library = imageLibrary.catalog[item.category] || [];
+             if(item.image_url && !library.includes(item.image_url)){
+                els.modalProductImageUrl.value = item.image_url || "";
+             } else {
+                els.modalProductImageUrl.value = "";
+             }
+          }
        } else {
           els.modalTitle.textContent = "Nuevo Producto";
           els.modalProductId.value = "";
@@ -1127,8 +1153,13 @@
           els.modalProductCategory.value = defaultCat;
           els.modalProductPrice.value = "";
           els.modalProductDesc.value = "";
+          
           const fallbackImage = (imageLibrary.catalog[defaultCat] || ["paneles.jpg"])[0];
           els.modalProductImage.value = fallbackImage;
+          
+          if(els.modalProductImageUrl){
+            els.modalProductImageUrl.value = "";
+          }
        }
        renderModalGallery();
     }
@@ -1154,48 +1185,73 @@
        els.modalGalleryGrid.innerHTML = html;
     }
 
-    function saveModalProduct(e) {
-       e.preventDefault();
-       const idVal = els.modalProductId.value;
-       const isNew = idVal === "";
-       
-       const payloadId = isNew ? "prod-" + slugify(els.modalProductName.value) + "-" + Date.now().toString().slice(-4) : idVal;
-       const img = els.modalProductImage.value;
+    function saveModalProduct(e){
+      e.preventDefault();
 
-       const payload = {
-          id: payloadId,
-          category: els.modalProductCategory.value,
-          name: els.modalProductName.value.trim(),
-          price: Number(els.modalProductPrice.value || 0),
-          description: els.modalProductDesc.value.trim(),
-          image: img,
-          image_url: img,
-          visible: isNew ? false : undefined 
-       };
+      const idVal = els.modalProductId.value.trim();
+      const isNew = idVal === "";
 
-       if(!payload.name || !payload.description){
-          showNotice("Nombre y descripción son obligatorios.", "error"); return;
-       }
+      const name = els.modalProductName.value.trim();
+      const description = els.modalProductDesc.value.trim();
+      const price = Number(els.modalProductPrice.value || 0);
+      const category = els.modalProductCategory.value;
+      
+      const galleryImage = els.modalProductImage ? els.modalProductImage.value.trim() : "";
+      const customImage = els.modalProductImageUrl ? els.modalProductImageUrl.value.trim() : "";
+      const image = customImage !== "" ? customImage : galleryImage;
 
-       if(isNew) {
-          state.products.unshift(payload);
-          showNotice("Producto creado como borrador.", "success");
-       } else {
-          const existing = state.products.find(p => p.id === payloadId);
-          if(existing){
-             existing.category = payload.category;
-             existing.name = payload.name;
-             existing.price = payload.price;
-             existing.description = payload.description;
-             existing.image = payload.image;
-             existing.image_url = payload.image_url;
-             showNotice("Producto actualizado.", "success");
-          }
-       }
+      if(!name || !description){
+        showNotice("Nombre y descripción son obligatorios.", "error");
+        return;
+      }
 
-       saveData();
-       renderAll();
-       closeModal();
+      if(!Number.isFinite(price) || price < 0){
+        showNotice("El precio no es válido.", "error");
+        return;
+      }
+
+      if(!image){
+        showNotice("Selecciona una imagen.", "error");
+        return;
+      }
+
+      const productId = isNew ? "prod-" + slugify(name) + "-" + Date.now().toString().slice(-4) : idVal;
+
+      if(isNew){
+        state.products.unshift({
+          id: productId,
+          category: category,
+          name: name,
+          price: price,
+          description: description,
+          image: image,
+          image_url: image,
+          visible: false
+        });
+
+        showNotice("Producto creado como borrador.", "success");
+      } else {
+        const existing = state.products.find(product => product.id === productId);
+
+        if(!existing){
+          showNotice("Producto no encontrado.", "error");
+          return;
+        }
+
+        existing.category = category;
+        existing.name = name;
+        existing.price = price;
+        existing.description = description;
+        existing.image = image;
+        existing.image_url = image;
+
+        showNotice("Producto actualizado.", "success");
+      }
+
+      saveData();
+      renderAll();
+      updateCartStats();
+      closeModal();
     }
 
     function loginAdmin(){
@@ -1264,7 +1320,8 @@
 
       const modalImgBtn = event.target.closest("[data-modal-img]");
       if(modalImgBtn){
-         els.modalProductImage.value = modalImgBtn.dataset.modalImg;
+         if(els.modalProductImage) els.modalProductImage.value = modalImgBtn.dataset.modalImg;
+         if(els.modalProductImageUrl) els.modalProductImageUrl.value = "";
          renderModalGallery();
       }
 
@@ -1297,8 +1354,8 @@
       els.modalProductCategory.addEventListener("change", () => {
         const category = els.modalProductCategory.value;
         const library = imageLibrary.catalog[category] || [];
-        if(library.length > 0 && !library.includes(els.modalProductImage.value)){
-           els.modalProductImage.value = library[0];
+        if(library.length > 0 && (!els.modalProductImage || !library.includes(els.modalProductImage.value))){
+           if(els.modalProductImage) els.modalProductImage.value = library[0];
         }
         renderModalGallery();
       });
@@ -1311,3 +1368,4 @@
   </script>
 </body>
 </html>
+```
