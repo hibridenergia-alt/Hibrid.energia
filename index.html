@@ -69,7 +69,7 @@
 
     img,svg{display:block;max-width:100%;height:auto}
     button,input,textarea,select{font:inherit;color:inherit}
-    button{cursor:pointer;background:none;border:0}
+    button{cursor:pointer;background:none;border:0;text-align:left;}
     :focus-visible{outline:2px solid var(--color-primary);outline-offset:3px;border-radius:var(--radius-sm)}
 
     .topbar{
@@ -109,6 +109,7 @@
       display:inline-flex;align-items:center;justify-content:center;gap:.55rem;
       border:1px solid transparent;font-size:var(--text-sm);font-weight:800;
       transition:all var(--transition);
+      text-align:center;
     }
     .btn:hover{transform:translateY(-1px)}
     .btn.primary{background:var(--color-primary);border-color:var(--color-primary);color:var(--color-text-inverse)}
@@ -146,7 +147,6 @@
       display:flex;
       flex-direction:column;
       min-height:180px;
-      text-align:left;
       border: 1px solid var(--color-border);
       border-radius: var(--radius-lg);
       background: linear-gradient(180deg,rgba(20,32,41,1),rgba(15,25,33,1));
@@ -164,7 +164,7 @@
     }
     .cat-img {
       width: 100%;
-      height: 100px;
+      height: 120px;
       object-fit: cover;
       background: #ffffff; 
       border-bottom: 1px solid var(--color-border);
@@ -192,7 +192,7 @@
       transition:transform var(--transition),border-color var(--transition),box-shadow var(--transition)
     }
     .product-card:hover{transform:translateY(-3px);border-color:rgba(40,210,109,.35);box-shadow:var(--shadow-lg)}
-    .product-media{aspect-ratio:4/3;background:#091118;overflow:hidden}
+    .product-media{aspect-ratio:4/3;background:#ffffff;overflow:hidden; display:flex; align-items:center; justify-content:center;}
     .product-media img{width:100%;height:100%;object-fit:cover}
     .product-body{padding:var(--space-4);display:grid;gap:var(--space-3)}
     .product-top{display:flex;gap:var(--space-3);justify-content:space-between;align-items:start}
@@ -218,8 +218,8 @@
     .bill-box{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--color-border);background:#091118}
     .bill-box img{width:100%;max-height:450px;object-fit:contain}
     .calc-result{
-      margin-top:var(--space-4);padding:var(--space-4);border-radius:var(--radius-lg);
-      background:rgba(40,210,109,.08);border:1px solid rgba(40,210,109,.34)
+      margin-top:var(--space-4);padding:var(--space-5);border-radius:var(--radius-lg);
+      background:rgba(40,210,109,.06);border:1px solid rgba(40,210,109,.34)
     }
     .calc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
 
@@ -228,7 +228,7 @@
       display:grid;grid-template-columns:96px 1fr auto;gap:var(--space-4);padding:var(--space-4);
       border-radius:var(--radius-lg);background:rgba(255,255,255,.02);border:1px solid var(--color-border)
     }
-    .cart-item img{width:96px;height:96px;border-radius:var(--radius-md);object-fit:cover;background:#091118}
+    .cart-item img{width:96px;height:96px;border-radius:var(--radius-md);object-fit:cover;background:#ffffff;}
     .qty-row{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-3)}
     .summary-line{display:flex;justify-content:space-between;gap:var(--space-3);padding:var(--space-3) 0;border-bottom:1px solid var(--color-divider)}
     .summary-line:last-child{border-bottom:0;padding-top:var(--space-4);font-size:var(--text-lg);font-weight:900}
@@ -240,17 +240,18 @@
     .admin-toolbar{display:grid;grid-template-columns:1fr auto;gap:var(--space-3);margin-bottom:var(--space-4)}
     .admin-list-item{
       display:grid;grid-template-columns:80px 1fr auto;gap:var(--space-3);align-items:center;
-      padding:var(--space-3);border-radius:var(--radius-lg);border:1px solid var(--color-border);background:rgba(255,255,255,.02)
+      padding:var(--space-3);border-radius:var(--radius-lg);border:1px solid var(--color-border);background:rgba(255,255,255,.02);
+      text-align: left;
     }
     .admin-list-item.active{border-color:rgba(40,210,109,.35);background:rgba(40,210,109,.06)}
-    .admin-list-item img{width:80px;height:80px;border-radius:var(--radius-md);object-fit:cover;background:#091118}
+    .admin-list-item img{width:80px;height:80px;border-radius:var(--radius-md);object-fit:cover;background:#ffffff;}
 
     .admin-form{display:grid;gap:var(--space-4)}
     .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
     .form-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4)}
 
     .image-workspace{display:grid;grid-template-columns:220px 1fr;gap:var(--space-4);align-items:start}
-    .preview-box{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--color-border);background:#091118;aspect-ratio:1/1}
+    .preview-box{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--color-border);background:#ffffff;aspect-ratio:1/1}
     .preview-box img{width:100%;height:100%;object-fit:cover}
 
     .gallery-panel{border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);background:rgba(255,255,255,.02)}
@@ -260,7 +261,7 @@
       overflow:hidden;cursor:pointer;transition:transform var(--transition),border-color var(--transition)
     }
     .gallery-item:hover,.gallery-item.active{transform:translateY(-2px);border-color:rgba(40,210,109,.35)}
-    .gallery-item img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#091118}
+    .gallery-item img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#ffffff;}
     .gallery-item span{display:block;padding:.55rem;font-size:var(--text-xs);line-height:1.35;color:var(--color-text-muted)}
 
     .notice-stack{
@@ -312,7 +313,7 @@
       <div class="logo-shell">
         <img src="logotipohibrid.png" alt="Logo HiBRID" class="logo-img" loading="eager" onerror="this.onerror=null; this.style.display='none';">
       </div>
-      <!-- Menú simplificado: Solo Productos y Calculadora -->
+      <!-- Menú limpio -->
       <nav class="nav" aria-label="Navegación principal">
         <button class="btn secondary nav-btn" type="button" data-route="home">Productos</button>
         <button class="btn secondary nav-btn" type="button" data-route="calculator">Calculadora</button>
@@ -330,7 +331,7 @@
         </div>
       </div>
 
-      <!-- Grilla de categorías siempre visible -->
+      <!-- Grilla de categorías, siempre firme aquí -->
       <div id="categoryGrid" class="category-grid"></div>
 
       <div class="section-head" id="catalogMetaJump" style="margin-top: var(--space-6);">
@@ -338,10 +339,10 @@
           <h3 id="catalogTitle">Todos los productos</h3>
           <p id="catalogMeta">Catálogo completo.</p>
         </div>
-        <!-- Botón para limpiar filtros y ver todo de nuevo -->
         <button id="clearFiltersBtn" class="btn secondary small" type="button" style="display:none;">Ver todos</button>
       </div>
 
+      <!-- Catálogo de productos -->
       <div id="catalogGrid" class="catalog-grid"></div>
     </section>
 
@@ -349,7 +350,7 @@
       <div class="section-head" style="margin-top:0">
         <div>
           <h3>Calculadora Solar Inteligente</h3>
-          <p>Calcula tu kit ideal basado en lo que pagas/consumes al mes.</p>
+          <p>Calcula tu kit ideal basado en lo que consumes al mes.</p>
         </div>
         <button class="btn ghost" type="button" data-route="home">Volver</button>
       </div>
@@ -369,9 +370,8 @@
 
           <div class="calc-grid" style="margin-top:1rem">
             <div>
-              <!-- CALCULADORA MEJORADA: Pide consumo en kWh en vez de Potencia Instalada -->
               <label for="powerInput" style="display:block;margin-bottom:.45rem;font-weight:800;color:var(--color-primary);">Consumo mensual (kWh)</label>
-              <input id="powerInput" class="field" type="number" min="1" step="10" placeholder="Ej: 350">
+              <input id="powerInput" class="field" type="number" min="1" step="10" placeholder="Ej: 250">
             </div>
             <div>
               <label for="batteryPercent" style="display:block;margin-bottom:.45rem;font-weight:800">Autonomía en Baterías (%)</label>
@@ -382,7 +382,7 @@
               <select id="projectUse" class="select">
                 <option value="hogar">Residencial / Hogar</option>
                 <option value="comercial">Comercial / Negocio</option>
-                <option value="parcela">Parcela / Off-Grid</option>
+                <option value="parcela">Parcela / Off-Grid (Aislado)</option>
               </select>
             </div>
           </div>
@@ -501,24 +501,16 @@
 
               <div class="admin-form">
                 <div>
-                  <label for="productImage" style="display:block;margin-bottom:.45rem;font-weight:800">Ruta / URL de imagen</label>
-                  <input id="productImage" class="field" type="text" placeholder="panelescatalago.jpg o URL">
-                  <div class="small muted" style="margin-top:.4rem">Puedes escribir una imagen del repositorio o pegar una URL externa.</div>
-                </div>
-
-                <div>
-                  <label for="productImageFile" style="display:block;margin-bottom:.45rem;font-weight:800">Preview local temporal</label>
-                  <input id="productImageFile" class="field" type="file" accept="image/*">
-                  <div class="small muted" style="margin-top:.4rem">Esto sirve solo para previsualizar en el navegador.</div>
+                  <label for="productImage" style="display:block;margin-bottom:.45rem;font-weight:800">Nombre del archivo de imagen</label>
+                  <input id="productImage" class="field" type="text" placeholder="ej: panelescatalago.jpg">
+                  <div class="small muted" style="margin-top:.4rem">Asegúrate de que coincida con un archivo subido a tu repositorio.</div>
                 </div>
 
                 <div class="gallery-panel">
                   <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);margin-bottom:var(--space-3)">
                     <div>
-                      <strong style="display:block">Biblioteca interna</strong>
-                      <span class="tiny muted">Elige imágenes reales del repositorio según la categoría.</span>
+                      <strong style="display:block">Fotos disponibles por categoría</strong>
                     </div>
-                    <button id="refreshGalleryBtn" class="btn secondary small" type="button">Actualizar</button>
                   </div>
                   <div id="galleryGrid" class="gallery-grid"></div>
                 </div>
@@ -537,7 +529,7 @@
   </main>
 
   <footer class="site-footer">
-    <!-- Botón del Administrador escondido estratégicamente en el footer -->
+    <!-- El botón del admin oculto abajo, sin estorbar -->
     <button class="btn ghost small" type="button" data-route="admin-login" style="color: var(--color-text-faint); border-color: transparent;">Acceso Administrador (Oculto)</button>
   </footer>
 
@@ -555,7 +547,7 @@
     const ADMIN_PASSWORD = "Hibrid2026";
     const WHATSAPP_NUMBER = "56956139055";
 
-    // IMÁGENES LIMPIAS PARA LAS CATEGORÍAS
+    // IMÁGENES LIMPIAS EXACTAS PARA LAS CATEGORÍAS
     const categories = [
       { key:"principales", label:"Principales", blurb:"Equipos destacados", image:"kitsolar.jpg" },
       { key:"paneles", label:"Paneles", blurb:"Módulos solares", image:"paneles.jpg" },
@@ -566,6 +558,7 @@
       { key:"otros", label:"Otros", blurb:"Focos, cables y más", image:"focosolar1.jpg" }
     ];
 
+    // BANCO DE IMÁGENES PARA LOS PRODUCTOS
     const imageLibrary = {
       catalog: {
         paneles:["panelescatalago.jpg","paneles.jpg"],
@@ -578,7 +571,6 @@
       }
     };
 
-    // IMÁGENES DE CATÁLOGO PARA LOS PRODUCTOS
     const demoProducts = [
       { id:"pri-001", name:"Kit Hogar Híbrido 3kW", price:1899000, description:"Sistema base para vivienda con paneles, inversor híbrido y batería. Ideal para consumo medio.", category:"principales", image:"kitsolar.jpg", visible:true },
       { id:"pri-002", name:"Kit Negocio 5kW Pro", price:3290000, description:"Solución orientativa para locales y oficinas con mejor capacidad de generación y expansión.", category:"principales", image:"inversorcatalogo.png", visible:true },
@@ -667,10 +659,8 @@
       productPrice:$("#productPrice"),
       productDescription:$("#productDescription"),
       productImage:$("#productImage"),
-      productImageFile:$("#productImageFile"),
       imagePreview:$("#imagePreview"),
       galleryGrid:$("#galleryGrid"),
-      refreshGalleryBtn:$("#refreshGalleryBtn"),
 
       noticeStack:$("#noticeStack")
     };
@@ -708,6 +698,7 @@
     }
 
     function getCategoryLabel(key){
+      if(key === "all") return "Todos los productos";
       return categories.find(item => item.key === key)?.label || key;
     }
 
@@ -730,12 +721,12 @@
     }
 
     function filteredProducts(){
-      let list = visibleProducts().filter(item => state.filterCategory === "all" ? true : item.category === state.filterCategory);
-      return list;
+      return visibleProducts().filter(item => state.filterCategory === "all" ? true : item.category === state.filterCategory);
     }
 
     function renderCategoryButtons(){
-      els.categoryGrid.innerHTML = categories.filter(cat => cat.key !== "all").map(cat => {
+      if(!els.categoryGrid) return;
+      els.categoryGrid.innerHTML = categories.map(cat => {
         const count = state.products.filter(item => item.category === cat.key && item.visible).length;
         const imgSrc = cat.image || 'paneles.jpg';
         return `
@@ -750,11 +741,16 @@
         `;
       }).join("");
 
-      els.adminFilter.innerHTML = `<option value="all">Todas las categorías</option>` + categories.filter(cat => cat.key !== "all").map(cat => `<option value="${cat.key}">${cat.label}</option>`).join("");
-      els.productCategory.innerHTML = categories.filter(cat => cat.key !== "all").map(cat => `<option value="${cat.key}">${cat.label}</option>`).join("");
+      if(els.adminFilter){
+        els.adminFilter.innerHTML = `<option value="all">Todas las categorías</option>` + categories.map(cat => `<option value="${cat.key}">${cat.label}</option>`).join("");
+      }
+      if(els.productCategory){
+        els.productCategory.innerHTML = categories.map(cat => `<option value="${cat.key}">${cat.label}</option>`).join("");
+      }
     }
 
     function renderCatalog(){
+      if(!els.catalogGrid) return;
       const list = filteredProducts();
       
       els.catalogTitle.textContent = state.filterCategory === "all" ? "Todos los productos" : `Mostrando: ${getCategoryLabel(state.filterCategory)}`;
@@ -902,14 +898,23 @@
       const use = els.projectUse.value;
 
       if(!monthlyKwh || monthlyKwh <= 0){
-        els.calcResult.innerHTML = `<p class="small" style="color:#ffc1c1;margin-top:1rem">Por favor, ingresa tu consumo mensual en kWh.</p>`;
+        els.calcResult.innerHTML = `<p class="small" style="color:#ffc1c1;margin-top:1rem">Por favor, ingresa tu consumo mensual en kWh (Este valor sale en tu boleta de luz).</p>`;
         return;
       }
 
       const dailyKwh = monthlyKwh / 30;
-      const hsp = 5;
-      const efficiency = 0.80;
-      const panelPowerKw = 0.55; // 550W
+      
+      // Chile HSP: Promedio general
+      let hsp = 4.5; 
+      let efficiency = 0.80;
+      
+      if(use === "parcela") {
+         // Off-grid debe ser capaz de funcionar en invierno (Peores meses de sol)
+         hsp = 2.5; 
+         efficiency = 0.70; // Mayores pérdidas al ciclar baterías
+      }
+
+      const panelPowerKw = 0.55; // Panel de 550W
       const areaPerPanel = 2.5;
 
       const requiredKw = dailyKwh / (hsp * efficiency);
@@ -917,23 +922,31 @@
       const totalInstalledKw = (panels * panelPowerKw).toFixed(2);
       const area = panels * areaPerPanel;
       const batteryKwh = (dailyKwh * batteryRatio).toFixed(1);
+      
+      let numBatteries = Math.ceil(batteryKwh / 5.12); // Baterías Litio estándar de 5.12kWh
 
       let inverter = "Inversor Monofásico 3kW - 5kW";
-      if(totalInstalledKw > 6 && totalInstalledKw <= 12) inverter = "Inversor Monofásico 8kW - 10kW";
-      if(totalInstalledKw > 12) inverter = "Inversor Trifásico o Paralelo";
+      if(totalInstalledKw > 5 && totalInstalledKw <= 10) inverter = "Inversor Monofásico 8kW u Off-Grid 6kW";
+      if(totalInstalledKw > 10) inverter = "Inversores en Paralelo o Sistema Trifásico";
+
+      let useNote = "";
+      if(use === "parcela") {
+        useNote = "Cálculo Off-Grid/Aislado: Dimensionado para funcionar de forma estable incluso en meses de invierno con poca radiación solar.";
+      } else {
+        useNote = "Cálculo On-Grid/Híbrido: Dimensionado con el promedio solar. Generarás más en verano para compensar tus cuentas de invierno.";
+      }
 
       els.calcResult.innerHTML = `
         <div class="calc-result">
           <h4 style="margin-bottom:.7rem; color:var(--color-primary);">Solución Recomendada</h4>
+          <p class="small" style="margin-bottom:1rem">Para un consumo de <strong>${monthlyKwh} kWh/mes</strong> (Aprox. ${dailyKwh.toFixed(1)} kWh al día):</p>
           <div class="calc-grid">
-            <div><strong>Sistema Ideal:</strong><br>${totalInstalledKw} kWp instalados</div>
-            <div><strong>Paneles:</strong><br>${panels} paneles de 550W</div>
-            <div><strong>Área en techo:</strong><br>${area} m² aprox.</div>
-            <div><strong>Generación:</strong><br>${dailyKwh.toFixed(1)} kWh/día requeridos</div>
-            <div><strong>Inversor:</strong><br>${inverter}</div>
-            <div><strong>Respaldo (Batería):</strong><br>${batteryKwh} kWh (${Number(els.batteryPercent.value || 0)}%)</div>
+            <div><strong>Paneles Solares:</strong><br>${panels} módulos de 550W<br><span class="tiny muted">Potencia: ${totalInstalledKw} kWp</span></div>
+            <div><strong>Inversor Sugerido:</strong><br>${inverter}<br><span class="tiny muted">Según capacidad del arreglo</span></div>
+            <div><strong>Banco de Baterías:</strong><br>${numBatteries}x Litio 5.12kWh<br><span class="tiny muted">Respaldo: ${batteryKwh} kWh solicitados</span></div>
+            <div><strong>Espacio en Techo:</strong><br>${area} m²<br><span class="tiny muted">Área libre de sombras</span></div>
           </div>
-          <p class="small muted" style="margin-top:1rem">Esta es una simulación real basada en tu boleta. Úsala como guía para armar tu kit.</p>
+          <p class="small muted" style="margin-top:1rem">${useNote}</p>
         </div>
       `;
     }
@@ -1092,17 +1105,6 @@
       renderImageGallery();
     }
 
-    function previewImageFromFile(event){
-      const file = event.target.files?.[0];
-      if(!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        els.imagePreview.src = reader.result;
-        els.productImage.value = reader.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
     function renderAll(){
       renderCategoryButtons();
       renderCatalog();
@@ -1114,7 +1116,7 @@
       const routeBtn = event.target.closest("[data-route]");
       if(routeBtn) routeTo(routeBtn.dataset.route);
 
-      // LÓGICA DE CATEGORÍAS (Desplaza hacia abajo, no las oculta)
+      // Filtro de categorías directo al catálogo
       const catBtn = event.target.closest("[data-select-category]");
       if(catBtn){
         state.filterCategory = catBtn.dataset.selectCategory;
@@ -1130,7 +1132,6 @@
         }, 50);
       }
 
-      // BOTÓN "VER TODOS"
       const clearBtn = event.target.closest("#clearFiltersBtn");
       if(clearBtn){
         state.filterCategory = "all";
@@ -1179,7 +1180,7 @@
     els.adminForm.addEventListener("submit", saveProduct);
     els.deleteProductBtn.addEventListener("click", deleteProduct);
     els.productImage.addEventListener("input", previewImageFromUrl);
-    els.productImageFile.addEventListener("change", previewImageFromFile);
+    
     els.productCategory.addEventListener("change", () => {
       const library = imageLibrary.catalog[els.productCategory.value] || [];
       if(library.length && !library.includes(els.productImage.value.trim())){
@@ -1191,6 +1192,7 @@
 
     els.refreshGalleryBtn.addEventListener("click", renderImageGallery);
 
+    // Inicializar todo seguro
     renderAll();
     routeTo("home");
   </script>
