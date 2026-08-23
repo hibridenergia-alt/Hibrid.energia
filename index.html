@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
   <style>
     :root,[data-theme="light"]{
@@ -82,7 +83,7 @@
     .topbar-inner{
       width:min(calc(100% - 24px), var(--max));
       margin:auto;
-      padding:var(--space-4) 0;
+      padding:var(--space-3) 0;
       display:flex;
       flex-wrap:wrap;
       gap:var(--space-4);
@@ -96,13 +97,13 @@
     }
     .logo-img{
       width:100%;
-      max-width:320px;
+      max-width:280px;
       height:auto;
-      max-height:85px;
+      max-height:75px;
       object-fit:contain;
     }
 
-    .nav{display:flex;gap:var(--space-2);flex-wrap:wrap;}
+    .nav{display:flex;gap:var(--space-2);flex-wrap:wrap;align-items:center;}
 
     .btn{
       min-height:46px;padding:.85rem 1rem;border-radius:var(--radius-md);
@@ -120,6 +121,37 @@
     .btn.danger{background:rgba(255,113,113,.12);border-color:rgba(255,113,113,.28);color:#ffd1d1}
     .btn.small{min-height:38px;padding:.6rem .85rem;border-radius:.8rem;font-size:var(--text-xs);}
     .btn.full{width:100%}
+
+    /* REDES SOCIALES CSS */
+    .social-links{
+      display:flex;
+      align-items:center;
+      gap:.45rem;
+      margin-left:.35rem;
+      padding-left:.7rem;
+      border-left:1px solid var(--color-border);
+    }
+    .social-link{
+      width:40px;
+      height:40px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:var(--radius-full);
+      border:1px solid var(--color-border);
+      background:rgba(255,255,255,.04);
+      color:var(--color-text-muted);
+      font-size:1rem;
+      transition: transform var(--transition), color var(--transition), background var(--transition), border-color var(--transition);
+    }
+    .social-link:hover{
+      transform:translateY(-2px);
+      color:#ffffff;
+    }
+    .social-link.facebook:hover{background:#1877f2; border-color:#1877f2;}
+    .social-link.instagram:hover{background:linear-gradient(135deg,#feda75,#d62976,#4f5bd5); border-color:#d62976;}
+    .social-link.whatsapp:hover{background:#25d366; border-color:#25d366;}
+    .social-link.tiktok:hover{background:#111111; border-color:#ffffff;}
 
     .page{flex: 1; width:min(calc(100% - 24px), var(--max));margin:auto;padding:var(--space-8) 0 var(--space-16)}
     .view{display:none}
@@ -141,7 +173,6 @@
     .section-head p{font-size:var(--text-sm);color:var(--color-text-muted);margin-top:.2rem;}
 
     .category-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-10);}
-    
     .category-card{
       padding:0;
       display:flex;
@@ -209,10 +240,9 @@
       border:1px dashed var(--color-border);border-radius:var(--radius-lg);background:rgba(255,255,255,.02)
     }
 
-    .calc-layout,.cart-layout,.admin-layout{display:grid;gap:var(--space-5)}
+    .calc-layout,.cart-layout{display:grid;gap:var(--space-5)}
     .calc-layout{grid-template-columns:.92fr 1.08fr}
     .cart-layout{grid-template-columns:1.18fr .82fr}
-    .admin-layout{grid-template-columns:360px 1fr}
 
     .panel,.cart-card,.summary-card,.admin-card,.login-card{padding:var(--space-5)}
     .bill-box{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--color-border);background:#091118}
@@ -223,7 +253,7 @@
     }
     .calc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
 
-    .cart-list,.admin-list{display:grid;gap:var(--space-4)}
+    .cart-list{display:grid;gap:var(--space-4)}
     .cart-item{
       display:grid;grid-template-columns:96px 1fr auto;gap:var(--space-4);padding:var(--space-4);
       border-radius:var(--radius-lg);background:rgba(255,255,255,.02);border:1px solid var(--color-border)
@@ -237,35 +267,62 @@
     .small{font-size:var(--text-sm)}
     .tiny{font-size:var(--text-xs)}
 
-    .admin-toolbar{display:grid;grid-template-columns:1fr auto;gap:var(--space-3);margin-bottom:var(--space-4)}
-    .admin-list-item{
-      display:grid;grid-template-columns:80px 1fr auto;gap:var(--space-3);align-items:center;
-      padding:var(--space-3);border-radius:var(--radius-lg);border:1px solid var(--color-border);background:rgba(255,255,255,.02);
-      text-align: left;
+    /* NUEVO PANEL ADMIN CSS */
+    .admin-inventory{display:grid;gap:var(--space-4);}
+    .admin-stats-row{display:grid;grid-template-columns:repeat(3, 1fr);gap:var(--space-3);margin-bottom:var(--space-4);}
+    .stat-card{background:rgba(255,255,255,.02);border:1px solid var(--color-border);padding:var(--space-4);border-radius:var(--radius-lg);text-align:center;}
+    .stat-card h4{font-size:var(--text-xl);color:var(--color-primary);margin-bottom:.2rem;}
+    .admin-controls{display:flex;gap:var(--space-3);justify-content:space-between;align-items:center;margin-bottom:var(--space-4);}
+    
+    .inventory-list{display:grid;grid-template-columns:1fr;gap:var(--space-3);}
+    .inv-item{
+      display:grid;grid-template-columns:80px 1fr auto;gap:var(--space-4);align-items:center;
+      padding:var(--space-3);border-radius:var(--radius-lg);background:rgba(255,255,255,.02);border:1px solid var(--color-border);
     }
-    .admin-list-item.active{border-color:rgba(40,210,109,.35);background:rgba(40,210,109,.06)}
-    .admin-list-item img{width:80px;height:80px;border-radius:var(--radius-md);object-fit:cover;background:#ffffff;}
+    .inv-item img{width:80px;height:80px;object-fit:cover;border-radius:var(--radius-md);background:#fff;}
+    .inv-info h4{font-size:var(--text-base);font-weight:800;margin-bottom:.2rem;}
+    .inv-actions{display:flex;align-items:center;gap:var(--space-2);}
+    
+    /* Toggle Switch */
+    .switch{position:relative;display:inline-block;width:44px;height:24px;}
+    .switch input{opacity:0;width:0;height:0;}
+    .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgba(255,255,255,.1);transition:.3s;border-radius:34px;border:1px solid var(--color-border);}
+    .slider:before{position:absolute;content:"";height:16px;width:16px;left:3px;bottom:3px;background-color:var(--color-text-muted);transition:.3s;border-radius:50%;}
+    input:checked + .slider{background-color:rgba(40,210,109,.2);border-color:var(--color-primary);}
+    input:checked + .slider:before{transform:translateX(20px);background-color:var(--color-primary);}
 
-    .admin-form{display:grid;gap:var(--space-4)}
+    /* MODAL CSS */
+    .modal-overlay{
+      position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);
+      z-index:1000;display:flex;align-items:center;justify-content:center;
+      opacity:0;visibility:hidden;transition:all var(--transition);
+    }
+    .modal-overlay.active{opacity:1;visibility:visible;}
+    .modal-content{
+      background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);
+      width:100%;max-width:700px;max-height:90vh;overflow-y:auto;padding:var(--space-6);
+      position:relative;transform:translateY(20px);transition:all var(--transition);
+    }
+    .modal-overlay.active .modal-content{transform:translateY(0);}
+    .btn-close-modal{
+      position:absolute;top:var(--space-4);right:var(--space-4);background:transparent;border:0;
+      color:var(--color-text-muted);font-size:1.5rem;cursor:pointer;
+    }
+    .btn-close-modal:hover{color:var(--color-text);}
+    
     .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
-    .form-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4)}
-
-    .image-workspace{display:grid;grid-template-columns:220px 1fr;gap:var(--space-4);align-items:start}
-    .preview-box{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--color-border);background:#ffffff;aspect-ratio:1/1}
-    .preview-box img{width:100%;height:100%;object-fit:cover}
-
-    .gallery-panel{border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);background:rgba(255,255,255,.02)}
-    .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3);max-height:320px;overflow:auto;padding-right:.25rem}
+    .gallery-panel{border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);background:rgba(255,255,255,.02);margin-top:var(--space-4);}
+    .gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);max-height:200px;overflow:auto;}
     .gallery-item{
-      border:1px solid var(--color-border);background:rgba(255,255,255,.02);border-radius:var(--radius-md);
-      overflow:hidden;cursor:pointer;transition:transform var(--transition),border-color var(--transition)
+      border:2px solid transparent;background:rgba(255,255,255,.02);border-radius:var(--radius-md);
+      overflow:hidden;cursor:pointer;transition:all var(--transition);
     }
-    .gallery-item:hover,.gallery-item.active{transform:translateY(-2px);border-color:rgba(40,210,109,.35)}
+    .gallery-item:hover{border-color:rgba(40,210,109,.5);}
+    .gallery-item.active{border-color:var(--color-primary);box-shadow:0 0 0 2px rgba(40,210,109,.2);}
     .gallery-item img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#ffffff;}
-    .gallery-item span{display:block;padding:.55rem;font-size:var(--text-xs);line-height:1.35;color:var(--color-text-muted)}
 
     .notice-stack{
-      position:fixed;top:100px;right:var(--space-4);z-index:120;display:grid;gap:var(--space-3);
+      position:fixed;top:100px;right:var(--space-4);z-index:1200;display:grid;gap:var(--space-3);
       width:min(360px,calc(100vw - 2rem))
     }
     .notice{padding:var(--space-4);display:flex;gap:var(--space-3);align-items:flex-start;border-radius:var(--radius-lg);background:rgba(15,25,33,.98);border:1px solid var(--color-border);box-shadow:var(--shadow-lg)}
@@ -277,32 +334,26 @@
     .sticky-cart strong{display:block;font-size:var(--text-sm)}
     .sticky-cart span{display:block;font-size:var(--text-xs);color:var(--color-text-muted)}
 
-    .site-footer {
-      text-align: center;
-      padding: var(--space-8);
-      margin-top: var(--space-12);
-      border-top: 1px solid var(--color-border);
-      padding-bottom: 120px; 
-    }
+    .site-footer { text-align: center; padding: var(--space-8); margin-top: var(--space-12); border-top: 1px solid var(--color-border); padding-bottom: 120px; }
 
     @media (max-width:1160px){
-      .calc-layout,.cart-layout,.admin-layout{grid-template-columns:1fr}
+      .calc-layout,.cart-layout{grid-template-columns:1fr}
       .catalog-grid{grid-template-columns:repeat(2,1fr)}
     }
     @media (max-width:760px){
-      .topbar { position: relative; }
-      .topbar-inner{flex-direction:column; padding: var(--space-3) var(--space-3); gap: var(--space-4);}
-      
+      .topbar-inner{flex-direction:column; padding: var(--space-3); gap: var(--space-3);}
       .logo-shell { justify-content:center; }
-      .logo-img { max-height: 80px; }
       .nav{justify-content:center; width:100%;}
-      
+      .social-links{width:100%; justify-content:center; margin-left:0; padding-left:0; padding-top:.65rem; border-left:0; border-top:1px solid var(--color-border);}
       .category-grid{grid-template-columns:repeat(2,1fr); gap:var(--space-3);}
-      .catalog-grid,.form-grid,.form-grid-3,.calc-grid,.gallery-grid{grid-template-columns:1fr}
-      .cart-item,.admin-list-item{grid-template-columns:1fr}
-      .cart-item img,.admin-list-item img{width:100%;height:auto;aspect-ratio:4/3}
+      .catalog-grid,.form-grid,.calc-grid{grid-template-columns:1fr}
+      .cart-item,.inv-item{grid-template-columns:1fr; text-align:center;}
+      .inv-actions{justify-content:center;}
+      .cart-item img,.inv-item img{width:100%;height:auto;aspect-ratio:4/3;margin:auto;}
       .sticky-cart{left:var(--space-3);right:var(--space-3);bottom:var(--space-3);justify-content:space-between;border-radius:var(--radius-xl)}
       .notice-stack{left:var(--space-3);right:var(--space-3);width:auto}
+      .admin-stats-row{grid-template-columns:1fr;}
+      .admin-controls{flex-direction:column;}
     }
   </style>
 </head>
@@ -316,6 +367,22 @@
       <nav class="nav" aria-label="Navegación principal">
         <button class="btn secondary nav-btn" type="button" data-route="home">Productos</button>
         <button class="btn secondary nav-btn" type="button" data-route="calculator">Calculadora</button>
+        
+        <!-- REDES SOCIALES -->
+        <div class="social-links" aria-label="Redes sociales">
+          <a class="social-link facebook" href="https://www.facebook.com/hibridenergia" target="_blank" rel="noopener noreferrer" title="Facebook">
+            <i class="fa-brands fa-facebook-f"></i>
+          </a>
+          <a class="social-link instagram" href="https://www.instagram.com/hibridenergia/" target="_blank" rel="noopener noreferrer" title="Instagram">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+          <a class="social-link whatsapp" href="https://wa.me/56956139055?text=Hola%20HiBRID%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n" target="_blank" rel="noopener noreferrer" title="WhatsApp">
+            <i class="fa-brands fa-whatsapp"></i>
+          </a>
+          <a class="social-link tiktok" href="https://www.tiktok.com/@hibrid976" target="_blank" rel="noopener noreferrer" title="TikTok">
+            <i class="fa-brands fa-tiktok"></i>
+          </a>
+        </div>
       </nav>
     </div>
   </header>
@@ -432,89 +499,83 @@
     <section id="admin" class="view">
       <div class="section-head" style="margin-top:0">
         <div>
-          <h3>Panel de administración</h3>
-          <p>Crea, edita, elimina, oculta y asigna imágenes del catálogo interno por categoría.</p>
+          <h3>Inventario HiBRID</h3>
+          <p>Gestiona todo tu catálogo de forma simple y rápida.</p>
         </div>
         <button class="btn ghost" type="button" data-route="home">Salir</button>
       </div>
 
-      <div class="admin-layout">
-        <aside class="admin-card">
-          <div class="admin-toolbar">
-            <select id="adminFilter" class="select"></select>
-            <button id="newProductBtn" class="btn primary" type="button">Nuevo producto</button>
+      <div class="admin-inventory">
+        <div class="admin-stats-row">
+          <div class="stat-card">
+            <h4 id="statTotal">0</h4>
+            <span class="small muted">Total Productos</span>
           </div>
-          <div id="adminList" class="admin-list"></div>
-        </aside>
+          <div class="stat-card">
+            <h4 id="statVisible" style="color:var(--color-primary)">0</h4>
+            <span class="small muted">Publicados</span>
+          </div>
+          <div class="stat-card">
+            <h4 id="statHidden" style="color:#ffc1c1">0</h4>
+            <span class="small muted">Ocultos</span>
+          </div>
+        </div>
 
-        <section class="admin-card">
-          <form id="adminForm" class="admin-form">
-            <div class="form-grid-3">
-              <div>
-                <label for="productId" style="display:block;margin-bottom:.45rem;font-weight:800">ID</label>
-                <input id="productId" class="field" type="text" placeholder="prod-001">
-              </div>
-              <div>
-                <label for="productCategory" style="display:block;margin-bottom:.45rem;font-weight:800">Categoría</label>
-                <select id="productCategory" class="select"></select>
-              </div>
-              <div>
-                <label for="productVisible" style="display:block;margin-bottom:.45rem;font-weight:800">Visible</label>
-                <select id="productVisible" class="select">
-                  <option value="true">Sí</option>
-                  <option value="false">No</option>
-                </select>
-              </div>
-            </div>
+        <div class="admin-controls">
+          <select id="adminFilter" class="select" style="max-width:250px;"></select>
+          <div style="display:flex; gap:var(--space-2);">
+            <button id="btnOpenNewProduct" class="btn primary" type="button">Nuevo producto</button>
+          </div>
+        </div>
 
-            <div class="form-grid">
-              <div>
-                <label for="productName" style="display:block;margin-bottom:.45rem;font-weight:800">Nombre</label>
-                <input id="productName" class="field" type="text" placeholder="Nombre del producto">
-              </div>
-              <div>
-                <label for="productPrice" style="display:block;margin-bottom:.45rem;font-weight:800">Precio</label>
-                <input id="productPrice" class="field" type="number" min="0" step="1000" placeholder="0">
-              </div>
-            </div>
-
-            <div>
-              <label for="productDescription" style="display:block;margin-bottom:.45rem;font-weight:800">Descripción</label>
-              <textarea id="productDescription" class="textarea" placeholder="Descripción del producto"></textarea>
-            </div>
-
-            <div class="image-workspace">
-              <div class="preview-box">
-                <img id="imagePreview" src="paneles.jpg" alt="Vista previa del producto" width="700" height="700" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
-              </div>
-
-              <div class="admin-form">
-                <div>
-                  <label for="productImage" style="display:block;margin-bottom:.45rem;font-weight:800">Nombre del archivo de imagen</label>
-                  <input id="productImage" class="field" type="text" placeholder="ej: panelescatalago.jpg">
-                  <div class="small muted" style="margin-top:.4rem">Asegúrate de que coincida con un archivo subido a tu repositorio.</div>
-                </div>
-
-                <div class="gallery-panel">
-                  <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);margin-bottom:var(--space-3)">
-                    <div>
-                      <strong style="display:block">Fotos disponibles por categoría</strong>
-                    </div>
-                  </div>
-                  <div id="galleryGrid" class="gallery-grid"></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-grid">
-              <button class="btn primary full" type="submit">Guardar cambios</button>
-              <button id="deleteProductBtn" class="btn danger full" type="button">Eliminar producto</button>
-            </div>
-          </form>
-        </section>
+        <div id="adminInventoryList" class="inventory-list"></div>
       </div>
     </section>
   </main>
+
+  <!-- MODAL DE FORMULARIO -->
+  <div id="productModal" class="modal-overlay">
+    <div class="modal-content">
+      <button id="btnCloseModal" class="btn-close-modal">&times;</button>
+      <h3 id="modalTitle" style="margin-bottom:var(--space-4);">Nuevo Producto</h3>
+      
+      <form id="modalForm">
+        <input type="hidden" id="modalProductId">
+        <input type="hidden" id="modalProductImage">
+
+        <div class="form-grid">
+          <div>
+            <label style="display:block;margin-bottom:.45rem;font-weight:800">Nombre del producto *</label>
+            <input id="modalProductName" class="field" type="text" placeholder="Ej: Batería Litio 5kWh" required>
+          </div>
+          <div>
+            <label style="display:block;margin-bottom:.45rem;font-weight:800">Categoría *</label>
+            <select id="modalProductCategory" class="select" required></select>
+          </div>
+        </div>
+
+        <div class="form-grid" style="margin-top:var(--space-4);">
+          <div>
+            <label style="display:block;margin-bottom:.45rem;font-weight:800">Precio de referencia *</label>
+            <input id="modalProductPrice" class="field" type="number" min="0" step="1000" placeholder="0" required>
+          </div>
+          <div>
+            <label style="display:block;margin-bottom:.45rem;font-weight:800">Descripción *</label>
+            <input id="modalProductDesc" class="field" type="text" placeholder="Descripción breve" required>
+          </div>
+        </div>
+
+        <div class="gallery-panel">
+          <strong style="display:block;margin-bottom:var(--space-2)">Selecciona una imagen del catálogo:</strong>
+          <div id="modalGalleryGrid" class="gallery-grid"></div>
+        </div>
+
+        <div style="margin-top:var(--space-5); display:flex; gap:var(--space-3);">
+          <button type="submit" class="btn primary full">Guardar Producto</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <footer class="site-footer">
     <button class="btn ghost small" type="button" data-route="admin-login" style="color: var(--color-text-faint); border-color: transparent;">Acceso Administrador (Oculto)</button>
@@ -564,30 +625,8 @@
       { id:"pri-005", name:"Sistema Comercio 8kW", price:5890000, description:"Configuración robusta para alto consumo diurno con enfoque comercial.", category:"principales", image:"panelescatalago.jpg", visible:true },
       { id:"pan-001", name:"Panel Monocristalino 550W", price:129990, description:"Panel solar de alto rendimiento para uso residencial.", category:"paneles", image:"panelescatalago.jpg", visible:true },
       { id:"pan-002", name:"Panel Jinko 565W", price:139900, description:"Módulo de alta eficiencia para proyectos residenciales y comerciales.", category:"paneles", image:"paneles.jpg", visible:true },
-      { id:"pan-003", name:"Panel Bifacial 610W", price:179900, description:"Panel bifacial orientado a estructuras de mayor captación.", category:"paneles", image:"panelescatalago.jpg", visible:true },
-      { id:"pan-004", name:"Panel 450W Residencial", price:94900, description:"Alternativa compacta para techos pequeños.", category:"paneles", image:"paneles.jpg", visible:true },
-      { id:"pan-005", name:"Panel 580W N-Type", price:149900, description:"Mejor estabilidad y menor degradación anual.", category:"paneles", image:"panelescatalago.jpg", visible:true },
       { id:"bat-001", name:"Batería Litio 5kWh", price:990000, description:"Respaldo energético para sistemas híbridos.", category:"baterias", image:"bateriacatalogo1.jpg", visible:true },
-      { id:"bat-002", name:"Batería Felicity 5.12kWh", price:1490000, description:"Batería mural de litio para sistemas residenciales.", category:"baterias", image:"bateriafcatalogo.jpeg", visible:true },
-      { id:"bat-003", name:"Batería Deye 5kWh", price:1690000, description:"Módulo escalable para sistemas de mayor estabilidad.", category:"baterias", image:"bateriadeyecatalogo.jpeg", visible:true },
-      { id:"bat-004", name:"Batería Rack 10kWh", price:2890000, description:"Formato rack para instalaciones técnicas con más respaldo.", category:"baterias", image:"bateriacatalalogo1.jpg", visible:true },
-      { id:"bat-005", name:"Batería 48V 200Ah", price:1890000, description:"Unidad de litio para autonomía extendida.", category:"baterias", image:"bateria.jpg", visible:true },
-      { id:"inv-001", name:"Inversor Híbrido 5kW", price:790000, description:"Control y conversión para instalaciones solares.", category:"inversores", image:"inversor.jpg", visible:true },
-      { id:"inv-002", name:"Inversor Deye Híbrido 5kW", price:1499000, description:"Equipo monofásico con soporte para baterías y monitoreo.", category:"inversores", image:"inversordeyecatalogo.jpg", visible:true },
-      { id:"inv-003", name:"Inversor Deye 8kW", price:2390000, description:"Modelo trifásico para proyectos comerciales.", category:"inversores", image:"inversorcatalogo.png", visible:true },
-      { id:"inv-004", name:"Inversor Off-Grid 6kW", price:1129000, description:"Solución de onda pura para independencia energética.", category:"inversores", image:"inversor.jpg", visible:true },
-      { id:"inv-005", name:"Microinversor 2MPPT", price:389000, description:"Alternativa compacta para matrices pequeñas.", category:"inversores", image:"inversorcatalogo.png", visible:true },
-      { id:"kit-001", name:"Kit Residencial 5kW", price:2490000, description:"Solución pensada para consumo medio residencial.", category:"kits", image:"kitsolar.jpg", visible:true },
-      { id:"kit-002", name:"Kit Autonomía Total", price:4290000, description:"Sistema de mayor capacidad para alto consumo.", category:"kits", image:"kitsolar.jpg", visible:true },
-      { id:"kit-003", name:"Kit Solar 1.5kW Básico", price:1099000, description:"Kit inicial con paneles, estructura e inversor.", category:"kits", image:"panelescatalago.jpg", visible:true },
-      { id:"kit-004", name:"Kit Solar 3kW Familiar", price:1890000, description:"Paquete pensado para hogares con cargas diarias.", category:"kits", image:"bateriacatalogo1.jpg", visible:true },
-      { id:"kit-005", name:"Kit Solar 8kW Comercio", price:5390000, description:"Solución mayor para negocios con consumos diurnos relevantes.", category:"kits", image:"inversorcatalogo.png", visible:true },
-      { id:"eol-001", name:"Aerogenerador 1kW", price:890000, description:"Equipo eólico complementario.", category:"eolico", image:"aerogeneradorcatalogo1.jpg", visible:true },
-      { id:"eol-002", name:"Aerogenerador 2kW Híbrido", price:2190000, description:"Pensado para combinar con banco de baterías e integración solar.", category:"eolico", image:"aerogeneradorcatalogo2.jpg", visible:true },
-      { id:"eol-003", name:"Turbina 3kW", price:3290000, description:"Alternativa de mayor potencia para parcelas o respaldo.", category:"eolico", image:"eolica.jpg", visible:true },
-      { id:"eol-004", name:"Controlador Eólico 48V", price:289000, description:"Complemento para gestión segura de carga.", category:"eolico", image:"aerogeneradorcatalogo1.jpg", visible:true },
-      { id:"eol-005", name:"Kit Eólico-Solar Mixto", price:4190000, description:"Configuración demostrativa para proyectos híbridos.", category:"eolico", image:"aerogeneradorcatalogo2.jpg", visible:true },
-      { id:"otr-001", name:"Foco Solar 100W", price:35000, description:"Foco LED solar con sensor de movimiento y control.", category:"otros", image:"focosolarproducto.jpeg", visible:true }
+      { id:"inv-001", name:"Inversor Híbrido 5kW", price:790000, description:"Control y conversión para instalaciones solares.", category:"inversores", image:"inversor.jpg", visible:true }
     ];
 
     const state = {
@@ -595,8 +634,7 @@
       products: [],
       cart: [],
       filterCategory: "all",
-      adminUnlocked: false,
-      selectedProductId: null
+      adminUnlocked: false
     };
 
     const $ = (selector, parent=document) => parent.querySelector(selector);
@@ -622,28 +660,31 @@
       adminPass: $("#adminPass"),
       adminLoginBtn: $("#adminLoginBtn"),
       adminFilter: $("#adminFilter"),
-      adminList: $("#adminList"),
-      adminForm: $("#adminForm"),
-      newProductBtn: $("#newProductBtn"),
-      deleteProductBtn: $("#deleteProductBtn"),
-      productId: $("#productId"),
-      productCategory: $("#productCategory"),
-      productVisible: $("#productVisible"),
-      productName: $("#productName"),
-      productPrice: $("#productPrice"),
-      productDescription: $("#productDescription"),
-      productImage: $("#productImage"),
-      imagePreview: $("#imagePreview"),
-      galleryGrid: $("#galleryGrid"),
+      adminInventoryList: $("#adminInventoryList"),
+      btnOpenNewProduct: $("#btnOpenNewProduct"),
+      productModal: $("#productModal"),
+      btnCloseModal: $("#btnCloseModal"),
+      modalForm: $("#modalForm"),
+      modalTitle: $("#modalTitle"),
+      modalProductId: $("#modalProductId"),
+      modalProductName: $("#modalProductName"),
+      modalProductCategory: $("#modalProductCategory"),
+      modalProductPrice: $("#modalProductPrice"),
+      modalProductDesc: $("#modalProductDesc"),
+      modalProductImage: $("#modalProductImage"),
+      modalGalleryGrid: $("#modalGalleryGrid"),
+      statTotal: $("#statTotal"),
+      statVisible: $("#statVisible"),
+      statHidden: $("#statHidden"),
       noticeStack: $("#noticeStack")
     };
 
     function loadData(){
-      // Borrado temporal para solucionar conflictos de los cambios anteriores
+      // Limpiamos caché antiguo para que veas la nueva versión fresca
       localStorage.removeItem("hibrid_products");
       localStorage.removeItem("hibrid_cart");
 
-      state.products = demoProducts.map(item => ({...item}));
+      state.products = demoProducts.map(item => Object.assign({}, item));
       state.cart = [];
     }
 
@@ -657,7 +698,7 @@
     }
 
     function escapeHtml(value){
-      return String(value ?? "")
+      return String(value !== null && value !== undefined ? value : "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -668,51 +709,49 @@
     function slugify(text){
       return String(text || "")
         .toLowerCase()
-        .normalize("NFD")
-        .replace(/[̀-ͯ]/g,"")
         .replace(/[^a-z0-9]+/g,"-")
         .replace(/^-+|-+$/g,"")
-        .slice(0,48) || `prod-${Date.now()}`;
+        .slice(0,30);
     }
 
     function showNotice(message, type="info"){
       const node = document.createElement("div");
       node.className = "notice";
-      node.innerHTML = `
-        <div>
-          <strong>
-            ${type === "success" ? "Listo" : type === "error" ? "Revisa" : "Info"}
-          </strong>
-          <div class="small muted" style="margin-top:.15rem">
-            ${escapeHtml(message)}
-          </div>
-        </div>
-      `;
+      let title = "Info";
+      if(type === "success") title = "Listo";
+      if(type === "error") title = "Revisa";
+
+      node.innerHTML = "<div><strong>" + title + "</strong><div class='small muted' style='margin-top:.15rem'>" + escapeHtml(message) + "</div></div>";
       if(els.noticeStack) els.noticeStack.appendChild(node);
       setTimeout(() => { node.style.opacity="0"; node.style.transform="translateY(-4px)"; }, 2800);
       setTimeout(() => node.remove(), 3400);
     }
 
     function productImage(product){
-      return (
-        product?.image_url ||
-        product?.image ||
-        product?.imagen ||
-        "paneles.jpg"
-      );
+      if(!product) return "paneles.jpg";
+      return product.image || product.image_url || product.imagen || "paneles.jpg";
     }
 
     function getCategoryLabel(key){
       if(key === "all") return "Todos los productos";
-      return categories.find(item => item.key === key)?.label || key;
+      const cat = categories.find(item => item.key === key);
+      return cat ? cat.label : key;
     }
 
     function routeTo(route){
       state.route = route;
-      $$(".view").forEach(view => view.classList.toggle("active", view.id === route));
+      $$(".view").forEach(view => {
+        if(view.id === route) view.classList.add("active");
+        else view.classList.remove("active");
+      });
       $$(".nav-btn").forEach(btn => {
-        btn.classList.toggle("primary", btn.dataset.route === route);
-        btn.classList.toggle("secondary", btn.dataset.route !== route);
+        if(btn.dataset.route === route){
+          btn.classList.add("primary");
+          btn.classList.remove("secondary");
+        } else {
+          btn.classList.remove("primary");
+          btn.classList.add("secondary");
+        }
       });
 
       if(route === "cart") renderCart();
@@ -726,31 +765,34 @@
     }
 
     function filteredProducts(){
-      return visibleProducts().filter(item => state.filterCategory === "all" ? true : item.category === state.filterCategory);
+      return visibleProducts().filter(item => {
+        if(state.filterCategory === "all") return true;
+        return item.category === state.filterCategory;
+      });
     }
 
     function renderCategoryButtons(){
       if(!els.categoryGrid) return;
-      els.categoryGrid.innerHTML = categories.map(cat => {
+      let html = "";
+      categories.forEach(cat => {
         const count = state.products.filter(item => item.category === cat.key && item.visible === true).length;
         const imgSrc = cat.image || 'paneles.jpg';
-        return `
-          <button class="category-card ${state.filterCategory===cat.key?"active":""}" type="button" data-select-category="${cat.key}">
-            <img src="${imgSrc}" class="cat-img" alt="${cat.label}" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
-            <div class="cat-body">
-              <strong>${cat.label}</strong>
-              <small>${cat.blurb}</small>
-              <span>${count} productos</span>
-            </div>
-          </button>
-        `;
-      }).join("");
+        const activeClass = state.filterCategory === cat.key ? "active" : "";
+        html += "<button class='category-card " + activeClass + "' type='button' data-select-category='" + cat.key + "'>";
+        html += "<img src='" + imgSrc + "' class='cat-img' alt='" + cat.label + "' loading='lazy'>";
+        html += "<div class='cat-body'><strong>" + cat.label + "</strong><small>" + cat.blurb + "</small><span>" + count + " productos</span></div></button>";
+      });
+      els.categoryGrid.innerHTML = html;
 
       if(els.adminFilter){
-        els.adminFilter.innerHTML = `<option value="all">Todas las categorías</option>` + categories.map(cat => `<option value="${cat.key}">${cat.label}</option>`).join("");
+        let opts = "<option value='all'>Todas las categorías</option>";
+        categories.forEach(cat => { opts += "<option value='" + cat.key + "'>" + cat.label + "</option>"; });
+        els.adminFilter.innerHTML = opts;
       }
-      if(els.productCategory){
-        els.productCategory.innerHTML = categories.map(cat => `<option value="${cat.key}">${cat.label}</option>`).join("");
+      if(els.modalProductCategory){
+        let mOpts = "";
+        categories.forEach(cat => { mOpts += "<option value='" + cat.key + "'>" + cat.label + "</option>"; });
+        els.modalProductCategory.innerHTML = mOpts;
       }
     }
 
@@ -758,29 +800,28 @@
       if(!els.catalogGrid) return;
       const list = filteredProducts();
       
-      if(els.catalogTitle) els.catalogTitle.textContent = state.filterCategory === "all" ? "Todos los productos" : `Mostrando: ${getCategoryLabel(state.filterCategory)}`;
+      if(els.catalogTitle) els.catalogTitle.textContent = state.filterCategory === "all" ? "Todos los productos" : "Mostrando: " + getCategoryLabel(state.filterCategory);
       if(els.catalogMeta) els.catalogMeta.textContent = state.filterCategory === "all" ? "Catálogo completo." : "Filtrado por categoría.";
       if(els.clearFiltersBtn) els.clearFiltersBtn.style.display = state.filterCategory === "all" ? "none" : "inline-flex";
 
-      els.catalogGrid.innerHTML = list.length ? list.map(item => `
-        <article class="product-card">
-          <div class="product-media">
-            <img src="${escapeHtml(productImage(item))}" alt="${escapeHtml(item.name)}" width="900" height="700" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
-          </div>
-          <div class="product-body">
-            <div class="product-top">
-              <div>
-                <span class="badge">${getCategoryLabel(item.category)}</span>
-                <h4 class="product-title" style="margin-top:.7rem">${escapeHtml(item.name)}</h4>
-              </div>
-              <div class="price">${formatPrice(item.price)}</div>
-            </div>
-            <p class="small muted">${escapeHtml(item.description)}</p>
-            <div class="tiny muted">ID: ${escapeHtml(item.id)}</div>
-            <button class="btn primary full" type="button" data-add="${escapeHtml(item.id)}">Agregar al carrito</button>
-          </div>
-        </article>
-      `).join("") : `<div class="empty">No hay productos visibles para esta categoría.</div>`;
+      if(list.length === 0){
+        els.catalogGrid.innerHTML = "<div class='empty'>No hay productos visibles para esta categoría.</div>";
+        return;
+      }
+
+      let html = "";
+      list.forEach(item => {
+        html += "<article class='product-card'>";
+        html += "<div class='product-media'><img src='" + escapeHtml(productImage(item)) + "' alt='" + escapeHtml(item.name) + "' loading='lazy'></div>";
+        html += "<div class='product-body'><div class='product-top'><div><span class='badge'>" + getCategoryLabel(item.category) + "</span>";
+        html += "<h4 class='product-title' style='margin-top:.7rem'>" + escapeHtml(item.name) + "</h4></div>";
+        html += "<div class='price'>" + formatPrice(item.price) + "</div></div>";
+        html += "<p class='small muted'>" + escapeHtml(item.description) + "</p>";
+        html += "<div class='tiny muted'>ID: " + escapeHtml(item.id) + "</div>";
+        html += "<button class='btn primary full' type='button' data-add='" + escapeHtml(item.id) + "'>Agregar al carrito</button>";
+        html += "</div></article>";
+      });
+      els.catalogGrid.innerHTML = html;
     }
 
     function getProductById(id){
@@ -793,16 +834,23 @@
 
     function detailedCart(){
       syncCart();
-      return state.cart.map(item => {
+      const result = [];
+      state.cart.forEach(item => {
         const product = getProductById(item.id);
-        return { id: item.id, quantity: item.quantity, product: product, subtotal: (product?.price || 0) * item.quantity };
-      }).filter(item => item.product);
+        if(product){
+           result.push({ id: item.id, quantity: item.quantity, product: product, subtotal: (product.price || 0) * item.quantity });
+        }
+      });
+      return result;
     }
 
     function addToCart(id){
       const item = state.cart.find(row => row.id === id);
-      if(item) item.quantity += 1;
-      else state.cart.push({ id: id, quantity: 1 });
+      if(item){
+         item.quantity += 1;
+      } else {
+         state.cart.push({ id: id, quantity: 1 });
+      }
       saveData();
       updateCartStats();
       showNotice("Producto agregado al carrito.", "success");
@@ -812,7 +860,9 @@
       const item = state.cart.find(row => row.id === id);
       if(!item) return;
       item.quantity += delta;
-      if(item.quantity <= 0) state.cart = state.cart.filter(row => row.id !== id);
+      if(item.quantity <= 0){
+         state.cart = state.cart.filter(row => row.id !== id);
+      }
       saveData();
       renderCart();
       updateCartStats();
@@ -838,49 +888,48 @@
       if(!els.cartList || !els.summaryBox) return;
       const items = detailedCart();
       
-      if(!items.length){
-        els.cartList.innerHTML = `<div class="empty">Tu carrito está vacío. Agrega productos desde el catálogo.</div>`;
-        els.summaryBox.innerHTML = `<div class="summary-line"><span>Productos</span><strong>0</strong></div><div class="summary-line"><span>Total</span><strong>${formatPrice(0)}</strong></div>`;
+      if(items.length === 0){
+        els.cartList.innerHTML = "<div class='empty'>Tu carrito está vacío. Agrega productos desde el catálogo.</div>";
+        els.summaryBox.innerHTML = "<div class='summary-line'><span>Productos</span><strong>0</strong></div><div class='summary-line'><span>Total</span><strong>" + formatPrice(0) + "</strong></div>";
         return;
       }
 
-      els.cartList.innerHTML = items.map(item => `
-        <article class="cart-item">
-          <img src="${escapeHtml(productImage(item.product))}" alt="${escapeHtml(item.product.name)}" width="300" height="300" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
-          <div>
-            <span class="badge">${getCategoryLabel(item.product.category)}</span>
-            <h4 style="margin-top:.6rem;font-size:var(--text-base);font-weight:900">${escapeHtml(item.product.name)}</h4>
-            <p class="small muted" style="margin-top:.3rem">${escapeHtml(item.product.description)}</p>
-            <div class="qty-row">
-              <button class="btn secondary small" type="button" data-qty="minus" data-id="${escapeHtml(item.id)}">−</button>
-              <button class="btn secondary small" type="button" data-qty="plus" data-id="${escapeHtml(item.id)}">+</button>
-              <button class="btn ghost small" type="button" data-remove="${escapeHtml(item.id)}">Quitar</button>
-            </div>
-          </div>
-          <div style="text-align:right">
-            <div class="tiny muted">Cantidad: ${item.quantity}</div>
-            <div class="tiny muted" style="margin-top:.35rem">Unitario: ${formatPrice(item.product.price)}</div>
-            <strong style="display:block;margin-top:.65rem">${formatPrice(item.subtotal)}</strong>
-          </div>
-        </article>
-      `).join("");
+      let html = "";
+      items.forEach(item => {
+        html += "<article class='cart-item'>";
+        html += "<img src='" + escapeHtml(productImage(item.product)) + "' alt='img' loading='lazy'>";
+        html += "<div><span class='badge'>" + getCategoryLabel(item.product.category) + "</span>";
+        html += "<h4 style='margin-top:.6rem;font-weight:900'>" + escapeHtml(item.product.name) + "</h4>";
+        html += "<p class='small muted' style='margin-top:.3rem'>" + escapeHtml(item.product.description) + "</p>";
+        html += "<div class='qty-row'>";
+        html += "<button class='btn secondary small' type='button' data-qty='minus' data-id='" + escapeHtml(item.id) + "'>−</button>";
+        html += "<button class='btn secondary small' type='button' data-qty='plus' data-id='" + escapeHtml(item.id) + "'>+</button>";
+        html += "<button class='btn ghost small' type='button' data-remove='" + escapeHtml(item.id) + "'>Quitar</button>";
+        html += "</div></div>";
+        html += "<div style='text-align:right'><div class='tiny muted'>Cantidad: " + item.quantity + "</div>";
+        html += "<div class='tiny muted' style='margin-top:.35rem'>Unitario: " + formatPrice(item.product.price) + "</div>";
+        html += "<strong style='display:block;margin-top:.65rem'>" + formatPrice(item.subtotal) + "</strong></div></article>";
+      });
+      els.cartList.innerHTML = html;
 
-      const totalUnits = items.reduce((sum,item) => sum + item.quantity, 0);
-      const total = items.reduce((sum,item) => sum + item.subtotal, 0);
-      els.summaryBox.innerHTML = `
-        <div class="summary-line"><span>Líneas cotizadas</span><strong>${items.length}</strong></div>
-        <div class="summary-line"><span>Unidades totales</span><strong>${totalUnits}</strong></div>
-        <div class="summary-line"><span>Total estimado</span><strong>${formatPrice(total)}</strong></div>
-      `;
+      let totalUnits = 0;
+      let total = 0;
+      items.forEach(item => { totalUnits += item.quantity; total += item.subtotal; });
+      
+      let sumHtml = "<div class='summary-line'><span>Líneas cotizadas</span><strong>" + items.length + "</strong></div>";
+      sumHtml += "<div class='summary-line'><span>Unidades totales</span><strong>" + totalUnits + "</strong></div>";
+      sumHtml += "<div class='summary-line'><span>Total estimado</span><strong>" + formatPrice(total) + "</strong></div>";
+      els.summaryBox.innerHTML = sumHtml;
     }
 
     function updateCartStats(){
       const items = detailedCart();
-      const qty = items.reduce((sum,item) => sum + item.quantity, 0);
-      const total = items.reduce((sum,item) => sum + item.subtotal, 0);
+      let qty = 0;
+      let total = 0;
+      items.forEach(item => { qty += item.quantity; total += item.subtotal; });
       
       if(els.stickyCartCount){
-        els.stickyCartCount.textContent = `${qty} ${qty === 1 ? "producto" : "productos"}`;
+        els.stickyCartCount.textContent = qty + (qty === 1 ? " producto" : " productos");
       }
       if(els.stickyCartTotal){
         els.stickyCartTotal.textContent = formatPrice(total);
@@ -889,23 +938,20 @@
 
     function sendWhatsApp(){
       const items = detailedCart();
-      if(!items.length){
+      if(items.length === 0){
         showNotice("Primero agrega productos al carrito.", "error");
         return;
       }
 
       let total = 0;
-      const lines = ["Hola, quiero cotizar estos productos de HiBRID:", ""];
-      items.forEach((item,index) => {
+      let text = "Hola, quiero cotizar estos productos de HiBRID:\n\n";
+      items.forEach((item, index) => {
         total += item.subtotal;
-        lines.push(`${index + 1}. ${item.product.name} | Cantidad: ${item.quantity} | Unitario: ${formatPrice(item.product.price)} | Subtotal: ${formatPrice(item.subtotal)}`);
+        text += (index + 1) + ". " + item.product.name + " | Cant: " + item.quantity + " | Unitario: " + formatPrice(item.product.price) + " | Subtotal: " + formatPrice(item.subtotal) + "\n";
       });
-      lines.push("");
-      lines.push(`Total estimado: ${formatPrice(total)}`);
-      lines.push("");
-      lines.push("Nota: Esta simulación y sus precios son estrictamente de referencia. La configuración final debe ser verificada por nuestro equipo técnico.");
+      text += "\nTotal estimado: " + formatPrice(total) + "\n\nNota: Esta simulación y sus precios son estrictamente de referencia. La configuración final debe ser verificada por nuestro equipo técnico.";
       
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`, "_blank", "noopener");
+      window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(text), "_blank", "noopener");
     }
 
     function calculateSystem(){
@@ -916,12 +962,11 @@
       const use = els.projectUse.value;
 
       if(!monthlyKwh || monthlyKwh <= 0){
-        els.calcResult.innerHTML = `<p class="small" style="color:#ffc1c1;margin-top:1rem">Por favor, ingresa tu consumo mensual en kWh (Este valor sale en tu boleta de luz).</p>`;
+        els.calcResult.innerHTML = "<p class='small' style='color:#ffc1c1;margin-top:1rem'>Ingresa tu consumo mensual en kWh.</p>";
         return;
       }
 
       const dailyKwh = monthlyKwh / 30;
-      
       let hsp = 4.5; 
       let efficiency = 0.80;
       
@@ -934,213 +979,213 @@
       const areaPerPanel = 2.5;
 
       const requiredKw = dailyKwh / (hsp * efficiency);
-      const panels = Math.max(1, Math.ceil(requiredKw / panelPowerKw));
+      let panels = Math.ceil(requiredKw / panelPowerKw);
+      if(panels < 1) panels = 1;
       
       const totalInstalledKwNumber = panels * panelPowerKw;
-      const totalInstalledKw = totalInstalledKwNumber.toFixed(2);
-      
       const area = panels * areaPerPanel;
       const batteryKwh = (dailyKwh * batteryRatio).toFixed(1);
       
-      let numBatteries = Math.max(1, Math.ceil(batteryKwh / 5.12));
+      let numBatteries = Math.ceil(batteryKwh / 5.12);
+      if(numBatteries < 1) numBatteries = 1;
 
       let inverter = "Inversor Monofásico 3kW - 5kW";
       if(totalInstalledKwNumber > 5 && totalInstalledKwNumber <= 10) inverter = "Inversor Monofásico 8kW u Off-Grid 6kW";
       if(totalInstalledKwNumber > 10) inverter = "Inversores en Paralelo o Sistema Trifásico";
 
-      let useNote = "";
+      let useNote = "Cálculo On-Grid/Híbrido: Dimensionado con el promedio solar.";
       if(use === "parcela") {
-        useNote = "Cálculo Off-Grid/Aislado: Dimensionado para funcionar de forma estable incluso en meses de invierno con poca radiación solar.";
-      } else {
-        useNote = "Cálculo On-Grid/Híbrido: Dimensionado con el promedio solar. Generarás más en verano para compensar tus cuentas de invierno.";
+        useNote = "Cálculo Off-Grid/Aislado: Dimensionado para funcionar de forma estable incluso en meses de invierno.";
       }
 
-      els.calcResult.innerHTML = `
-        <div class="calc-result">
-          <h4 style="margin-bottom:.7rem; color:var(--color-primary);">Solución Recomendada</h4>
-          <p class="small" style="margin-bottom:1rem">Para un consumo de <strong>${monthlyKwh} kWh/mes</strong> (Aprox. ${dailyKwh.toFixed(1)} kWh al día):</p>
-          <div class="calc-grid">
-            <div><strong>Paneles Solares:</strong><br>${panels} módulos de 550W<br><span class="tiny muted">Potencia: ${totalInstalledKw} kWp</span></div>
-            <div><strong>Inversor Sugerido:</strong><br>${inverter}<br><span class="tiny muted">Según capacidad del arreglo</span></div>
-            <div><strong>Banco de Baterías:</strong><br>${numBatteries}x Litio 5.12kWh<br><span class="tiny muted">Respaldo: ${batteryKwh} kWh solicitados</span></div>
-            <div><strong>Espacio en Techo:</strong><br>${area} m²<br><span class="tiny muted">Área libre de sombras</span></div>
-          </div>
-          <p class="small muted" style="margin-top:1rem">${useNote}</p>
-          <p class="tiny muted" style="margin-top:1rem; border-top:1px solid var(--color-border); padding-top:.5rem;">Nota: Esta simulación y sus precios son estrictamente de referencia. La configuración final debe ser verificada por nuestro equipo técnico.</p>
-        </div>
-      `;
+      let html = "<div class='calc-result'><h4 style='margin-bottom:.7rem; color:var(--color-primary);'>Solución Recomendada</h4>";
+      html += "<p class='small' style='margin-bottom:1rem'>Para un consumo de <strong>" + monthlyKwh + " kWh/mes</strong>:</p>";
+      html += "<div class='calc-grid'>";
+      html += "<div><strong>Paneles Solares:</strong><br>" + panels + " módulos de 550W<br><span class='tiny muted'>Potencia: " + totalInstalledKwNumber.toFixed(2) + " kWp</span></div>";
+      html += "<div><strong>Inversor Sugerido:</strong><br>" + inverter + "<br><span class='tiny muted'>Según capacidad</span></div>";
+      html += "<div><strong>Banco de Baterías:</strong><br>" + numBatteries + "x Litio 5.12kWh<br><span class='tiny muted'>Respaldo: " + batteryKwh + " kWh</span></div>";
+      html += "<div><strong>Espacio en Techo:</strong><br>" + area + " m²<br><span class='tiny muted'>Área libre de sombras</span></div>";
+      html += "</div><p class='small muted' style='margin-top:1rem'>" + useNote + "</p>";
+      html += "<p class='tiny muted' style='margin-top:1rem; border-top:1px solid var(--color-border); padding-top:.5rem;'>Nota: Esta simulación y sus precios son estrictamente de referencia.</p></div>";
+      
+      els.calcResult.innerHTML = html;
     }
 
+    // --- NUEVO ADMINISTRADOR LOGICA ---
     function adminFilteredProducts(){
       if(!els.adminFilter) return state.products.slice();
       const filter = els.adminFilter.value || "all";
-      return filter === "all" ? state.products.slice() : state.products.filter(item => item.category === filter);
+      if(filter === "all"){
+         return state.products.slice();
+      }
+      return state.products.filter(item => item.category === filter);
     }
 
     function renderAdmin(){
-      if(!state.adminUnlocked || !els.adminList) return;
+      if(!state.adminUnlocked || !els.adminInventoryList) return;
+
+      // Stats
+      if(els.statTotal) els.statTotal.textContent = state.products.length;
+      if(els.statVisible) els.statVisible.textContent = state.products.filter(p => p.visible).length;
+      if(els.statHidden) els.statHidden.textContent = state.products.filter(p => !p.visible).length;
 
       const list = adminFilteredProducts();
-      if(!state.selectedProductId && list.length) state.selectedProductId = list[0].id;
-      if(state.selectedProductId && !state.products.find(item => item.id === state.selectedProductId)){
-        state.selectedProductId = list[0]?.id || null;
-      }
-
-      els.adminList.innerHTML = list.length ? list.map(item => `
-        <button class="admin-list-item ${state.selectedProductId===item.id?"active":""}" type="button" data-admin-select="${escapeHtml(item.id)}">
-          <img src="${escapeHtml(productImage(item))}" alt="${escapeHtml(item.name)}" width="200" height="200" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
-          <div style="text-align:left">
-            <strong style="display:block">${escapeHtml(item.name)}</strong>
-            <div class="tiny muted" style="margin-top:.2rem">${escapeHtml(item.id)}</div>
-            <div class="small muted" style="margin-top:.25rem">${getCategoryLabel(item.category)} · ${formatPrice(item.price)}</div>
-            <div class="tiny" style="margin-top:.3rem;color:${item.visible ? '#9ef0b8' : '#ffc6c6'}">${item.visible ? "Visible" : "Oculto"}</div>
-          </div>
-          <span class="badge">Editar</span>
-        </button>
-      `).join("") : `<div class="empty">No hay productos en esta categoría.</div>`;
-
-      fillAdminForm();
-      renderImageGallery();
-    }
-
-    function fillAdminForm(){
-      if(!els.productId) return;
-      const item = state.products.find(product => product.id === state.selectedProductId);
       
-      if(!item){
-        els.productId.value = "";
-        els.productCategory.value = "principales";
-        els.productVisible.value = "false";
-        els.productName.value = "";
-        els.productPrice.value = "";
-        els.productDescription.value = "";
-        els.productImage.value = "";
-        if(els.imagePreview) els.imagePreview.src = "paneles.jpg";
+      if(list.length === 0){
+        els.adminInventoryList.innerHTML = "<div class='empty'>No hay productos en esta categoría.</div>";
         return;
       }
 
-      els.productId.value = item.id;
-      els.productCategory.value = item.category;
-      els.productVisible.value = String(Boolean(item.visible));
-      els.productName.value = item.name;
-      els.productPrice.value = item.price;
-      els.productDescription.value = item.description;
-      els.productImage.value = productImage(item);
-      if(els.imagePreview) els.imagePreview.src = productImage(item) || "paneles.jpg";
+      let html = "";
+      list.forEach(item => {
+        let isChecked = item.visible ? "checked" : "";
+        html += "<div class='inv-item'>";
+        html += "<img src='" + escapeHtml(productImage(item)) + "' alt='img'>";
+        html += "<div class='inv-info'><h4>" + escapeHtml(item.name) + "</h4>";
+        html += "<div class='tiny muted'>Cat: " + getCategoryLabel(item.category) + " | Precio: " + formatPrice(item.price) + "</div></div>";
+        
+        html += "<div class='inv-actions'>";
+        // Toggle Visibilidad directo
+        html += "<label class='switch' title='Activar/Ocultar'><input type='checkbox' data-toggle-id='" + escapeHtml(item.id) + "' " + isChecked + "><span class='slider'></span></label>";
+        
+        html += "<button class='btn secondary small' style='margin-left:.5rem' type='button' data-edit-id='" + escapeHtml(item.id) + "'>Editar</button>";
+        html += "<button class='btn secondary small' type='button' data-duplicate-id='" + escapeHtml(item.id) + "'>Duplicar</button>";
+        html += "<button class='btn danger small' type='button' data-delete-id='" + escapeHtml(item.id) + "'><i class='fa-solid fa-trash'></i></button>";
+        html += "</div></div>";
+      });
+
+      els.adminInventoryList.innerHTML = html;
     }
 
-    function renderImageGallery(){
-      if(!els.galleryGrid || !els.productCategory || !els.productImage) return;
-      const category = els.productCategory.value || "principales";
-      const images = imageLibrary.catalog[category] || [];
-      const current = els.productImage.value.trim();
-
-      els.galleryGrid.innerHTML = images.length ? images.map(image => `
-        <button class="gallery-item ${current===image?"active":""}" type="button" data-gallery-image="${escapeHtml(image)}">
-          <img src="${escapeHtml(image)}" alt="${escapeHtml(image)}" width="300" height="300" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
-          <span>${escapeHtml(image)}</span>
-        </button>
-      `).join("") : `<div class="empty">No hay imágenes configuradas para esta categoría.</div>`;
+    function toggleVisibility(id) {
+       const item = state.products.find(p => p.id === id);
+       if(item){
+          item.visible = !item.visible;
+          saveData();
+          renderAdmin();
+          renderCatalog();
+          showNotice(item.visible ? "Producto Publicado" : "Producto Oculto", "info");
+       }
     }
 
-    function createNewProduct(){
-      const category = (els.adminFilter && els.adminFilter.value && els.adminFilter.value !== "all") ? els.adminFilter.value : "principales";
-      const fallbackImage = (imageLibrary.catalog[category] || ["paneles.jpg"])[0];
-
-      const draft = {
-        id: `prod-${Date.now()}`,
-        name: "Nuevo producto",
-        price: 0,
-        description: "Agrega una descripción del producto.",
-        category: category,
-        image: fallbackImage,
-        image_url: fallbackImage,
-        visible: false
-      };
-      state.products.unshift(draft);
-      state.selectedProductId = draft.id;
-      saveData();
-      renderAll();
-      routeTo("admin");
-      
-      setTimeout(() => {
-        if(els.adminForm) els.adminForm.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 50);
-      
-      showNotice("Nuevo producto creado como borrador.", "info");
+    function duplicateProduct(id) {
+       const original = state.products.find(p => p.id === id);
+       if(!original) return;
+       const copy = Object.assign({}, original);
+       copy.id = "prod-" + slugify(original.name) + "-" + Date.now().toString().slice(-4);
+       copy.name = original.name + " (Copia)";
+       copy.visible = false; 
+       
+       state.products.unshift(copy);
+       saveData();
+       renderAdmin();
+       showNotice("Producto duplicado como borrador.", "success");
     }
 
-    function saveProduct(event){
-      event.preventDefault();
-
-      const newId = els.productId.value.trim() || slugify(els.productName.value);
-      const image = els.productImage.value.trim();
-
-      const payload = {
-        id: newId,
-        category: els.productCategory.value,
-        visible: els.productVisible.value === "true",
-        name: els.productName.value.trim(),
-        price: Number(els.productPrice.value || 0),
-        description: els.productDescription.value.trim(),
-        image: image,
-        image_url: image
-      };
-
-      if(!payload.name){
-        showNotice("El nombre del producto es obligatorio.", "error");
-        return;
-      }
-      if(!payload.description){
-        showNotice("La descripción es obligatoria.", "error");
-        return;
-      }
-      if(!Number.isFinite(payload.price) || payload.price < 0){
-        showNotice("El precio no puede ser negativo.", "error");
-        return;
-      }
-      if(!payload.image){
-        showNotice("Debes asignar una imagen al producto.", "error");
-        return;
-      }
-
-      const duplicated = state.products.find(item => item.id === payload.id && item.id !== state.selectedProductId);
-      if(duplicated){
-        showNotice("Ya existe otro producto con ese ID.", "error");
-        return;
-      }
-
-      const existing = state.products.find(item => item.id === state.selectedProductId);
-      if(existing){
-        const oldId = existing.id;
-        Object.assign(existing, payload);
-        state.cart.forEach(item => { if(item.id === oldId) item.id = payload.id; });
-      } else {
-        state.products.unshift(payload);
-      }
-
-      state.selectedProductId = payload.id;
-      saveData();
-      renderAll();
-      routeTo("admin");
-      showNotice("Producto guardado y actualizado.", "success");
-    }
-
-    function deleteProduct() {
-      if(!state.selectedProductId) {
-        showNotice("Selecciona un producto para eliminar.", "error");
-        return;
-      }
+    function deleteProduct(id) {
       if (confirm("¿Estás seguro de que deseas eliminar permanentemente este producto del catálogo?")) {
-        state.products = state.products.filter(item => item.id !== state.selectedProductId);
-        state.cart = state.cart.filter(item => item.id !== state.selectedProductId);
-        state.selectedProductId = null;
+        state.products = state.products.filter(item => item.id !== id);
+        state.cart = state.cart.filter(item => item.id !== id);
         saveData();
         renderAll();
         updateCartStats();
-        routeTo("admin");
         showNotice("Producto eliminado correctamente.", "success");
       }
+    }
+
+    // Modal Form Logic
+    function openModal(productId = null) {
+       if(!els.productModal) return;
+       els.productModal.classList.add("active");
+       
+       if(productId){
+          const item = state.products.find(p => p.id === productId);
+          els.modalTitle.textContent = "Editar Producto";
+          els.modalProductId.value = item.id;
+          els.modalProductName.value = item.name;
+          els.modalProductCategory.value = item.category;
+          els.modalProductPrice.value = item.price;
+          els.modalProductDesc.value = item.description;
+          els.modalProductImage.value = productImage(item);
+       } else {
+          // New Product
+          els.modalTitle.textContent = "Nuevo Producto";
+          els.modalProductId.value = "";
+          els.modalProductName.value = "";
+          const defaultCat = (els.adminFilter && els.adminFilter.value !== "all") ? els.adminFilter.value : "principales";
+          els.modalProductCategory.value = defaultCat;
+          els.modalProductPrice.value = "";
+          els.modalProductDesc.value = "";
+          const fallbackImage = (imageLibrary.catalog[defaultCat] || ["paneles.jpg"])[0];
+          els.modalProductImage.value = fallbackImage;
+       }
+       renderModalGallery();
+    }
+
+    function closeModal() {
+       if(els.productModal) els.productModal.classList.remove("active");
+    }
+
+    function renderModalGallery() {
+       if(!els.modalGalleryGrid) return;
+       const category = els.modalProductCategory.value || "principales";
+       const images = imageLibrary.catalog[category] || [];
+       const current = els.modalProductImage.value;
+
+       let html = "";
+       images.forEach(img => {
+          const activeClass = current === img ? "active" : "";
+          html += "<button class='gallery-item " + activeClass + "' type='button' data-modal-img='" + escapeHtml(img) + "'>";
+          html += "<img src='" + escapeHtml(img) + "' loading='lazy'></button>";
+       });
+       if(images.length === 0) html = "<div class='small muted'>No hay imágenes para esta categoría.</div>";
+       
+       els.modalGalleryGrid.innerHTML = html;
+    }
+
+    function saveModalProduct(e) {
+       e.preventDefault();
+       const idVal = els.modalProductId.value;
+       const isNew = idVal === "";
+       
+       const payloadId = isNew ? "prod-" + slugify(els.modalProductName.value) + "-" + Date.now().toString().slice(-4) : idVal;
+       const img = els.modalProductImage.value;
+
+       const payload = {
+          id: payloadId,
+          category: els.modalProductCategory.value,
+          name: els.modalProductName.value.trim(),
+          price: Number(els.modalProductPrice.value || 0),
+          description: els.modalProductDesc.value.trim(),
+          image: img,
+          image_url: img,
+          visible: isNew ? false : undefined // Keep existing visibility if editing
+       };
+
+       if(!payload.name || !payload.description){
+          showNotice("Nombre y descripción son obligatorios.", "error"); return;
+       }
+
+       if(isNew) {
+          state.products.unshift(payload);
+          showNotice("Producto creado como borrador.", "success");
+       } else {
+          const existing = state.products.find(p => p.id === payloadId);
+          if(existing){
+             // Safe update without ...
+             existing.category = payload.category;
+             existing.name = payload.name;
+             existing.price = payload.price;
+             existing.description = payload.description;
+             existing.image = payload.image;
+             existing.image_url = payload.image_url;
+             showNotice("Producto actualizado.", "success");
+          }
+       }
+
+       saveData();
+       renderAll();
+       closeModal();
     }
 
     function loginAdmin(){
@@ -1156,13 +1201,6 @@
       showNotice("Acceso concedido al administrador.", "success");
     }
 
-    function previewImageFromUrl(){
-      if(!els.productImage || !els.imagePreview) return;
-      const image = els.productImage.value.trim();
-      if(image) els.imagePreview.src = image;
-      renderImageGallery();
-    }
-
     function renderAll(){
       renderCategoryButtons();
       renderCatalog();
@@ -1170,22 +1208,22 @@
       if(state.adminUnlocked) renderAdmin();
     }
 
+    // Global Click Listener
     document.addEventListener("click", (event) => {
+      // Routing
       const routeBtn = event.target.closest("[data-route]");
       if(routeBtn) routeTo(routeBtn.dataset.route);
 
+      // Filters
       const catBtn = event.target.closest("[data-select-category]");
       if(catBtn){
         state.filterCategory = catBtn.dataset.selectCategory;
         renderCategoryButtons();
         renderCatalog();
         if(state.route !== "home") routeTo("home");
-
         setTimeout(() => {
           const catalogSection = document.getElementById("catalogMetaJump");
-          if(catalogSection) {
-            catalogSection.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
+          if(catalogSection) catalogSection.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 50);
       }
 
@@ -1196,33 +1234,50 @@
         renderCatalog();
       }
 
+      // Cart
       const addBtn = event.target.closest("[data-add]");
       if(addBtn) addToCart(addBtn.dataset.add);
 
       const qtyBtn = event.target.closest("[data-qty]");
-      if(qtyBtn) changeQty(qtyBtn.dataset.id, qtyBtn.dataset.qty === "plus" ? 1 : -1);
+      if(qtyBtn){
+         if(qtyBtn.dataset.qty === "plus") changeQty(qtyBtn.dataset.id, 1);
+         else changeQty(qtyBtn.dataset.id, -1);
+      }
 
       const removeBtn = event.target.closest("[data-remove]");
       if(removeBtn) removeFromCart(removeBtn.dataset.remove);
 
-      const adminSelect = event.target.closest("[data-admin-select]");
-      if(adminSelect){
-        state.selectedProductId = adminSelect.dataset.adminSelect;
-        renderAdmin();
-        
-        setTimeout(() => {
-          if(els.adminForm) els.adminForm.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 50);
+      // Admin Actions
+      const editBtn = event.target.closest("[data-edit-id]");
+      if(editBtn) openModal(editBtn.dataset.editId);
+
+      const dupBtn = event.target.closest("[data-duplicate-id]");
+      if(dupBtn) duplicateProduct(dupBtn.dataset.duplicateId);
+
+      const delBtn = event.target.closest("[data-delete-id]");
+      if(delBtn) deleteProduct(delBtn.dataset.deleteId);
+
+      // Modal Gallery image select
+      const modalImgBtn = event.target.closest("[data-modal-img]");
+      if(modalImgBtn){
+         els.modalProductImage.value = modalImgBtn.dataset.modalImg;
+         renderModalGallery();
       }
 
-      const galleryImageBtn = event.target.closest("[data-gallery-image]");
-      if(galleryImageBtn){
-        if(els.productImage) els.productImage.value = galleryImageBtn.dataset.galleryImage;
-        if(els.imagePreview) els.imagePreview.src = galleryImageBtn.dataset.galleryImage;
-        renderImageGallery();
+      // Close modal on outside click
+      if(event.target === els.productModal){
+         closeModal();
       }
     });
 
+    // Toggle Input listener (delegated via change event)
+    document.addEventListener("change", (e) => {
+       if(e.target.matches("[data-toggle-id]")){
+          toggleVisibility(e.target.dataset.toggleId);
+       }
+    });
+
+    // Listeners bindings
     if(els.whatsappBtn) els.whatsappBtn.addEventListener("click", sendWhatsApp);
     if(els.clearCartBtn) els.clearCartBtn.addEventListener("click", clearCart);
     if(els.calculateBtn) els.calculateBtn.addEventListener("click", calculateSystem);
@@ -1233,25 +1288,22 @@
     });
 
     if(els.adminFilter) els.adminFilter.addEventListener("change", () => renderAdmin());
-    if(els.newProductBtn) els.newProductBtn.addEventListener("click", createNewProduct);
-    if(els.adminForm) els.adminForm.addEventListener("submit", saveProduct);
-    if(els.deleteProductBtn) els.deleteProductBtn.addEventListener("click", deleteProduct);
-    if(els.productImage) els.productImage.addEventListener("input", previewImageFromUrl);
+    if(els.btnOpenNewProduct) els.btnOpenNewProduct.addEventListener("click", () => openModal(null));
+    if(els.btnCloseModal) els.btnCloseModal.addEventListener("click", closeModal);
+    if(els.modalForm) els.modalForm.addEventListener("submit", saveModalProduct);
     
-    if(els.productCategory){
-      els.productCategory.addEventListener("change", () => {
-        const category = els.productCategory.value;
+    if(els.modalProductCategory){
+      els.modalProductCategory.addEventListener("change", () => {
+        const category = els.modalProductCategory.value;
         const library = imageLibrary.catalog[category] || [];
-
-        if(library.length && !library.includes(els.productImage.value.trim())){
-          els.productImage.value = library[0];
-          els.imagePreview.src = library[0];
+        if(library.length > 0 && !library.includes(els.modalProductImage.value)){
+           els.modalProductImage.value = library[0];
         }
-        renderImageGallery();
+        renderModalGallery();
       });
     }
 
-    // Inicializar todo seguro con limpieza temporal
+    // Inicializar todo
     loadData();
     renderAll();
     updateCartStats();
