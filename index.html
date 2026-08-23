@@ -99,14 +99,14 @@
       border: none;
       box-shadow: none;
     }
-    .logo-wrap{display:flex;align-items:center;justify-content:flex-start;width:100%;}
+    .logo-wrap{display:flex;align-items:center;justify-content:center;width:100%;}
     .logo-img{
       width:100%;
-      max-width:320px;
+      max-width:360px;
       height:auto;
-      max-height:85px;
+      max-height:100px;
       object-fit:contain;
-      object-position:left center;
+      object-position:center;
     }
 
     .nav{display:flex;gap:var(--space-2);flex-wrap:wrap;justify-content:flex-end}
@@ -291,10 +291,10 @@
     @media (max-width:760px){
       .topbar { position: relative; }
       .topbar-inner{grid-template-columns:1fr; padding: var(--space-3) 0;}
-      .nav{justify-content:flex-start; padding: 0 var(--space-3);}
+      .nav{justify-content:center; padding: 0 var(--space-3);}
       
-      .logo-shell { padding: 0 var(--space-3); justify-content:flex-start; }
-      .logo-img { max-width: 100%; max-height: 80px; }
+      .logo-shell { padding: 0 var(--space-3); justify-content:center; }
+      .logo-img { max-width: 100%; max-height: 90px; }
       
       .category-grid{grid-template-columns:repeat(2,1fr); gap:var(--space-3);}
       .catalog-grid,.form-grid,.form-grid-3,.calc-grid,.gallery-grid{grid-template-columns:1fr}
@@ -317,7 +317,6 @@
 
       <nav class="nav" aria-label="Navegación principal">
         <button class="btn secondary nav-btn" type="button" data-route="home">Productos</button>
-        <button class="btn secondary nav-btn" type="button" data-route="cart">Carrito <span id="cartCount">0</span></button>
         <button class="btn secondary nav-btn" type="button" data-route="calculator">Calculadora</button>
       </nav>
     </div>
@@ -326,7 +325,6 @@
   <main id="mainContent" class="page">
     <section id="home" class="view active">
       
-      <!-- VISTA DE CATEGORÍAS (Se oculta al seleccionar una) -->
       <div id="categoriesView">
         <div class="section-head">
           <div>
@@ -337,7 +335,6 @@
         <div id="categoryGrid" class="category-grid"></div>
       </div>
 
-      <!-- VISTA DE CATÁLOGO (Se oculta por defecto, se muestra al tocar una categoría) -->
       <div id="catalogView" style="display:none;">
         <div class="section-head" id="catalogMetaJump">
           <div>
@@ -568,9 +565,8 @@
     const ADMIN_PASSWORD = "Hibrid2026";
     const WHATSAPP_NUMBER = "56956139055";
 
-    // Nombres base para las categorías basados en la lista de archivos enviada
     const categories = [
-      { key:"principales", label:"Principales", blurb:"Equipos destacados", image:"kitsolar.jpg" },
+      { key:"principales", label:"Principales", blurb:"Equipos destacados", image:"kitsolarproductos.jpeg" },
       { key:"paneles", label:"Paneles", blurb:"Módulos solares", image:"paneles.jpg" },
       { key:"baterias", label:"Baterías", blurb:"Litio y respaldo", image:"bateria.jpg" },
       { key:"inversores", label:"Inversores", blurb:"Control y conversión", image:"inversor.jpg" },
@@ -734,7 +730,6 @@
         btn.classList.toggle("secondary", btn.dataset.route !== route);
       });
 
-      // Si volvemos a inicio, SIEMPRE mostrar las categorías primero
       if(route === "home"){
         els.categoriesView.style.display = "block";
         els.catalogView.style.display = "none";
@@ -1055,7 +1050,9 @@
       };
       state.products.unshift(draft);
       state.selectedProductId = draft.id;
+      renderAll();
       routeTo("admin");
+      els.adminForm.scrollIntoView({ behavior: "smooth", block: "start" });
       showNotice("Nuevo producto creado como borrador.", "info");
     }
 
@@ -1143,12 +1140,10 @@
       const routeBtn = event.target.closest("[data-route]");
       if(routeBtn) routeTo(routeBtn.dataset.route);
 
-      // Evento para cuando el usuario hace clic en una CATEGORÍA (en la grilla de inicio)
       const catBtn = event.target.closest("[data-select-category]");
       if(catBtn){
         state.filterCategory = catBtn.dataset.selectCategory;
         
-        // Ocultar categorías, mostrar solo catálogo
         els.categoriesView.style.display = "none";
         els.catalogView.style.display = "block";
         
@@ -1169,6 +1164,7 @@
       if(adminSelect){
         state.selectedProductId = adminSelect.dataset.adminSelect;
         renderAdmin();
+        els.adminForm.scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
       const galleryImageBtn = event.target.closest("[data-gallery-image]");
@@ -1179,7 +1175,6 @@
       }
     });
 
-    // Evento para el botón "Volver a categorías"
     els.backToCategoriesBtn.addEventListener("click", () => {
       state.filterCategory = "all";
       els.categoriesView.style.display = "block";
