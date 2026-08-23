@@ -64,6 +64,8 @@
       line-height:1.6;
       color:var(--color-text);
       background: linear-gradient(180deg,#071016 0%, #0d161e 100%);
+      display: flex;
+      flex-direction: column;
     }
 
     img,svg{display:block;max-width:100%;height:auto}
@@ -93,15 +95,18 @@
       display:flex;align-items:center;justify-content:center;
       padding:var(--space-2) 0;
       width: 100%;
+      background: transparent;
+      border: none;
+      box-shadow: none;
     }
-    .logo-wrap{display:flex;align-items:center;justify-content:center;width:100%;}
+    .logo-wrap{display:flex;align-items:center;justify-content:flex-start;width:100%;}
     .logo-img{
       width:100%;
-      max-width:280px;
+      max-width:320px;
       height:auto;
-      max-height:80px;
+      max-height:85px;
       object-fit:contain;
-      object-position:center;
+      object-position:left center;
     }
 
     .nav{display:flex;gap:var(--space-2);flex-wrap:wrap;justify-content:flex-end}
@@ -122,7 +127,7 @@
     .btn.small{min-height:38px;padding:.6rem .85rem;border-radius:.8rem}
     .btn.full{width:100%}
 
-    .page{width:min(calc(100% - 24px), var(--max));margin:auto;padding:var(--space-8) 0 var(--space-16)}
+    .page{flex: 1; width:min(calc(100% - 24px), var(--max));margin:auto;padding:var(--space-8) 0 var(--space-16)}
     .view{display:none}
     .view.active{display:block}
 
@@ -134,7 +139,7 @@
     }
 
     .section-head{
-      display:flex;align-items:end;justify-content:space-between;gap:var(--space-4);
+      display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);
       margin:0 0 var(--space-4);
       scroll-margin-top: 120px;
     }
@@ -152,14 +157,14 @@
       transition:transform var(--transition),border-color var(--transition),background var(--transition);
       overflow:hidden;
     }
-    .category-card:hover,.category-card.active{
+    .category-card:hover{
       transform:translateY(-2px);
       border-color:rgba(40,210,109,.35);
       background:linear-gradient(180deg,rgba(20,32,41,1),rgba(24,39,48,1));
     }
     .cat-img {
       width: 100%;
-      height: 90px;
+      height: 110px;
       object-fit: cover;
       background: #091118;
       border-bottom: 1px solid var(--color-border);
@@ -270,7 +275,14 @@
     }
     .sticky-cart strong{display:block;font-size:var(--text-sm)}
     .sticky-cart span{display:block;font-size:var(--text-xs);color:var(--color-text-muted)}
-    .footer-gap{height:96px}
+
+    .site-footer {
+      text-align: center;
+      padding: var(--space-8);
+      margin-top: var(--space-12);
+      border-top: 1px solid var(--color-border);
+      padding-bottom: 120px; 
+    }
 
     @media (max-width:1160px){
       .calc-layout,.cart-layout,.admin-layout{grid-template-columns:1fr}
@@ -279,10 +291,10 @@
     @media (max-width:760px){
       .topbar { position: relative; }
       .topbar-inner{grid-template-columns:1fr; padding: var(--space-3) 0;}
-      .nav{justify-content:flex-start}
+      .nav{justify-content:flex-start; padding: 0 var(--space-3);}
       
-      .logo-shell { padding: 0 var(--space-3); }
-      .logo-img { max-width: 250px; max-height: 70px; }
+      .logo-shell { padding: 0 var(--space-3); justify-content:flex-start; }
+      .logo-img { max-width: 100%; max-height: 80px; }
       
       .category-grid{grid-template-columns:repeat(2,1fr); gap:var(--space-3);}
       .catalog-grid,.form-grid,.form-grid-3,.calc-grid,.gallery-grid{grid-template-columns:1fr}
@@ -294,13 +306,12 @@
   </style>
 </head>
 <body>
-  <a href="#mainContent" class="skip-link">Saltar al contenido</a>
 
   <header class="topbar">
     <div class="topbar-inner">
       <div class="logo-shell">
         <div class="logo-wrap">
-          <img src="logohi.jpg" alt="Logo HiBRID" class="logo-img" width="1200" height="300" loading="eager" onerror="this.style.display='none'">
+          <img src="logohi.jpg" alt="Logo HiBRID" class="logo-img" width="1200" height="300" loading="eager" onerror="this.onerror=null; this.style.display='none';">
         </div>
       </div>
 
@@ -308,7 +319,6 @@
         <button class="btn secondary nav-btn" type="button" data-route="home">Productos</button>
         <button class="btn secondary nav-btn" type="button" data-route="cart">Carrito <span id="cartCount">0</span></button>
         <button class="btn secondary nav-btn" type="button" data-route="calculator">Calculadora</button>
-        <button class="btn secondary nav-btn" type="button" data-route="admin-login">Administrador</button>
       </nav>
     </div>
   </header>
@@ -316,23 +326,29 @@
   <main id="mainContent" class="page">
     <section id="home" class="view active">
       
-      <div class="section-head">
-        <div>
-          <h3>Categorías</h3>
-          <p>Encuentra rápidamente la familia de producto que buscas.</p>
+      <!-- VISTA DE CATEGORÍAS (Se oculta al seleccionar una) -->
+      <div id="categoriesView">
+        <div class="section-head">
+          <div>
+            <h3>Categorías</h3>
+            <p>Encuentra rápidamente la familia de producto que buscas.</p>
+          </div>
         </div>
+        <div id="categoryGrid" class="category-grid"></div>
       </div>
 
-      <div id="categoryGrid" class="category-grid"></div>
-
-      <div class="section-head" id="catalogMetaJump">
-        <div>
-          <h3 id="catalogTitle">Todos los productos</h3>
-          <p id="catalogMeta">Catálogo completo.</p>
+      <!-- VISTA DE CATÁLOGO (Se oculta por defecto, se muestra al tocar una categoría) -->
+      <div id="catalogView" style="display:none;">
+        <div class="section-head" id="catalogMetaJump">
+          <div>
+            <h3 id="catalogTitle">Productos</h3>
+            <p id="catalogMeta">Catálogo completo.</p>
+          </div>
+          <button class="btn ghost small" type="button" id="backToCategoriesBtn">Volver a categorías</button>
         </div>
+        <div id="catalogGrid" class="catalog-grid"></div>
       </div>
 
-      <div id="catalogGrid" class="catalog-grid"></div>
     </section>
 
     <section id="calculator" class="view">
@@ -349,7 +365,7 @@
           <h3 style="margin-bottom:.6rem">Referencia visual</h3>
           <p class="small muted" style="margin-bottom:1rem">La boleta sirve como apoyo visual para ubicar el consumo o comparar con la solución planteada.</p>
           <div class="bill-box">
-            <img src="boleta.jpg" alt="Referencia de boleta de luz" width="900" height="1200" loading="lazy" onerror="this.style.display='none'">
+            <img src="boleta.jpg" alt="Referencia de boleta de luz" width="900" height="1200" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
           </div>
         </article>
 
@@ -494,7 +510,7 @@
 
             <div class="image-workspace">
               <div class="preview-box">
-                <img id="imagePreview" src="paneles.jpg" alt="Vista previa del producto" width="700" height="700" loading="lazy" onerror="this.src='paneles.jpg'">
+                <img id="imagePreview" src="paneles.jpg" alt="Vista previa del producto" width="700" height="700" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
               </div>
 
               <div class="admin-form">
@@ -532,8 +548,11 @@
       </div>
     </section>
 
-    <div class="footer-gap"></div>
   </main>
+
+  <footer class="site-footer">
+    <button class="btn ghost small" type="button" data-route="admin-login" style="color: var(--color-text-muted);">Acceso Administrador</button>
+  </footer>
 
   <div class="sticky-cart">
     <div>
@@ -549,15 +568,16 @@
     const ADMIN_PASSWORD = "Hibrid2026";
     const WHATSAPP_NUMBER = "56956139055";
 
+    // Nombres base para las categorías basados en la lista de archivos enviada
     const categories = [
       { key:"principales", label:"Principales", blurb:"Equipos destacados", image:"kitsolar.jpg" },
-      { key:"paneles", label:"Paneles", blurb:"Módulos solares", image:"panelescatalago.jpg" },
-      { key:"baterias", label:"Baterías", blurb:"Litio y respaldo", image:"bateriacatalogo1.jpg" },
-      { key:"inversores", label:"Inversores", blurb:"Control y conversión", image:"inversorcatalogo.png" },
+      { key:"paneles", label:"Paneles", blurb:"Módulos solares", image:"paneles.jpg" },
+      { key:"baterias", label:"Baterías", blurb:"Litio y respaldo", image:"bateria.jpg" },
+      { key:"inversores", label:"Inversores", blurb:"Control y conversión", image:"inversor.jpg" },
       { key:"kits", label:"Kits solar", blurb:"Paquetes listos", image:"kitsolar.jpg" },
-      { key:"eolico", label:"Eólica", blurb:"Energía del viento", image:"aerogeneradorcatalogo1.jpg" },
-      { key:"otros", label:"Otros", blurb:"Focos, cables y más", image:"paneles.jpg" },
-      { key:"all", label:"Ver todos", blurb:"Todo el catálogo", image:"paneles.jpg" }
+      { key:"eolico", label:"Eólica", blurb:"Energía del viento", image:"eolica.jpg" },
+      { key:"otros", label:"Otros", blurb:"Focos, cables y más", image:"focosolar1.jpg" },
+      { key:"all", label:"Ver todos", blurb:"Todo el catálogo", image:"camarasproductos.jpeg" }
     ];
 
     const imageLibrary = {
@@ -568,7 +588,7 @@
         kits:["kitsolar.jpg","panelescatalago.jpg","bateriacatalogo1.jpg","inversorcatalogo.png"],
         eolico:["aerogeneradorcatalogo1.jpg","aerogeneradorcatalogo2.jpg","eolica.jpg"],
         principales:["kitsolar.jpg","panelescatalago.jpg","bateriacatalogo1.jpg","inversorcatalogo.png","aerogeneradorcatalogo1.jpg"],
-        otros:["paneles.jpg", "panelescatalago.jpg"]
+        otros:["focosolar1.jpg", "focosolarproducto.jpeg"]
       }
     };
 
@@ -609,8 +629,7 @@
       { id:"eol-004", name:"Controlador Eólico 48V", price:289000, description:"Complemento para gestión segura de carga.", category:"eolico", image:"aerogeneradorcatalogo1.jpg", visible:true },
       { id:"eol-005", name:"Kit Eólico-Solar Mixto", price:4190000, description:"Configuración demostrativa para proyectos híbridos.", category:"eolico", image:"aerogeneradorcatalogo2.jpg", visible:true },
       
-      { id:"otr-001", name:"Cable Solar 4mm (Metro)", price:1500, description:"Cable fotovoltaico resistente a rayos UV.", category:"otros", image:"paneles.jpg", visible:true },
-      { id:"otr-002", name:"Foco Solar 100W", price:35000, description:"Foco LED solar con sensor de movimiento y control.", category:"otros", image:"panelescatalago.jpg", visible:true }
+      { id:"otr-001", name:"Foco Solar 100W", price:35000, description:"Foco LED solar con sensor de movimiento y control.", category:"otros", image:"focosolarproducto.jpeg", visible:true }
     ];
 
     const state = {
@@ -630,6 +649,8 @@
       catalogGrid:$("#catalogGrid"),
       catalogTitle:$("#catalogTitle"),
       catalogMeta:$("#catalogMeta"),
+      categoriesView:$("#categoriesView"),
+      catalogView:$("#catalogView"),
 
       cartCount:$("#cartCount"),
       cartList:$("#cartList"),
@@ -665,7 +686,8 @@
       galleryGrid:$("#galleryGrid"),
       refreshGalleryBtn:$("#refreshGalleryBtn"),
 
-      noticeStack:$("#noticeStack")
+      noticeStack:$("#noticeStack"),
+      backToCategoriesBtn:$("#backToCategoriesBtn")
     };
 
     function formatPrice(value){
@@ -711,6 +733,13 @@
         btn.classList.toggle("primary", btn.dataset.route === route);
         btn.classList.toggle("secondary", btn.dataset.route !== route);
       });
+
+      // Si volvemos a inicio, SIEMPRE mostrar las categorías primero
+      if(route === "home"){
+        els.categoriesView.style.display = "block";
+        els.catalogView.style.display = "none";
+      }
+
       if(route === "cart") renderCart();
       if(route === "admin") renderAdmin();
       
@@ -734,8 +763,8 @@
         const count = cat.key === "all" ? visibleProducts().length : state.products.filter(item => item.category === cat.key && item.visible).length;
         const imgSrc = cat.image || 'paneles.jpg';
         return `
-          <button class="category-card ${state.filterCategory===cat.key?"active":""}" type="button" data-filter="${cat.key}">
-            <img src="${imgSrc}" class="cat-img" alt="${cat.label}" loading="lazy" onerror="this.src='paneles.jpg'">
+          <button class="category-card" type="button" data-select-category="${cat.key}">
+            <img src="${imgSrc}" class="cat-img" alt="${cat.label}" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
             <div class="cat-body">
               <strong>${cat.label}</strong>
               <small>${cat.blurb}</small>
@@ -760,7 +789,7 @@
       els.catalogGrid.innerHTML = list.length ? list.map(item => `
         <article class="product-card">
           <div class="product-media">
-            <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" width="900" height="700" loading="lazy" onerror="this.src='paneles.jpg'">
+            <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" width="900" height="700" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
           </div>
           <div class="product-body">
             <div class="product-top">
@@ -775,7 +804,7 @@
             <button class="btn primary full" type="button" data-add="${escapeHtml(item.id)}">Agregar al carrito</button>
           </div>
         </article>
-      `).join("") : `<div class="empty">No hay productos visibles para este filtro.</div>`;
+      `).join("") : `<div class="empty">No hay productos visibles para esta categoría.</div>`;
     }
 
     function getProductById(id){
@@ -835,7 +864,7 @@
 
       els.cartList.innerHTML = items.map(item => `
         <article class="cart-item">
-          <img src="${escapeHtml(item.product.image)}" alt="${escapeHtml(item.product.name)}" width="300" height="300" loading="lazy" onerror="this.src='paneles.jpg'">
+          <img src="${escapeHtml(item.product.image)}" alt="${escapeHtml(item.product.name)}" width="300" height="300" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
           <div>
             <span class="badge">${getCategoryLabel(item.product.category)}</span>
             <h4 style="margin-top:.6rem;font-size:var(--text-base);font-weight:900">${escapeHtml(item.product.name)}</h4>
@@ -940,10 +969,6 @@
             <div><strong>Baterías:</strong><br>${batteryKwh.toLocaleString("es-CL")} kWh (${Number(els.batteryPercent.value || 0)}%)</div>
           </div>
           <p class="small muted" style="margin-top:1rem">${useNote} ${focusNote}</p>
-          <div style="margin-top:1rem;display:flex;gap:var(--space-3);flex-wrap:wrap">
-            <button class="btn primary" type="button" data-filter="kits">Ver kits</button>
-            <button class="btn secondary" type="button" data-filter="inversores">Ver inversores</button>
-          </div>
         </div>
       `;
     }
@@ -964,7 +989,7 @@
 
       els.adminList.innerHTML = list.length ? list.map(item => `
         <button class="admin-list-item ${state.selectedProductId===item.id?"active":""}" type="button" data-admin-select="${escapeHtml(item.id)}">
-          <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" width="200" height="200" loading="lazy" onerror="this.src='paneles.jpg'">
+          <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" width="200" height="200" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
           <div style="text-align:left">
             <strong style="display:block">${escapeHtml(item.name)}</strong>
             <div class="tiny muted" style="margin-top:.2rem">${escapeHtml(item.id)}</div>
@@ -1010,7 +1035,7 @@
 
       els.galleryGrid.innerHTML = images.length ? images.map(image => `
         <button class="gallery-item ${current===image?"active":""}" type="button" data-gallery-image="${escapeHtml(image)}">
-          <img src="${escapeHtml(image)}" alt="${escapeHtml(image)}" width="300" height="300" loading="lazy" onerror="this.src='paneles.jpg'">
+          <img src="${escapeHtml(image)}" alt="${escapeHtml(image)}" width="300" height="300" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
           <span>${escapeHtml(image)}</span>
         </button>
       `).join("") : `<div class="empty">No hay imágenes configuradas para esta categoría.</div>`;
@@ -1030,7 +1055,6 @@
       };
       state.products.unshift(draft);
       state.selectedProductId = draft.id;
-      renderAll();
       routeTo("admin");
       showNotice("Nuevo producto creado como borrador.", "info");
     }
@@ -1119,19 +1143,17 @@
       const routeBtn = event.target.closest("[data-route]");
       if(routeBtn) routeTo(routeBtn.dataset.route);
 
-      const filterBtn = event.target.closest("[data-filter]");
-      if(filterBtn){
-        state.filterCategory = filterBtn.dataset.filter;
-        renderCategoryButtons();
+      // Evento para cuando el usuario hace clic en una CATEGORÍA (en la grilla de inicio)
+      const catBtn = event.target.closest("[data-select-category]");
+      if(catBtn){
+        state.filterCategory = catBtn.dataset.selectCategory;
+        
+        // Ocultar categorías, mostrar solo catálogo
+        els.categoriesView.style.display = "none";
+        els.catalogView.style.display = "block";
+        
         renderCatalog();
-        if(state.route !== "home") routeTo("home");
-
-        setTimeout(() => {
-          const catalogSection = document.getElementById("catalogMetaJump");
-          if(catalogSection) {
-            catalogSection.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
-        }, 50);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
       const addBtn = event.target.closest("[data-add]");
@@ -1155,6 +1177,13 @@
         els.imagePreview.src = galleryImageBtn.dataset.galleryImage;
         renderImageGallery();
       }
+    });
+
+    // Evento para el botón "Volver a categorías"
+    els.backToCategoriesBtn.addEventListener("click", () => {
+      state.filterCategory = "all";
+      els.categoriesView.style.display = "block";
+      els.catalogView.style.display = "none";
     });
 
     els.whatsappBtn.addEventListener("click", sendWhatsApp);
