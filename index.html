@@ -313,7 +313,6 @@
       <div class="logo-shell">
         <img src="logotipohibrid.png" alt="Logo HiBRID" class="logo-img" loading="eager" onerror="this.onerror=null; this.style.display='none';">
       </div>
-      <!-- Menú limpio -->
       <nav class="nav" aria-label="Navegación principal">
         <button class="btn secondary nav-btn" type="button" data-route="home">Productos</button>
         <button class="btn secondary nav-btn" type="button" data-route="calculator">Calculadora</button>
@@ -331,7 +330,6 @@
         </div>
       </div>
 
-      <!-- Grilla de categorías, siempre firme aquí -->
       <div id="categoryGrid" class="category-grid"></div>
 
       <div class="section-head" id="catalogMetaJump" style="margin-top: var(--space-6);">
@@ -342,7 +340,6 @@
         <button id="clearFiltersBtn" class="btn secondary small" type="button" style="display:none;">Ver todos</button>
       </div>
 
-      <!-- Catálogo de productos -->
       <div id="catalogGrid" class="catalog-grid"></div>
     </section>
 
@@ -529,7 +526,6 @@
   </main>
 
   <footer class="site-footer">
-    <!-- El botón del admin oculto abajo, sin estorbar -->
     <button class="btn ghost small" type="button" data-route="admin-login" style="color: var(--color-text-faint); border-color: transparent;">Acceso Administrador (Oculto)</button>
   </footer>
 
@@ -547,7 +543,6 @@
     const ADMIN_PASSWORD = "Hibrid2026";
     const WHATSAPP_NUMBER = "56956139055";
 
-    // IMÁGENES LIMPIAS EXACTAS PARA LAS CATEGORÍAS
     const categories = [
       { key:"principales", label:"Principales", blurb:"Equipos destacados", image:"kitsolar.jpg" },
       { key:"paneles", label:"Paneles", blurb:"Módulos solares", image:"paneles.jpg" },
@@ -558,7 +553,6 @@
       { key:"otros", label:"Otros", blurb:"Focos, cables y más", image:"focosolar1.jpg" }
     ];
 
-    // BANCO DE IMÁGENES PARA LOS PRODUCTOS
     const imageLibrary = {
       catalog: {
         paneles:["panelescatalago.jpg","paneles.jpg"],
@@ -612,58 +606,55 @@
     ];
 
     const state = {
-      route:"home",
-      products:demoProducts.map(item => ({ ...item })),
-      cart:[],
-      filterCategory:"all",
-      adminUnlocked:false,
-      selectedProductId:null,
+      route: "home",
+      products: demoProducts.map(item => ({ id: item.id, name: item.name, price: item.price, description: item.description, category: item.category, image: item.image, visible: item.visible })),
+      cart: [],
+      filterCategory: "all",
+      adminUnlocked: false,
+      selectedProductId: null
     };
 
     const $ = (selector, parent=document) => parent.querySelector(selector);
     const $$ = (selector, parent=document) => [...parent.querySelectorAll(selector)];
 
     const els = {
-      categoryGrid:$("#categoryGrid"),
-      catalogGrid:$("#catalogGrid"),
-      catalogTitle:$("#catalogTitle"),
-      catalogMeta:$("#catalogMeta"),
-      clearFiltersBtn:$("#clearFiltersBtn"),
+      categoryGrid: $("#categoryGrid"),
+      catalogGrid: $("#catalogGrid"),
+      catalogTitle: $("#catalogTitle"),
+      catalogMeta: $("#catalogMeta"),
+      clearFiltersBtn: $("#clearFiltersBtn"),
 
-      cartCount:$("#cartCount"),
-      cartList:$("#cartList"),
-      summaryBox:$("#summaryBox"),
-      stickyCartCount:$("#stickyCartCount"),
-      stickyCartTotal:$("#stickyCartTotal"),
-      whatsappBtn:$("#whatsappBtn"),
-      clearCartBtn:$("#clearCartBtn"),
+      cartList: $("#cartList"),
+      summaryBox: $("#summaryBox"),
+      stickyCartCount: $("#stickyCartCount"),
+      stickyCartTotal: $("#stickyCartTotal"),
+      whatsappBtn: $("#whatsappBtn"),
+      clearCartBtn: $("#clearCartBtn"),
 
-      powerInput:$("#powerInput"),
-      batteryPercent:$("#batteryPercent"),
-      projectUse:$("#projectUse"),
-      phaseInput:$("#phaseInput"),
-      calculateBtn:$("#calculateBtn"),
-      calcResult:$("#calcResult"),
+      powerInput: $("#powerInput"),
+      batteryPercent: $("#batteryPercent"),
+      projectUse: $("#projectUse"),
+      calculateBtn: $("#calculateBtn"),
+      calcResult: $("#calcResult"),
 
-      adminPass:$("#adminPass"),
-      adminLoginBtn:$("#adminLoginBtn"),
-      adminFilter:$("#adminFilter"),
-      adminList:$("#adminList"),
-      adminForm:$("#adminForm"),
-      newProductBtn:$("#newProductBtn"),
-      deleteProductBtn:$("#deleteProductBtn"),
-      productId:$("#productId"),
-      productCategory:$("#productCategory"),
-      productVisible:$("#productVisible"),
-      productName:$("#productName"),
-      productPrice:$("#productPrice"),
-      productDescription:$("#productDescription"),
-      productImage:$("#productImage"),
-      imagePreview:$("#imagePreview"),
-      galleryGrid:$("#galleryGrid"),
+      adminPass: $("#adminPass"),
+      adminLoginBtn: $("#adminLoginBtn"),
+      adminFilter: $("#adminFilter"),
+      adminList: $("#adminList"),
+      adminForm: $("#adminForm"),
+      newProductBtn: $("#newProductBtn"),
+      deleteProductBtn: $("#deleteProductBtn"),
+      productId: $("#productId"),
+      productCategory: $("#productCategory"),
+      productVisible: $("#productVisible"),
+      productName: $("#productName"),
+      productPrice: $("#productPrice"),
+      productDescription: $("#productDescription"),
+      productImage: $("#productImage"),
+      imagePreview: $("#imagePreview"),
+      galleryGrid: $("#galleryGrid"),
 
-      noticeStack:$("#noticeStack"),
-      refreshGalleryBtn:$("#refreshGalleryBtn")
+      noticeStack: $("#noticeStack")
     };
 
     function loadData() {
@@ -688,11 +679,11 @@
 
     function escapeHtml(value){
       return String(value ?? "")
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
     function slugify(text){
@@ -709,13 +700,13 @@
       const node = document.createElement("div");
       node.className = "notice";
       node.innerHTML = `<div><strong>${type==="success"?"Listo":type==="error"?"Revisa":"Info"}</strong><div class="small muted" style="margin-top:.15rem">${escapeHtml(message)}</div></div>`;
-      els.noticeStack.appendChild(node);
+      if(els.noticeStack) els.noticeStack.appendChild(node);
       setTimeout(() => { node.style.opacity="0"; node.style.transform="translateY(-4px)"; }, 2800);
       setTimeout(() => node.remove(), 3400);
     }
 
     function productImage(product) {
-      return product?.imagen || product?.image_url || product?.image || "";
+      return product?.image || product?.image_url || product?.imagen || "";
     }
 
     function getCategoryLabel(key){
@@ -774,9 +765,9 @@
       if(!els.catalogGrid) return;
       const list = filteredProducts();
       
-      els.catalogTitle.textContent = state.filterCategory === "all" ? "Todos los productos" : `Mostrando: ${getCategoryLabel(state.filterCategory)}`;
-      els.catalogMeta.textContent = state.filterCategory === "all" ? "Catálogo completo." : "Filtrado por categoría.";
-      els.clearFiltersBtn.style.display = state.filterCategory === "all" ? "none" : "inline-flex";
+      if(els.catalogTitle) els.catalogTitle.textContent = state.filterCategory === "all" ? "Todos los productos" : `Mostrando: ${getCategoryLabel(state.filterCategory)}`;
+      if(els.catalogMeta) els.catalogMeta.textContent = state.filterCategory === "all" ? "Catálogo completo." : "Filtrado por categoría.";
+      if(els.clearFiltersBtn) els.clearFiltersBtn.style.display = state.filterCategory === "all" ? "none" : "inline-flex";
 
       els.catalogGrid.innerHTML = list.length ? list.map(item => `
         <article class="product-card">
@@ -811,14 +802,14 @@
       syncCart();
       return state.cart.map(item => {
         const product = getProductById(item.id);
-        return { ...item, product, subtotal:(product?.price || 0) * item.quantity };
+        return { id: item.id, quantity: item.quantity, product: product, subtotal: (product?.price || 0) * item.quantity };
       }).filter(item => item.product);
     }
 
     function addToCart(id){
       const item = state.cart.find(row => row.id === id);
       if(item) item.quantity += 1;
-      else state.cart.push({ id, quantity:1 });
+      else state.cart.push({ id: id, quantity: 1 });
       saveData();
       updateCartStats();
       showNotice("Producto agregado al carrito.", "success");
@@ -851,7 +842,9 @@
     }
 
     function renderCart(){
+      if(!els.cartList || !els.summaryBox) return;
       const items = detailedCart();
+      
       if(!items.length){
         els.cartList.innerHTML = `<div class="empty">Tu carrito está vacío. Agrega productos desde el catálogo.</div>`;
         els.summaryBox.innerHTML = `<div class="summary-line"><span>Productos</span><strong>0</strong></div><div class="summary-line"><span>Total</span><strong>${formatPrice(0)}</strong></div>`;
@@ -893,11 +886,8 @@
       const qty = items.reduce((sum,item) => sum + item.quantity, 0);
       const total = items.reduce((sum,item) => sum + item.subtotal, 0);
       
-      if(els.cartCount){
-        els.cartCount.textContent = qty;
-      }
       if(els.stickyCartCount){
-        els.stickyCartCount.textContent = `${qty} ${qty===1?"producto":"productos"}`;
+        els.stickyCartCount.textContent = `${qty} ${qty === 1 ? "producto" : "productos"}`;
       }
       if(els.stickyCartTotal){
         els.stickyCartTotal.textContent = formatPrice(total);
@@ -926,6 +916,8 @@
     }
 
     function calculateSystem(){
+      if(!els.powerInput || !els.batteryPercent || !els.projectUse || !els.calcResult) return;
+
       const monthlyKwh = Number(els.powerInput.value || 0);
       const batteryRatio = Number(els.batteryPercent.value || 0) / 100;
       const use = els.projectUse.value;
@@ -957,7 +949,7 @@
       const area = panels * areaPerPanel;
       const batteryKwh = (dailyKwh * batteryRatio).toFixed(1);
       
-      let numBatteries = Math.ceil(batteryKwh / 5.12);
+      let numBatteries = Math.max(1, Math.ceil(batteryKwh / 5.12));
 
       let inverter = "Inversor Monofásico 3kW - 5kW";
       if(totalInstalledKwNumber > 5 && totalInstalledKwNumber <= 10) inverter = "Inversor Monofásico 8kW u Off-Grid 6kW";
@@ -987,12 +979,13 @@
     }
 
     function adminFilteredProducts(){
+      if(!els.adminFilter) return state.products.slice();
       const filter = els.adminFilter.value || "all";
       return filter === "all" ? state.products.slice() : state.products.filter(item => item.category === filter);
     }
 
     function renderAdmin(){
-      if(!state.adminUnlocked) return;
+      if(!state.adminUnlocked || !els.adminList) return;
 
       const list = adminFilteredProducts();
       if(!state.selectedProductId && list.length) state.selectedProductId = list[0].id;
@@ -1018,7 +1011,9 @@
     }
 
     function fillAdminForm(){
+      if(!els.productId) return;
       const item = state.products.find(product => product.id === state.selectedProductId);
+      
       if(!item){
         els.productId.value = "";
         els.productCategory.value = "principales";
@@ -1027,7 +1022,7 @@
         els.productPrice.value = "";
         els.productDescription.value = "";
         els.productImage.value = "";
-        els.imagePreview.src = "paneles.jpg";
+        if(els.imagePreview) els.imagePreview.src = "paneles.jpg";
         return;
       }
 
@@ -1038,10 +1033,11 @@
       els.productPrice.value = item.price;
       els.productDescription.value = item.description;
       els.productImage.value = productImage(item);
-      els.imagePreview.src = productImage(item) || "paneles.jpg";
+      if(els.imagePreview) els.imagePreview.src = productImage(item) || "paneles.jpg";
     }
 
     function renderImageGallery(){
+      if(!els.galleryGrid || !els.productCategory || !els.productImage) return;
       const category = els.productCategory.value || "principales";
       const images = imageLibrary.catalog[category] || [];
       const current = els.productImage.value.trim();
@@ -1055,12 +1051,12 @@
     }
 
     function createNewProduct(){
-      const category = (els.adminFilter.value && els.adminFilter.value !== "all") ? els.adminFilter.value : "principales";
+      const category = (els.adminFilter && els.adminFilter.value && els.adminFilter.value !== "all") ? els.adminFilter.value : "principales";
       const draft = {
-        id:`prod-${Date.now()}`,
-        name:"Nuevo producto",
-        price:0,
-        description:"Agrega una descripción del producto.",
+        id: `prod-${Date.now()}`,
+        name: "Nuevo producto",
+        price: 0,
+        description: "Agrega una descripción del producto.",
         category: category,
         image: "",
         visible: false
@@ -1072,7 +1068,7 @@
       routeTo("admin");
       
       setTimeout(() => {
-        els.adminForm.scrollIntoView({ behavior: "smooth", block: "start" });
+        if(els.adminForm) els.adminForm.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 50);
       
       showNotice("Nuevo producto creado como borrador.", "info");
@@ -1083,13 +1079,13 @@
 
       const newId = els.productId.value.trim() || slugify(els.productName.value);
       const payload = {
-        id:newId,
-        category:els.productCategory.value,
+        id: newId,
+        category: els.productCategory.value,
         visible: els.productVisible.value === "true",
-        name:els.productName.value.trim(),
-        price:Number(els.productPrice.value || 0),
-        description:els.productDescription.value.trim(),
-        image:els.productImage.value.trim()
+        name: els.productName.value.trim(),
+        price: Number(els.productPrice.value || 0),
+        description: els.productDescription.value.trim(),
+        image: els.productImage.value.trim()
       };
 
       if(!payload.name){
@@ -1112,7 +1108,7 @@
         const oldId = existing.id;
         Object.assign(existing, payload);
         state.cart.forEach(item => { if(item.id === oldId) item.id = payload.id; });
-      }else{
+      } else {
         state.products.unshift(payload);
       }
 
@@ -1141,6 +1137,7 @@
     }
 
     function loginAdmin(){
+      if(!els.adminPass) return;
       if(els.adminPass.value.toLowerCase() !== ADMIN_PASSWORD.toLowerCase()){
         showNotice("Contraseña incorrecta.", "error");
         return;
@@ -1153,6 +1150,7 @@
     }
 
     function previewImageFromUrl(){
+      if(!els.productImage || !els.imagePreview) return;
       const image = els.productImage.value.trim();
       if(image) els.imagePreview.src = image;
       renderImageGallery();
@@ -1169,7 +1167,6 @@
       const routeBtn = event.target.closest("[data-route]");
       if(routeBtn) routeTo(routeBtn.dataset.route);
 
-      // Filtro de categorías directo al catálogo
       const catBtn = event.target.closest("[data-select-category]");
       if(catBtn){
         state.filterCategory = catBtn.dataset.selectCategory;
@@ -1234,18 +1231,12 @@
     if(els.deleteProductBtn) els.deleteProductBtn.addEventListener("click", deleteProduct);
     if(els.productImage) els.productImage.addEventListener("input", previewImageFromUrl);
     
-    if(els.productCategory) els.productCategory.addEventListener("change", () => {
-      const library = imageLibrary.catalog[els.productCategory.value] || [];
-      if(library.length && !library.includes(els.productImage.value.trim())){
-        els.productImage.value = library[0];
-        els.imagePreview.src = library[0];
-      }
-      renderImageGallery();
-    });
+    if(els.productCategory) {
+      els.productCategory.addEventListener("change", () => {
+        renderImageGallery();
+      });
+    }
 
-    if(els.refreshGalleryBtn) els.refreshGalleryBtn.addEventListener("click", renderImageGallery);
-
-    // Inicializar todo seguro con LocalStorage
     loadData();
     renderAll();
     updateCartStats();
