@@ -322,14 +322,12 @@
 
   <main id="mainContent" class="page">
     <section id="home" class="view active">
-      
       <div class="section-head">
         <div>
           <h3>Categorías</h3>
           <p>Encuentra rápidamente la familia de producto que buscas.</p>
         </div>
       </div>
-
       <div id="categoryGrid" class="category-grid"></div>
 
       <div class="section-head" id="catalogMetaJump" style="margin-top: var(--space-6);">
@@ -339,7 +337,6 @@
         </div>
         <button id="clearFiltersBtn" class="btn secondary small" type="button" style="display:none;">Ver todos</button>
       </div>
-
       <div id="catalogGrid" class="catalog-grid"></div>
     </section>
 
@@ -364,7 +361,6 @@
         <article class="panel">
           <h3 style="margin-bottom:.6rem">Ingresa tus datos</h3>
           <p class="small muted">Simularemos un sistema con paneles de 550W (alta eficiencia) basándonos en tu requerimiento energético real.</p>
-
           <div class="calc-grid" style="margin-top:1rem">
             <div>
               <label for="powerInput" style="display:block;margin-bottom:.45rem;font-weight:800;color:var(--color-primary);">Consumo mensual (kWh)</label>
@@ -383,11 +379,9 @@
               </select>
             </div>
           </div>
-
           <div style="margin-top:1rem">
             <button id="calculateBtn" class="btn primary full" type="button">Calcular mi sistema ideal</button>
           </div>
-
           <div id="calcResult"></div>
         </article>
       </div>
@@ -406,7 +400,6 @@
         <article class="cart-card">
           <div id="cartList" class="cart-list"></div>
         </article>
-
         <aside class="summary-card">
           <h3 style="margin-bottom:.8rem">Resumen final</h3>
           <div id="summaryBox"></div>
@@ -427,7 +420,6 @@
         </div>
         <button class="btn ghost" type="button" data-route="home">Volver al inicio</button>
       </div>
-
       <div class="login-card" style="max-width:520px; margin: auto;">
         <label for="adminPass" style="display:block;margin-bottom:.45rem;font-weight:800">Contraseña de acceso</label>
         <input id="adminPass" class="field" type="password" placeholder="Ingresa contraseña">
@@ -522,7 +514,6 @@
         </section>
       </div>
     </section>
-
   </main>
 
   <footer class="site-footer">
@@ -571,43 +562,37 @@
       { id:"pri-003", name:"Respaldo Crítico 48V", price:2590000, description:"Banco de respaldo con batería de litio e inversor de onda pura para equipos sensibles.", category:"principales", image:"bateriafcatalogo.jpeg", visible:true },
       { id:"pri-004", name:"Solución Parcela 6kW", price:4490000, description:"Paquete mixto para parcela con mayor autonomía y respaldo extendido.", category:"principales", image:"aerogeneradorcatalogo1.jpg", visible:true },
       { id:"pri-005", name:"Sistema Comercio 8kW", price:5890000, description:"Configuración robusta para alto consumo diurno con enfoque comercial.", category:"principales", image:"panelescatalago.jpg", visible:true },
-
       { id:"pan-001", name:"Panel Monocristalino 550W", price:129990, description:"Panel solar de alto rendimiento para uso residencial.", category:"paneles", image:"panelescatalago.jpg", visible:true },
       { id:"pan-002", name:"Panel Jinko 565W", price:139900, description:"Módulo de alta eficiencia para proyectos residenciales y comerciales.", category:"paneles", image:"paneles.jpg", visible:true },
       { id:"pan-003", name:"Panel Bifacial 610W", price:179900, description:"Panel bifacial orientado a estructuras de mayor captación.", category:"paneles", image:"panelescatalago.jpg", visible:true },
       { id:"pan-004", name:"Panel 450W Residencial", price:94900, description:"Alternativa compacta para techos pequeños.", category:"paneles", image:"paneles.jpg", visible:true },
       { id:"pan-005", name:"Panel 580W N-Type", price:149900, description:"Mejor estabilidad y menor degradación anual.", category:"paneles", image:"panelescatalago.jpg", visible:true },
-
       { id:"bat-001", name:"Batería Litio 5kWh", price:990000, description:"Respaldo energético para sistemas híbridos.", category:"baterias", image:"bateriacatalogo1.jpg", visible:true },
       { id:"bat-002", name:"Batería Felicity 5.12kWh", price:1490000, description:"Batería mural de litio para sistemas residenciales.", category:"baterias", image:"bateriafcatalogo.jpeg", visible:true },
       { id:"bat-003", name:"Batería Deye 5kWh", price:1690000, description:"Módulo escalable para sistemas de mayor estabilidad.", category:"baterias", image:"bateriadeyecatalogo.jpeg", visible:true },
       { id:"bat-004", name:"Batería Rack 10kWh", price:2890000, description:"Formato rack para instalaciones técnicas con más respaldo.", category:"baterias", image:"bateriacatalalogo1.jpg", visible:true },
       { id:"bat-005", name:"Batería 48V 200Ah", price:1890000, description:"Unidad de litio para autonomía extendida.", category:"baterias", image:"bateria.jpg", visible:true },
-
       { id:"inv-001", name:"Inversor Híbrido 5kW", price:790000, description:"Control y conversión para instalaciones solares.", category:"inversores", image:"inversor.jpg", visible:true },
       { id:"inv-002", name:"Inversor Deye Híbrido 5kW", price:1499000, description:"Equipo monofásico con soporte para baterías y monitoreo.", category:"inversores", image:"inversordeyecatalogo.jpg", visible:true },
       { id:"inv-003", name:"Inversor Deye 8kW", price:2390000, description:"Modelo trifásico para proyectos comerciales.", category:"inversores", image:"inversorcatalogo.png", visible:true },
       { id:"inv-004", name:"Inversor Off-Grid 6kW", price:1129000, description:"Solución de onda pura para independencia energética.", category:"inversores", image:"inversor.jpg", visible:true },
       { id:"inv-005", name:"Microinversor 2MPPT", price:389000, description:"Alternativa compacta para matrices pequeñas.", category:"inversores", image:"inversorcatalogo.png", visible:true },
-
       { id:"kit-001", name:"Kit Residencial 5kW", price:2490000, description:"Solución pensada para consumo medio residencial.", category:"kits", image:"kitsolar.jpg", visible:true },
       { id:"kit-002", name:"Kit Autonomía Total", price:4290000, description:"Sistema de mayor capacidad para alto consumo.", category:"kits", image:"kitsolar.jpg", visible:true },
       { id:"kit-003", name:"Kit Solar 1.5kW Básico", price:1099000, description:"Kit inicial con paneles, estructura e inversor.", category:"kits", image:"panelescatalago.jpg", visible:true },
       { id:"kit-004", name:"Kit Solar 3kW Familiar", price:1890000, description:"Paquete pensado para hogares con cargas diarias.", category:"kits", image:"bateriacatalogo1.jpg", visible:true },
       { id:"kit-005", name:"Kit Solar 8kW Comercio", price:5390000, description:"Solución mayor para negocios con consumos diurnos relevantes.", category:"kits", image:"inversorcatalogo.png", visible:true },
-
       { id:"eol-001", name:"Aerogenerador 1kW", price:890000, description:"Equipo eólico complementario.", category:"eolico", image:"aerogeneradorcatalogo1.jpg", visible:true },
       { id:"eol-002", name:"Aerogenerador 2kW Híbrido", price:2190000, description:"Pensado para combinar con banco de baterías e integración solar.", category:"eolico", image:"aerogeneradorcatalogo2.jpg", visible:true },
       { id:"eol-003", name:"Turbina 3kW", price:3290000, description:"Alternativa de mayor potencia para parcelas o respaldo.", category:"eolico", image:"eolica.jpg", visible:true },
       { id:"eol-004", name:"Controlador Eólico 48V", price:289000, description:"Complemento para gestión segura de carga.", category:"eolico", image:"aerogeneradorcatalogo1.jpg", visible:true },
       { id:"eol-005", name:"Kit Eólico-Solar Mixto", price:4190000, description:"Configuración demostrativa para proyectos híbridos.", category:"eolico", image:"aerogeneradorcatalogo2.jpg", visible:true },
-      
       { id:"otr-001", name:"Foco Solar 100W", price:35000, description:"Foco LED solar con sensor de movimiento y control.", category:"otros", image:"focosolarproducto.jpeg", visible:true }
     ];
 
     const state = {
       route: "home",
-      products: demoProducts.map(item => ({ id: item.id, name: item.name, price: item.price, description: item.description, category: item.category, image: item.image, visible: item.visible })),
+      products: [],
       cart: [],
       filterCategory: "all",
       adminUnlocked: false,
@@ -623,20 +608,17 @@
       catalogTitle: $("#catalogTitle"),
       catalogMeta: $("#catalogMeta"),
       clearFiltersBtn: $("#clearFiltersBtn"),
-
       cartList: $("#cartList"),
       summaryBox: $("#summaryBox"),
       stickyCartCount: $("#stickyCartCount"),
       stickyCartTotal: $("#stickyCartTotal"),
       whatsappBtn: $("#whatsappBtn"),
       clearCartBtn: $("#clearCartBtn"),
-
       powerInput: $("#powerInput"),
       batteryPercent: $("#batteryPercent"),
       projectUse: $("#projectUse"),
       calculateBtn: $("#calculateBtn"),
       calcResult: $("#calcResult"),
-
       adminPass: $("#adminPass"),
       adminLoginBtn: $("#adminLoginBtn"),
       adminFilter: $("#adminFilter"),
@@ -653,19 +635,16 @@
       productImage: $("#productImage"),
       imagePreview: $("#imagePreview"),
       galleryGrid: $("#galleryGrid"),
-
       noticeStack: $("#noticeStack")
     };
 
-    function loadData() {
-      const storedProducts = localStorage.getItem("hibrid_products");
-      const storedCart = localStorage.getItem("hibrid_cart");
-      if (storedProducts) {
-        try { state.products = JSON.parse(storedProducts); } catch(e) {}
-      }
-      if (storedCart) {
-        try { state.cart = JSON.parse(storedCart); } catch(e) {}
-      }
+    function loadData(){
+      // Borrado temporal para solucionar conflictos de los cambios anteriores
+      localStorage.removeItem("hibrid_products");
+      localStorage.removeItem("hibrid_cart");
+
+      state.products = demoProducts.map(item => ({...item}));
+      state.cart = [];
     }
 
     function saveData() {
@@ -699,14 +678,28 @@
     function showNotice(message, type="info"){
       const node = document.createElement("div");
       node.className = "notice";
-      node.innerHTML = `<div><strong>${type==="success"?"Listo":type==="error"?"Revisa":"Info"}</strong><div class="small muted" style="margin-top:.15rem">${escapeHtml(message)}</div></div>`;
+      node.innerHTML = `
+        <div>
+          <strong>
+            ${type === "success" ? "Listo" : type === "error" ? "Revisa" : "Info"}
+          </strong>
+          <div class="small muted" style="margin-top:.15rem">
+            ${escapeHtml(message)}
+          </div>
+        </div>
+      `;
       if(els.noticeStack) els.noticeStack.appendChild(node);
       setTimeout(() => { node.style.opacity="0"; node.style.transform="translateY(-4px)"; }, 2800);
       setTimeout(() => node.remove(), 3400);
     }
 
-    function productImage(product) {
-      return product?.image || product?.image_url || product?.imagen || "";
+    function productImage(product){
+      return (
+        product?.image_url ||
+        product?.image ||
+        product?.imagen ||
+        "paneles.jpg"
+      );
     }
 
     function getCategoryLabel(key){
@@ -1052,13 +1045,16 @@
 
     function createNewProduct(){
       const category = (els.adminFilter && els.adminFilter.value && els.adminFilter.value !== "all") ? els.adminFilter.value : "principales";
+      const fallbackImage = (imageLibrary.catalog[category] || ["paneles.jpg"])[0];
+
       const draft = {
         id: `prod-${Date.now()}`,
         name: "Nuevo producto",
         price: 0,
         description: "Agrega una descripción del producto.",
         category: category,
-        image: "",
+        image: fallbackImage,
+        image_url: fallbackImage,
         visible: false
       };
       state.products.unshift(draft);
@@ -1078,6 +1074,8 @@
       event.preventDefault();
 
       const newId = els.productId.value.trim() || slugify(els.productName.value);
+      const image = els.productImage.value.trim();
+
       const payload = {
         id: newId,
         category: els.productCategory.value,
@@ -1085,15 +1083,24 @@
         name: els.productName.value.trim(),
         price: Number(els.productPrice.value || 0),
         description: els.productDescription.value.trim(),
-        image: els.productImage.value.trim()
+        image: image,
+        image_url: image
       };
 
       if(!payload.name){
         showNotice("El nombre del producto es obligatorio.", "error");
         return;
       }
-      if(payload.price < 0){
+      if(!payload.description){
+        showNotice("La descripción es obligatoria.", "error");
+        return;
+      }
+      if(!Number.isFinite(payload.price) || payload.price < 0){
         showNotice("El precio no puede ser negativo.", "error");
+        return;
+      }
+      if(!payload.image){
+        showNotice("Debes asignar una imagen al producto.", "error");
         return;
       }
 
@@ -1231,12 +1238,20 @@
     if(els.deleteProductBtn) els.deleteProductBtn.addEventListener("click", deleteProduct);
     if(els.productImage) els.productImage.addEventListener("input", previewImageFromUrl);
     
-    if(els.productCategory) {
+    if(els.productCategory){
       els.productCategory.addEventListener("change", () => {
+        const category = els.productCategory.value;
+        const library = imageLibrary.catalog[category] || [];
+
+        if(library.length && !library.includes(els.productImage.value.trim())){
+          els.productImage.value = library[0];
+          els.imagePreview.src = library[0];
+        }
         renderImageGallery();
       });
     }
 
+    // Inicializar todo seguro con limpieza temporal
     loadData();
     renderAll();
     updateCartStats();
