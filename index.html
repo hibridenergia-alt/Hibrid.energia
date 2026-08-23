@@ -34,7 +34,6 @@
       --radius-sm:.5rem; --radius-md:.85rem; --radius-lg:1.1rem; --radius-xl:1.45rem; --radius-full:999px;
       --font-body:'Satoshi',system-ui,sans-serif;
       --max:1260px;
-      --header-h:100px;
       --transition:180ms cubic-bezier(.16,1,.3,1);
     }
 
@@ -84,38 +83,32 @@
       width:min(calc(100% - 24px), var(--max));
       margin:auto;
       padding:var(--space-4) 0;
-      display:grid;
-      grid-template-columns:1fr auto;
+      display:flex;
+      flex-wrap:wrap;
       gap:var(--space-4);
       align-items:center;
-      min-height:var(--header-h);
+      justify-content:space-between;
     }
 
     .logo-shell{
-      display:flex;align-items:center;justify-content:center;
-      padding:var(--space-2) 0;
-      width: 100%;
-      background: transparent;
-      border: none;
-      box-shadow: none;
+      display:flex;
+      align-items:center;
     }
-    .logo-wrap{display:flex;align-items:center;justify-content:flex-start;width:100%;}
     .logo-img{
       width:100%;
       max-width:320px;
       height:auto;
       max-height:85px;
       object-fit:contain;
-      object-position:left center;
     }
 
-    .nav{display:flex;gap:var(--space-2);flex-wrap:wrap;justify-content:flex-end}
+    .nav{display:flex;gap:var(--space-2);flex-wrap:wrap;}
 
     .btn{
       min-height:46px;padding:.85rem 1rem;border-radius:var(--radius-md);
       display:inline-flex;align-items:center;justify-content:center;gap:.55rem;
       border:1px solid transparent;font-size:var(--text-sm);font-weight:800;
-      transition:background var(--transition),border-color var(--transition),transform var(--transition),color var(--transition),box-shadow var(--transition)
+      transition:all var(--transition);
     }
     .btn:hover{transform:translateY(-1px)}
     .btn.primary{background:var(--color-primary);border-color:var(--color-primary);color:var(--color-text-inverse)}
@@ -124,7 +117,7 @@
     .btn.secondary:hover{background:rgba(255,255,255,.06)}
     .btn.ghost{background:transparent;border-color:var(--color-border)}
     .btn.danger{background:rgba(255,113,113,.12);border-color:rgba(255,113,113,.28);color:#ffd1d1}
-    .btn.small{min-height:38px;padding:.6rem .85rem;border-radius:.8rem}
+    .btn.small{min-height:38px;padding:.6rem .85rem;border-radius:.8rem;font-size:var(--text-xs);}
     .btn.full{width:100%}
 
     .page{flex: 1; width:min(calc(100% - 24px), var(--max));margin:auto;padding:var(--space-8) 0 var(--space-16)}
@@ -144,48 +137,47 @@
       scroll-margin-top: 120px;
     }
     .section-head h3{font-size:var(--text-lg);font-weight:900;letter-spacing:-.02em}
-    .section-head p{font-size:var(--text-sm);color:var(--color-text-muted)}
+    .section-head p{font-size:var(--text-sm);color:var(--color-text-muted);margin-top:.2rem;}
 
-    /* Ajuste para que las tarjetas de categoría queden iguales a tu screenshot */
-    .category-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-8);}
+    .category-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-10);}
     
     .category-card{
       padding:0;
       display:flex;
       flex-direction:column;
-      min-height:200px;
+      min-height:180px;
       text-align:left;
       border: 1px solid var(--color-border);
-      border-radius: var(--radius-xl);
-      background: linear-gradient(180deg,rgba(15,25,33,.98),rgba(20,33,42,.98));
-      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(180deg,rgba(20,32,41,1),rgba(15,25,33,1));
+      transition:all var(--transition);
       overflow:hidden;
     }
     .category-card:hover{
-      transform:translateY(-3px);
-      border-color:rgba(40,210,109,.4);
+      transform:translateY(-4px);
+      border-color:var(--color-primary);
       box-shadow: var(--shadow-lg);
     }
     .category-card.active{
-      border-color:rgba(40,210,109,.8);
+      border-color:var(--color-primary);
       box-shadow: 0 0 0 1px rgba(40,210,109,.5);
     }
     .cat-img {
       width: 100%;
-      height: 120px;
+      height: 100px;
       object-fit: cover;
-      background: #ffffff; /* Fondo blanco para las imágenes limpias como pediste */
+      background: #ffffff; 
       border-bottom: 1px solid var(--color-border);
     }
     .cat-body {
-      padding: var(--space-4);
+      padding: var(--space-3);
       display: flex;
       flex-direction: column;
       flex: 1;
     }
-    .category-card strong {font-size:var(--text-base);font-weight:900; color:var(--color-text); text-transform:uppercase; letter-spacing:.03em;}
+    .category-card strong {font-size:var(--text-base);font-weight:900; color:var(--color-text); text-transform:uppercase; letter-spacing:.05em;}
     .category-card small {font-size:var(--text-sm);font-weight:400;color:var(--color-text-muted); margin-top:.2rem;}
-    .category-card span {margin-top:auto;font-size:var(--text-xs);color:var(--color-text-faint); padding-top: .8rem;}
+    .category-card span {margin-top:auto;font-size:var(--text-xs);color:var(--color-text-faint); padding-top: .6rem;}
 
     .field,.select,.textarea{
       width:100%;padding:.95rem 1rem;border-radius:var(--radius-md);border:1px solid var(--color-border);
@@ -272,10 +264,10 @@
     .gallery-item span{display:block;padding:.55rem;font-size:var(--text-xs);line-height:1.35;color:var(--color-text-muted)}
 
     .notice-stack{
-      position:fixed;top:calc(var(--header-h) + 10px);right:var(--space-4);z-index:120;display:grid;gap:var(--space-3);
+      position:fixed;top:100px;right:var(--space-4);z-index:120;display:grid;gap:var(--space-3);
       width:min(360px,calc(100vw - 2rem))
     }
-    .notice{padding:var(--space-4);display:flex;gap:var(--space-3);align-items:flex-start;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg)}
+    .notice{padding:var(--space-4);display:flex;gap:var(--space-3);align-items:flex-start;border-radius:var(--radius-lg);background:rgba(15,25,33,.98);border:1px solid var(--color-border);box-shadow:var(--shadow-lg)}
     .sticky-cart{
       position:fixed;right:var(--space-4);bottom:var(--space-4);z-index:70;display:flex;align-items:center;gap:var(--space-3);
       padding:.75rem .82rem .75rem 1rem;border-radius:var(--radius-full);border:1px solid var(--color-border);
@@ -298,11 +290,11 @@
     }
     @media (max-width:760px){
       .topbar { position: relative; }
-      .topbar-inner{grid-template-columns:1fr; padding: var(--space-3) 0;}
-      .nav{justify-content:center; padding: 0 var(--space-3);}
+      .topbar-inner{flex-direction:column; padding: var(--space-3) var(--space-3); gap: var(--space-4);}
       
-      .logo-shell { padding: 0 var(--space-3); justify-content:center; }
-      .logo-img { max-width: 100%; max-height: 80px; }
+      .logo-shell { justify-content:center; }
+      .logo-img { max-height: 80px; }
+      .nav{justify-content:center; width:100%;}
       
       .category-grid{grid-template-columns:repeat(2,1fr); gap:var(--space-3);}
       .catalog-grid,.form-grid,.form-grid-3,.calc-grid,.gallery-grid{grid-template-columns:1fr}
@@ -318,12 +310,9 @@
   <header class="topbar">
     <div class="topbar-inner">
       <div class="logo-shell">
-        <div class="logo-wrap">
-          <!-- LOGO ACTUALIZADO AQUÍ -->
-          <img src="logotipohibrid.png" alt="Logo HiBRID" class="logo-img" width="1200" height="300" loading="eager" onerror="this.onerror=null; this.style.display='none';">
-        </div>
+        <img src="logotipohibrid.png" alt="Logo HiBRID" class="logo-img" loading="eager" onerror="this.onerror=null; this.style.display='none';">
       </div>
-
+      <!-- Menú simplificado: Solo Productos y Calculadora -->
       <nav class="nav" aria-label="Navegación principal">
         <button class="btn secondary nav-btn" type="button" data-route="home">Productos</button>
         <button class="btn secondary nav-btn" type="button" data-route="calculator">Calculadora</button>
@@ -334,33 +323,33 @@
   <main id="mainContent" class="page">
     <section id="home" class="view active">
       
-      <div id="categoriesView">
-        <div class="section-head">
-          <div>
-            <h3>Categorías</h3>
-            <p>Encuentra rápidamente la familia de producto que buscas.</p>
-          </div>
+      <div class="section-head">
+        <div>
+          <h3>Categorías</h3>
+          <p>Encuentra rápidamente la familia de producto que buscas.</p>
         </div>
-        <div id="categoryGrid" class="category-grid"></div>
       </div>
 
-      <div id="catalogView">
-        <div class="section-head" id="catalogMetaJump" style="margin-top: var(--space-8);">
-          <div>
-            <h3 id="catalogTitle">Todos los productos</h3>
-            <p id="catalogMeta">Catálogo completo.</p>
-          </div>
+      <!-- Grilla de categorías siempre visible -->
+      <div id="categoryGrid" class="category-grid"></div>
+
+      <div class="section-head" id="catalogMetaJump" style="margin-top: var(--space-6);">
+        <div>
+          <h3 id="catalogTitle">Todos los productos</h3>
+          <p id="catalogMeta">Catálogo completo.</p>
         </div>
-        <div id="catalogGrid" class="catalog-grid"></div>
+        <!-- Botón para limpiar filtros y ver todo de nuevo -->
+        <button id="clearFiltersBtn" class="btn secondary small" type="button" style="display:none;">Ver todos</button>
       </div>
 
+      <div id="catalogGrid" class="catalog-grid"></div>
     </section>
 
     <section id="calculator" class="view">
       <div class="section-head" style="margin-top:0">
         <div>
-          <h3>Calculadora real</h3>
-          <p>Ingresa potencia instalada en kW y recibe una salida orientativa útil para cotizar.</p>
+          <h3>Calculadora Solar Inteligente</h3>
+          <p>Calcula tu kit ideal basado en lo que pagas/consumes al mes.</p>
         </div>
         <button class="btn ghost" type="button" data-route="home">Volver</button>
       </div>
@@ -368,45 +357,38 @@
       <div class="calc-layout">
         <article class="panel">
           <h3 style="margin-bottom:.6rem">Referencia visual</h3>
-          <p class="small muted" style="margin-bottom:1rem">La boleta sirve como apoyo visual para ubicar el consumo o comparar con la solución planteada.</p>
+          <p class="small muted" style="margin-bottom:1rem">Revisa el apartado de "Consumo" en tu boleta de luz para ingresar el valor exacto.</p>
           <div class="bill-box">
             <img src="boleta.jpg" alt="Referencia de boleta de luz" width="900" height="1200" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
           </div>
         </article>
 
         <article class="panel">
-          <h3 style="margin-bottom:.6rem">Parámetros del cálculo</h3>
-          <p class="small muted">Se aplica panel de 550W, 5 HSP, eficiencia 0.80 y 2.5 m² por panel. Puedes calcular respaldo en baterías como porcentaje de la energía diaria.</p>
+          <h3 style="margin-bottom:.6rem">Ingresa tus datos</h3>
+          <p class="small muted">Simularemos un sistema con paneles de 550W (alta eficiencia) basándonos en tu requerimiento energético real.</p>
 
           <div class="calc-grid" style="margin-top:1rem">
             <div>
-              <label for="powerInput" style="display:block;margin-bottom:.45rem;font-weight:800">Potencia a instalar (kW)</label>
-              <input id="powerInput" class="field" type="number" min="0.1" step="0.1" placeholder="Ej: 30">
+              <!-- CALCULADORA MEJORADA: Pide consumo en kWh en vez de Potencia Instalada -->
+              <label for="powerInput" style="display:block;margin-bottom:.45rem;font-weight:800;color:var(--color-primary);">Consumo mensual (kWh)</label>
+              <input id="powerInput" class="field" type="number" min="1" step="10" placeholder="Ej: 350">
             </div>
             <div>
-              <label for="batteryPercent" style="display:block;margin-bottom:.45rem;font-weight:800">Baterías (% de respaldo)</label>
-              <input id="batteryPercent" class="field" type="number" min="0" max="100" step="5" value="50">
+              <label for="batteryPercent" style="display:block;margin-bottom:.45rem;font-weight:800">Autonomía en Baterías (%)</label>
+              <input id="batteryPercent" class="field" type="number" min="0" max="100" step="10" value="50" placeholder="Ej: 50">
             </div>
             <div>
               <label for="projectUse" style="display:block;margin-bottom:.45rem;font-weight:800">Tipo de proyecto</label>
               <select id="projectUse" class="select">
-                <option value="hogar">Hogar</option>
-                <option value="comercial">Comercial</option>
-                <option value="parcela">Parcela / Campo</option>
-                <option value="respaldo">Respaldo crítico</option>
-              </select>
-            </div>
-            <div>
-              <label for="phaseInput" style="display:block;margin-bottom:.45rem;font-weight:800">Enfoque</label>
-              <select id="phaseInput" class="select">
-                <option value="automatico">Selección automática de inversor</option>
-                <option value="cotizacion">Cotización rápida</option>
+                <option value="hogar">Residencial / Hogar</option>
+                <option value="comercial">Comercial / Negocio</option>
+                <option value="parcela">Parcela / Off-Grid</option>
               </select>
             </div>
           </div>
 
           <div style="margin-top:1rem">
-            <button id="calculateBtn" class="btn primary full" type="button">Calcular sistema</button>
+            <button id="calculateBtn" class="btn primary full" type="button">Calcular mi sistema ideal</button>
           </div>
 
           <div id="calcResult"></div>
@@ -444,17 +426,16 @@
       <div class="section-head" style="margin-top:0">
         <div>
           <h3>Administrador</h3>
-          <p>Acceso para editar catálogo, imágenes, precios y visibilidad.</p>
+          <p>Acceso restringido para gestión de catálogo.</p>
         </div>
-        <button class="btn ghost" type="button" data-route="home">Volver</button>
+        <button class="btn ghost" type="button" data-route="home">Volver al inicio</button>
       </div>
 
-      <div class="login-card" style="max-width:520px">
-        <label for="adminPass" style="display:block;margin-bottom:.45rem;font-weight:800">Contraseña</label>
+      <div class="login-card" style="max-width:520px; margin: auto;">
+        <label for="adminPass" style="display:block;margin-bottom:.45rem;font-weight:800">Contraseña de acceso</label>
         <input id="adminPass" class="field" type="password" placeholder="Ingresa contraseña">
         <div style="display:grid;gap:var(--space-3);margin-top:1rem">
           <button id="adminLoginBtn" class="btn primary full" type="button">Entrar al panel</button>
-          <p class="tiny muted">Contraseña por defecto: Hibrid2026</p>
         </div>
       </div>
     </section>
@@ -556,7 +537,8 @@
   </main>
 
   <footer class="site-footer">
-    <button class="btn ghost small" type="button" data-route="admin-login" style="color: var(--color-text-muted);">Acceso Administrador</button>
+    <!-- Botón del Administrador escondido estratégicamente en el footer -->
+    <button class="btn ghost small" type="button" data-route="admin-login" style="color: var(--color-text-faint); border-color: transparent;">Acceso Administrador (Oculto)</button>
   </footer>
 
   <div class="sticky-cart">
@@ -573,7 +555,7 @@
     const ADMIN_PASSWORD = "Hibrid2026";
     const WHATSAPP_NUMBER = "56956139055";
 
-    // IMÁGENES LIMPIAS PARA LAS CATEGORÍAS (Según tu captura de pantalla)
+    // IMÁGENES LIMPIAS PARA LAS CATEGORÍAS
     const categories = [
       { key:"principales", label:"Principales", blurb:"Equipos destacados", image:"kitsolar.jpg" },
       { key:"paneles", label:"Paneles", blurb:"Módulos solares", image:"paneles.jpg" },
@@ -581,8 +563,7 @@
       { key:"inversores", label:"Inversores", blurb:"Control y conversión", image:"inversor.jpg" },
       { key:"kits", label:"Kits solar", blurb:"Paquetes listos", image:"kitsolar.jpg" },
       { key:"eolico", label:"Eólica", blurb:"Energía del viento", image:"eolica.jpg" },
-      { key:"otros", label:"Otros", blurb:"Focos, cables y más", image:"focosolar1.jpg" },
-      { key:"all", label:"Ver todos", blurb:"Todo el catálogo", image:"camarasproductos.jpeg" }
+      { key:"otros", label:"Otros", blurb:"Focos, cables y más", image:"focosolar1.jpg" }
     ];
 
     const imageLibrary = {
@@ -655,6 +636,7 @@
       catalogGrid:$("#catalogGrid"),
       catalogTitle:$("#catalogTitle"),
       catalogMeta:$("#catalogMeta"),
+      clearFiltersBtn:$("#clearFiltersBtn"),
 
       cartCount:$("#cartCount"),
       cartList:$("#cartList"),
@@ -740,10 +722,7 @@
       if(route === "cart") renderCart();
       if(route === "admin") renderAdmin();
       
-      const mainContent = document.getElementById("mainContent");
-      if(mainContent) {
-        mainContent.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function visibleProducts(){
@@ -756,8 +735,8 @@
     }
 
     function renderCategoryButtons(){
-      els.categoryGrid.innerHTML = categories.map(cat => {
-        const count = cat.key === "all" ? visibleProducts().length : state.products.filter(item => item.category === cat.key && item.visible).length;
+      els.categoryGrid.innerHTML = categories.filter(cat => cat.key !== "all").map(cat => {
+        const count = state.products.filter(item => item.category === cat.key && item.visible).length;
         const imgSrc = cat.image || 'paneles.jpg';
         return `
           <button class="category-card ${state.filterCategory===cat.key?"active":""}" type="button" data-select-category="${cat.key}">
@@ -779,9 +758,8 @@
       const list = filteredProducts();
       
       els.catalogTitle.textContent = state.filterCategory === "all" ? "Todos los productos" : `Mostrando: ${getCategoryLabel(state.filterCategory)}`;
-      els.catalogMeta.textContent = state.filterCategory === "all"
-        ? `Catálogo completo de HiBRID Energy.`
-        : `Solo productos de la familia ${getCategoryLabel(state.filterCategory)}.`;
+      els.catalogMeta.textContent = state.filterCategory === "all" ? "Catálogo completo." : "Filtrado por categoría.";
+      els.clearFiltersBtn.style.display = state.filterCategory === "all" ? "none" : "inline-flex";
 
       els.catalogGrid.innerHTML = list.length ? list.map(item => `
         <article class="product-card">
@@ -917,55 +895,45 @@
       window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`, "_blank", "noopener");
     }
 
+    // CALCULADORA MEJORADA (Con consumo en kWh)
     function calculateSystem(){
-      const power = Number(els.powerInput.value || 0);
+      const monthlyKwh = Number(els.powerInput.value || 0);
       const batteryRatio = Number(els.batteryPercent.value || 0) / 100;
       const use = els.projectUse.value;
-      const focus = els.phaseInput.value;
 
-      if(!power || power <= 0){
-        els.calcResult.innerHTML = `<p class="small" style="color:#ffc1c1;margin-top:1rem">Ingresa una potencia válida en kW.</p>`;
+      if(!monthlyKwh || monthlyKwh <= 0){
+        els.calcResult.innerHTML = `<p class="small" style="color:#ffc1c1;margin-top:1rem">Por favor, ingresa tu consumo mensual en kWh.</p>`;
         return;
       }
 
-      const panelPower = 0.55;
+      const dailyKwh = monthlyKwh / 30;
       const hsp = 5;
       const efficiency = 0.80;
+      const panelPowerKw = 0.55; // 550W
       const areaPerPanel = 2.5;
 
-      const panels = Math.ceil(power / panelPower);
+      const requiredKw = dailyKwh / (hsp * efficiency);
+      const panels = Math.ceil(requiredKw / panelPowerKw);
+      const totalInstalledKw = (panels * panelPowerKw).toFixed(2);
       const area = panels * areaPerPanel;
-      const dailyGeneration = power * hsp * efficiency;
-      const batteryKwh = dailyGeneration * batteryRatio;
+      const batteryKwh = (dailyKwh * batteryRatio).toFixed(1);
 
-      let inverter = "Inversor Monofásico";
-      if(power > 10 && power <= 100) inverter = "Inversor Trifásico";
-      if(power > 100) inverter = "Múltiples Inversores Trifásicos en Red";
-
-      const useNote = use === "comercial"
-        ? "Proyecto comercial: revisar demanda, horarios punta y escalabilidad."
-        : use === "parcela"
-        ? "Proyecto rural/parcela: priorizar autonomía, estructura y respaldo."
-        : use === "respaldo"
-        ? "Respaldo crítico: priorizar baterías e inversor con enfoque de continuidad."
-        : "Proyecto residencial: base útil para autoconsumo y respaldo parcial.";
-
-      const focusNote = focus === "cotizacion"
-        ? "Salida enfocada a cotización rápida y orientación comercial."
-        : "Salida con selección automática de inversor según potencia instalada.";
+      let inverter = "Inversor Monofásico 3kW - 5kW";
+      if(totalInstalledKw > 6 && totalInstalledKw <= 12) inverter = "Inversor Monofásico 8kW - 10kW";
+      if(totalInstalledKw > 12) inverter = "Inversor Trifásico o Paralelo";
 
       els.calcResult.innerHTML = `
         <div class="calc-result">
-          <h4 style="margin-bottom:.7rem">Resultado estimado</h4>
+          <h4 style="margin-bottom:.7rem; color:var(--color-primary);">Solución Recomendada</h4>
           <div class="calc-grid">
-            <div><strong>Potencia:</strong><br>${power.toLocaleString("es-CL")} kW</div>
+            <div><strong>Sistema Ideal:</strong><br>${totalInstalledKw} kWp instalados</div>
             <div><strong>Paneles:</strong><br>${panels} paneles de 550W</div>
-            <div><strong>Área requerida:</strong><br>${area.toLocaleString("es-CL")} m²</div>
-            <div><strong>Generación diaria:</strong><br>${dailyGeneration.toLocaleString("es-CL")} kWh/día</div>
+            <div><strong>Área en techo:</strong><br>${area} m² aprox.</div>
+            <div><strong>Generación:</strong><br>${dailyKwh.toFixed(1)} kWh/día requeridos</div>
             <div><strong>Inversor:</strong><br>${inverter}</div>
-            <div><strong>Baterías:</strong><br>${batteryKwh.toLocaleString("es-CL")} kWh (${Number(els.batteryPercent.value || 0)}%)</div>
+            <div><strong>Respaldo (Batería):</strong><br>${batteryKwh} kWh (${Number(els.batteryPercent.value || 0)}%)</div>
           </div>
-          <p class="small muted" style="margin-top:1rem">${useNote} ${focusNote}</p>
+          <p class="small muted" style="margin-top:1rem">Esta es una simulación real basada en tu boleta. Úsala como guía para armar tu kit.</p>
         </div>
       `;
     }
@@ -1055,7 +1023,6 @@
       renderAll();
       routeTo("admin");
       
-      // FIX 3: Hacer scroll hacia abajo directamente al formulario al crear nuevo producto
       setTimeout(() => {
         els.adminForm.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 50);
@@ -1147,6 +1114,7 @@
       const routeBtn = event.target.closest("[data-route]");
       if(routeBtn) routeTo(routeBtn.dataset.route);
 
+      // LÓGICA DE CATEGORÍAS (Desplaza hacia abajo, no las oculta)
       const catBtn = event.target.closest("[data-select-category]");
       if(catBtn){
         state.filterCategory = catBtn.dataset.selectCategory;
@@ -1160,6 +1128,14 @@
             catalogSection.scrollIntoView({ behavior: "smooth", block: "start" });
           }
         }, 50);
+      }
+
+      // BOTÓN "VER TODOS"
+      const clearBtn = event.target.closest("#clearFiltersBtn");
+      if(clearBtn){
+        state.filterCategory = "all";
+        renderCategoryButtons();
+        renderCatalog();
       }
 
       const addBtn = event.target.closest("[data-add]");
@@ -1176,7 +1152,6 @@
         state.selectedProductId = adminSelect.dataset.adminSelect;
         renderAdmin();
         
-        // FIX 3: Hacer scroll automático hacia abajo al tocar "Editar"
         setTimeout(() => {
           els.adminForm.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 50);
