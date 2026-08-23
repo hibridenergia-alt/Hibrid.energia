@@ -99,14 +99,14 @@
       border: none;
       box-shadow: none;
     }
-    .logo-wrap{display:flex;align-items:center;justify-content:center;width:100%;}
+    .logo-wrap{display:flex;align-items:center;justify-content:flex-start;width:100%;}
     .logo-img{
       width:100%;
-      max-width:360px;
+      max-width:320px;
       height:auto;
-      max-height:100px;
+      max-height:85px;
       object-fit:contain;
-      object-position:center;
+      object-position:left center;
     }
 
     .nav{display:flex;gap:var(--space-2);flex-wrap:wrap;justify-content:flex-end}
@@ -131,7 +131,7 @@
     .view{display:none}
     .view.active{display:block}
 
-    .panel,.product-card,.category-card,.cart-card,.summary-card,.admin-card,.notice,.login-card{
+    .panel,.product-card,.cart-card,.summary-card,.admin-card,.notice,.login-card{
       background:linear-gradient(180deg,rgba(15,25,33,.98),rgba(20,33,42,.98));
       border:1px solid var(--color-border);
       border-radius:var(--radius-xl);
@@ -146,38 +146,46 @@
     .section-head h3{font-size:var(--text-lg);font-weight:900;letter-spacing:-.02em}
     .section-head p{font-size:var(--text-sm);color:var(--color-text-muted)}
 
+    /* Ajuste para que las tarjetas de categoría queden iguales a tu screenshot */
     .category-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-8);}
     
     .category-card{
       padding:0;
       display:flex;
       flex-direction:column;
-      min-height:160px;
+      min-height:200px;
       text-align:left;
-      transition:transform var(--transition),border-color var(--transition),background var(--transition);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(180deg,rgba(15,25,33,.98),rgba(20,33,42,.98));
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
       overflow:hidden;
     }
     .category-card:hover{
-      transform:translateY(-2px);
-      border-color:rgba(40,210,109,.35);
-      background:linear-gradient(180deg,rgba(20,32,41,1),rgba(24,39,48,1));
+      transform:translateY(-3px);
+      border-color:rgba(40,210,109,.4);
+      box-shadow: var(--shadow-lg);
+    }
+    .category-card.active{
+      border-color:rgba(40,210,109,.8);
+      box-shadow: 0 0 0 1px rgba(40,210,109,.5);
     }
     .cat-img {
       width: 100%;
-      height: 110px;
+      height: 120px;
       object-fit: cover;
-      background: #091118;
+      background: #ffffff; /* Fondo blanco para las imágenes limpias como pediste */
       border-bottom: 1px solid var(--color-border);
     }
     .cat-body {
-      padding: var(--space-3);
+      padding: var(--space-4);
       display: flex;
       flex-direction: column;
       flex: 1;
     }
     .category-card strong {font-size:var(--text-base);font-weight:900; color:var(--color-text); text-transform:uppercase; letter-spacing:.03em;}
     .category-card small {font-size:var(--text-sm);font-weight:400;color:var(--color-text-muted); margin-top:.2rem;}
-    .category-card span {margin-top:auto;font-size:var(--text-xs);color:var(--color-text-faint); padding-top: .6rem;}
+    .category-card span {margin-top:auto;font-size:var(--text-xs);color:var(--color-text-faint); padding-top: .8rem;}
 
     .field,.select,.textarea{
       width:100%;padding:.95rem 1rem;border-radius:var(--radius-md);border:1px solid var(--color-border);
@@ -294,7 +302,7 @@
       .nav{justify-content:center; padding: 0 var(--space-3);}
       
       .logo-shell { padding: 0 var(--space-3); justify-content:center; }
-      .logo-img { max-width: 100%; max-height: 90px; }
+      .logo-img { max-width: 100%; max-height: 80px; }
       
       .category-grid{grid-template-columns:repeat(2,1fr); gap:var(--space-3);}
       .catalog-grid,.form-grid,.form-grid-3,.calc-grid,.gallery-grid{grid-template-columns:1fr}
@@ -311,7 +319,8 @@
     <div class="topbar-inner">
       <div class="logo-shell">
         <div class="logo-wrap">
-          <img src="logohi.jpg" alt="Logo HiBRID" class="logo-img" width="1200" height="300" loading="eager" onerror="this.onerror=null; this.style.display='none';">
+          <!-- LOGO ACTUALIZADO AQUÍ -->
+          <img src="logotipohibrid.png" alt="Logo HiBRID" class="logo-img" width="1200" height="300" loading="eager" onerror="this.onerror=null; this.style.display='none';">
         </div>
       </div>
 
@@ -335,13 +344,12 @@
         <div id="categoryGrid" class="category-grid"></div>
       </div>
 
-      <div id="catalogView" style="display:none;">
-        <div class="section-head" id="catalogMetaJump">
+      <div id="catalogView">
+        <div class="section-head" id="catalogMetaJump" style="margin-top: var(--space-8);">
           <div>
-            <h3 id="catalogTitle">Productos</h3>
+            <h3 id="catalogTitle">Todos los productos</h3>
             <p id="catalogMeta">Catálogo completo.</p>
           </div>
-          <button class="btn ghost small" type="button" id="backToCategoriesBtn">Volver a categorías</button>
         </div>
         <div id="catalogGrid" class="catalog-grid"></div>
       </div>
@@ -565,8 +573,9 @@
     const ADMIN_PASSWORD = "Hibrid2026";
     const WHATSAPP_NUMBER = "56956139055";
 
+    // IMÁGENES LIMPIAS PARA LAS CATEGORÍAS (Según tu captura de pantalla)
     const categories = [
-      { key:"principales", label:"Principales", blurb:"Equipos destacados", image:"kitsolarproductos.jpeg" },
+      { key:"principales", label:"Principales", blurb:"Equipos destacados", image:"kitsolar.jpg" },
       { key:"paneles", label:"Paneles", blurb:"Módulos solares", image:"paneles.jpg" },
       { key:"baterias", label:"Baterías", blurb:"Litio y respaldo", image:"bateria.jpg" },
       { key:"inversores", label:"Inversores", blurb:"Control y conversión", image:"inversor.jpg" },
@@ -584,10 +593,11 @@
         kits:["kitsolar.jpg","panelescatalago.jpg","bateriacatalogo1.jpg","inversorcatalogo.png"],
         eolico:["aerogeneradorcatalogo1.jpg","aerogeneradorcatalogo2.jpg","eolica.jpg"],
         principales:["kitsolar.jpg","panelescatalago.jpg","bateriacatalogo1.jpg","inversorcatalogo.png","aerogeneradorcatalogo1.jpg"],
-        otros:["focosolar1.jpg", "focosolarproducto.jpeg"]
+        otros:["focosolar1.jpg", "focosolarproducto.jpeg", "camarasproductos.jpeg"]
       }
     };
 
+    // IMÁGENES DE CATÁLOGO PARA LOS PRODUCTOS
     const demoProducts = [
       { id:"pri-001", name:"Kit Hogar Híbrido 3kW", price:1899000, description:"Sistema base para vivienda con paneles, inversor híbrido y batería. Ideal para consumo medio.", category:"principales", image:"kitsolar.jpg", visible:true },
       { id:"pri-002", name:"Kit Negocio 5kW Pro", price:3290000, description:"Solución orientativa para locales y oficinas con mejor capacidad de generación y expansión.", category:"principales", image:"inversorcatalogo.png", visible:true },
@@ -645,8 +655,6 @@
       catalogGrid:$("#catalogGrid"),
       catalogTitle:$("#catalogTitle"),
       catalogMeta:$("#catalogMeta"),
-      categoriesView:$("#categoriesView"),
-      catalogView:$("#catalogView"),
 
       cartCount:$("#cartCount"),
       cartList:$("#cartList"),
@@ -682,8 +690,7 @@
       galleryGrid:$("#galleryGrid"),
       refreshGalleryBtn:$("#refreshGalleryBtn"),
 
-      noticeStack:$("#noticeStack"),
-      backToCategoriesBtn:$("#backToCategoriesBtn")
+      noticeStack:$("#noticeStack")
     };
 
     function formatPrice(value){
@@ -730,11 +737,6 @@
         btn.classList.toggle("secondary", btn.dataset.route !== route);
       });
 
-      if(route === "home"){
-        els.categoriesView.style.display = "block";
-        els.catalogView.style.display = "none";
-      }
-
       if(route === "cart") renderCart();
       if(route === "admin") renderAdmin();
       
@@ -758,7 +760,7 @@
         const count = cat.key === "all" ? visibleProducts().length : state.products.filter(item => item.category === cat.key && item.visible).length;
         const imgSrc = cat.image || 'paneles.jpg';
         return `
-          <button class="category-card" type="button" data-select-category="${cat.key}">
+          <button class="category-card ${state.filterCategory===cat.key?"active":""}" type="button" data-select-category="${cat.key}">
             <img src="${imgSrc}" class="cat-img" alt="${cat.label}" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
             <div class="cat-body">
               <strong>${cat.label}</strong>
@@ -1052,7 +1054,12 @@
       state.selectedProductId = draft.id;
       renderAll();
       routeTo("admin");
-      els.adminForm.scrollIntoView({ behavior: "smooth", block: "start" });
+      
+      // FIX 3: Hacer scroll hacia abajo directamente al formulario al crear nuevo producto
+      setTimeout(() => {
+        els.adminForm.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
+      
       showNotice("Nuevo producto creado como borrador.", "info");
     }
 
@@ -1143,12 +1150,16 @@
       const catBtn = event.target.closest("[data-select-category]");
       if(catBtn){
         state.filterCategory = catBtn.dataset.selectCategory;
-        
-        els.categoriesView.style.display = "none";
-        els.catalogView.style.display = "block";
-        
+        renderCategoryButtons();
         renderCatalog();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if(state.route !== "home") routeTo("home");
+
+        setTimeout(() => {
+          const catalogSection = document.getElementById("catalogMetaJump");
+          if(catalogSection) {
+            catalogSection.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }, 50);
       }
 
       const addBtn = event.target.closest("[data-add]");
@@ -1164,7 +1175,11 @@
       if(adminSelect){
         state.selectedProductId = adminSelect.dataset.adminSelect;
         renderAdmin();
-        els.adminForm.scrollIntoView({ behavior: "smooth", block: "start" });
+        
+        // FIX 3: Hacer scroll automático hacia abajo al tocar "Editar"
+        setTimeout(() => {
+          els.adminForm.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 50);
       }
 
       const galleryImageBtn = event.target.closest("[data-gallery-image]");
@@ -1173,12 +1188,6 @@
         els.imagePreview.src = galleryImageBtn.dataset.galleryImage;
         renderImageGallery();
       }
-    });
-
-    els.backToCategoriesBtn.addEventListener("click", () => {
-      state.filterCategory = "all";
-      els.categoriesView.style.display = "block";
-      els.catalogView.style.display = "none";
     });
 
     els.whatsappBtn.addEventListener("click", sendWhatsApp);
