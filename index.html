@@ -695,9 +695,7 @@
       const node = document.createElement("div");
       node.className = "notice " + type;
       
-      let title = "Info";
-      if(type === "success") title = "Listo";
-      if(type === "error") title = "Revisa";
+      const title = type === "success" ? "Listo" : type === "error" ? "Revisa" : "Info";
 
       node.innerHTML = "<div><strong>" + title + "</strong><div class='small muted' style='margin-top:.15rem'>" + escapeHtml(message) + "</div></div>";
       
@@ -766,24 +764,21 @@
 
     function routeTo(route){
       state.route = route;
+
       $$(".view").forEach(view => {
-        if(view.id === route) view.classList.add("active");
-        else view.classList.remove("active");
+        view.classList.toggle("active", view.id === route);
       });
+
       $$(".nav-btn").forEach(btn => {
-        if(btn.dataset.route === route){
-          btn.classList.add("primary");
-          btn.classList.remove("secondary");
-        } else {
-          btn.classList.remove("primary");
-          btn.classList.add("secondary");
-        }
+        const active = btn.dataset.route === route;
+        btn.classList.toggle("primary", active);
+        btn.classList.toggle("secondary", !active);
       });
 
       if(route === "cart") renderCart();
       if(route === "admin") renderAdmin();
       
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function visibleProducts(){
@@ -964,6 +959,7 @@
 
     function sendWhatsApp(){
       const items = detailedCart();
+
       if(items.length === 0){
         showNotice("Primero agrega productos al carrito.", "error");
         return;
@@ -971,10 +967,12 @@
 
       let total = 0;
       let text = "Hola HiBRID, quiero más información sobre estos productos:\n\n";
+
       items.forEach((item, index) => {
         total += item.subtotal;
         text += (index + 1) + ". " + item.product.name + " | Cant: " + item.quantity + " | Unitario: " + formatPrice(item.product.price) + " | Subtotal: " + formatPrice(item.subtotal) + "\n";
       });
+
       text += "\nTotal estimado: " + formatPrice(total) + "\n\nNota: Esta simulación y sus precios son estrictamente de referencia. La configuración final debe ser verificada por nuestro equipo técnico.";
       
       window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(text), "_blank", "noopener");
@@ -1122,9 +1120,13 @@
        
        if(productId){
           const item = state.products.find(p => p.id === productId);
+          
           if(!item) return;
 
-          if(els.modalTitle) els.modalTitle.textContent = "Editar Producto";
+          if(els.modalTitle){
+            els.modalTitle.textContent = "Editar Producto";
+          }
+
           if(els.modalProductId) els.modalProductId.value = item.id;
           if(els.modalProductName) els.modalProductName.value = item.name;
           if(els.modalProductCategory) els.modalProductCategory.value = item.category;
@@ -1144,7 +1146,6 @@
           if(els.modalTitle) els.modalTitle.textContent = "Nuevo Producto";
           if(els.modalProductId) els.modalProductId.value = "";
           if(els.modalProductName) els.modalProductName.value = "";
-          
           const defaultCat = (els.adminFilter && els.adminFilter.value !== "all") ? els.adminFilter.value : "principales";
           if(els.modalProductCategory) els.modalProductCategory.value = defaultCat;
           if(els.modalProductPrice) els.modalProductPrice.value = "";
