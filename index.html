@@ -662,8 +662,25 @@
       imagePreview:$("#imagePreview"),
       galleryGrid:$("#galleryGrid"),
 
-      noticeStack:$("#noticeStack")
+      noticeStack:$("#noticeStack"),
+      refreshGalleryBtn:$("#refreshGalleryBtn")
     };
+
+    function loadData() {
+      const storedProducts = localStorage.getItem("hibrid_products");
+      const storedCart = localStorage.getItem("hibrid_cart");
+      if (storedProducts) {
+        try { state.products = JSON.parse(storedProducts); } catch(e) {}
+      }
+      if (storedCart) {
+        try { state.cart = JSON.parse(storedCart); } catch(e) {}
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem("hibrid_products", JSON.stringify(state.products));
+      localStorage.setItem("hibrid_cart", JSON.stringify(state.cart));
+    }
 
     function formatPrice(value){
       return new Intl.NumberFormat("es-CL",{style:"currency",currency:"CLP",maximumFractionDigits:0}).format(Number(value || 0));
@@ -697,6 +714,10 @@
       setTimeout(() => node.remove(), 3400);
     }
 
+    function productImage(product) {
+      return product?.imagen || product?.image_url || product?.image || "";
+    }
+
     function getCategoryLabel(key){
       if(key === "all") return "Todos los productos";
       return categories.find(item => item.key === key)?.label || key;
@@ -717,7 +738,7 @@
     }
 
     function visibleProducts(){
-      return state.products.filter(item => item.visible);
+      return state.products.filter(item => item.visible === true);
     }
 
     function filteredProducts(){
@@ -727,7 +748,7 @@
     function renderCategoryButtons(){
       if(!els.categoryGrid) return;
       els.categoryGrid.innerHTML = categories.map(cat => {
-        const count = state.products.filter(item => item.category === cat.key && item.visible).length;
+        const count = state.products.filter(item => item.category === cat.key && item.visible === true).length;
         const imgSrc = cat.image || 'paneles.jpg';
         return `
           <button class="category-card ${state.filterCategory===cat.key?"active":""}" type="button" data-select-category="${cat.key}">
@@ -760,7 +781,7 @@
       els.catalogGrid.innerHTML = list.length ? list.map(item => `
         <article class="product-card">
           <div class="product-media">
-            <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" width="900" height="700" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
+            <img src="${escapeHtml(productImage(item))}" alt="${escapeHtml(item.name)}" width="900" height="700" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
           </div>
           <div class="product-body">
             <div class="product-top">
@@ -798,6 +819,7 @@
       const item = state.cart.find(row => row.id === id);
       if(item) item.quantity += 1;
       else state.cart.push({ id, quantity:1 });
+      saveData();
       updateCartStats();
       showNotice("Producto agregado al carrito.", "success");
     }
@@ -807,12 +829,14 @@
       if(!item) return;
       item.quantity += delta;
       if(item.quantity <= 0) state.cart = state.cart.filter(row => row.id !== id);
+      saveData();
       renderCart();
       updateCartStats();
     }
 
     function removeFromCart(id){
       state.cart = state.cart.filter(item => item.id !== id);
+      saveData();
       renderCart();
       updateCartStats();
       showNotice("Producto quitado del carrito.", "info");
@@ -820,6 +844,7 @@
 
     function clearCart(){
       state.cart = [];
+      saveData();
       renderCart();
       updateCartStats();
       showNotice("Carrito vaciado.", "info");
@@ -835,7 +860,7 @@
 
       els.cartList.innerHTML = items.map(item => `
         <article class="cart-item">
-          <img src="${escapeHtml(item.product.image)}" alt="${escapeHtml(item.product.name)}" width="300" height="300" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
+          <img src="${escapeHtml(productImage(item.product))}" alt="${escapeHtml(item.product.name)}" width="300" height="300" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
           <div>
             <span class="badge">${getCategoryLabel(item.product.category)}</span>
             <h4 style="margin-top:.6rem;font-size:var(--text-base);font-weight:900">${escapeHtml(item.product.name)}</h4>
@@ -867,9 +892,16 @@
       const items = detailedCart();
       const qty = items.reduce((sum,item) => sum + item.quantity, 0);
       const total = items.reduce((sum,item) => sum + item.subtotal, 0);
-      els.cartCount.textContent = qty;
-      els.stickyCartCount.textContent = `${qty} ${qty===1?"producto":"productos"}`;
-      els.stickyCartTotal.textContent = formatPrice(total);
+      
+      if(els.cartCount){
+        els.cartCount.textContent = qty;
+      }
+      if(els.stickyCartCount){
+        els.stickyCartCount.textContent = `${qty} ${qty===1?"producto":"productos"}`;
+      }
+      if(els.stickyCartTotal){
+        els.stickyCartTotal.textContent = formatPrice(total);
+      }
     }
 
     function sendWhatsApp(){
@@ -887,11 +919,12 @@
       });
       lines.push("");
       lines.push(`Total estimado: ${formatPrice(total)}`);
+      lines.push("");
+      lines.push("Nota: Esta simulación y sus precios son estrictamente de referencia. La configuración final debe ser verificada por nuestro equipo técnico.");
       
       window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`, "_blank", "noopener");
     }
 
-    // CALCULADORA MEJORADA (Con consumo en kWh)
     function calculateSystem(){
       const monthlyKwh = Number(els.powerInput.value || 0);
       const batteryRatio = Number(els.batteryPercent.value || 0) / 100;
@@ -904,30 +937,31 @@
 
       const dailyKwh = monthlyKwh / 30;
       
-      // Chile HSP: Promedio general
       let hsp = 4.5; 
       let efficiency = 0.80;
       
       if(use === "parcela") {
-         // Off-grid debe ser capaz de funcionar en invierno (Peores meses de sol)
          hsp = 2.5; 
-         efficiency = 0.70; // Mayores pérdidas al ciclar baterías
+         efficiency = 0.70; 
       }
 
-      const panelPowerKw = 0.55; // Panel de 550W
+      const panelPowerKw = 0.55; 
       const areaPerPanel = 2.5;
 
       const requiredKw = dailyKwh / (hsp * efficiency);
-      const panels = Math.ceil(requiredKw / panelPowerKw);
-      const totalInstalledKw = (panels * panelPowerKw).toFixed(2);
+      const panels = Math.max(1, Math.ceil(requiredKw / panelPowerKw));
+      
+      const totalInstalledKwNumber = panels * panelPowerKw;
+      const totalInstalledKw = totalInstalledKwNumber.toFixed(2);
+      
       const area = panels * areaPerPanel;
       const batteryKwh = (dailyKwh * batteryRatio).toFixed(1);
       
-      let numBatteries = Math.ceil(batteryKwh / 5.12); // Baterías Litio estándar de 5.12kWh
+      let numBatteries = Math.ceil(batteryKwh / 5.12);
 
       let inverter = "Inversor Monofásico 3kW - 5kW";
-      if(totalInstalledKw > 5 && totalInstalledKw <= 10) inverter = "Inversor Monofásico 8kW u Off-Grid 6kW";
-      if(totalInstalledKw > 10) inverter = "Inversores en Paralelo o Sistema Trifásico";
+      if(totalInstalledKwNumber > 5 && totalInstalledKwNumber <= 10) inverter = "Inversor Monofásico 8kW u Off-Grid 6kW";
+      if(totalInstalledKwNumber > 10) inverter = "Inversores en Paralelo o Sistema Trifásico";
 
       let useNote = "";
       if(use === "parcela") {
@@ -947,6 +981,7 @@
             <div><strong>Espacio en Techo:</strong><br>${area} m²<br><span class="tiny muted">Área libre de sombras</span></div>
           </div>
           <p class="small muted" style="margin-top:1rem">${useNote}</p>
+          <p class="tiny muted" style="margin-top:1rem; border-top:1px solid var(--color-border); padding-top:.5rem;">Nota: Esta simulación y sus precios son estrictamente de referencia. La configuración final debe ser verificada por nuestro equipo técnico.</p>
         </div>
       `;
     }
@@ -967,7 +1002,7 @@
 
       els.adminList.innerHTML = list.length ? list.map(item => `
         <button class="admin-list-item ${state.selectedProductId===item.id?"active":""}" type="button" data-admin-select="${escapeHtml(item.id)}">
-          <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" width="200" height="200" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
+          <img src="${escapeHtml(productImage(item))}" alt="${escapeHtml(item.name)}" width="200" height="200" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
           <div style="text-align:left">
             <strong style="display:block">${escapeHtml(item.name)}</strong>
             <div class="tiny muted" style="margin-top:.2rem">${escapeHtml(item.id)}</div>
@@ -987,7 +1022,7 @@
       if(!item){
         els.productId.value = "";
         els.productCategory.value = "principales";
-        els.productVisible.value = "true";
+        els.productVisible.value = "false";
         els.productName.value = "";
         els.productPrice.value = "";
         els.productDescription.value = "";
@@ -1002,8 +1037,8 @@
       els.productName.value = item.name;
       els.productPrice.value = item.price;
       els.productDescription.value = item.description;
-      els.productImage.value = item.image;
-      els.imagePreview.src = item.image;
+      els.productImage.value = productImage(item);
+      els.imagePreview.src = productImage(item) || "paneles.jpg";
     }
 
     function renderImageGallery(){
@@ -1021,18 +1056,18 @@
 
     function createNewProduct(){
       const category = (els.adminFilter.value && els.adminFilter.value !== "all") ? els.adminFilter.value : "principales";
-      const fallbackImage = (imageLibrary.catalog[category] || ["paneles.jpg"])[0];
       const draft = {
         id:`prod-${Date.now()}`,
         name:"Nuevo producto",
         price:0,
         description:"Agrega una descripción del producto.",
-        category,
-        image:fallbackImage,
-        visible:false
+        category: category,
+        image: "",
+        visible: false
       };
       state.products.unshift(draft);
       state.selectedProductId = draft.id;
+      saveData();
       renderAll();
       routeTo("admin");
       
@@ -1050,11 +1085,11 @@
       const payload = {
         id:newId,
         category:els.productCategory.value,
-        visible:els.productVisible.value === "true",
+        visible: els.productVisible.value === "true",
         name:els.productName.value.trim(),
         price:Number(els.productPrice.value || 0),
         description:els.productDescription.value.trim(),
-        image:els.productImage.value.trim() || ((imageLibrary.catalog[els.productCategory.value] || ["paneles.jpg"])[0])
+        image:els.productImage.value.trim()
       };
 
       if(!payload.name){
@@ -1082,9 +1117,27 @@
       }
 
       state.selectedProductId = payload.id;
+      saveData();
       renderAll();
       routeTo("admin");
       showNotice("Producto guardado y actualizado.", "success");
+    }
+
+    function deleteProduct() {
+      if(!state.selectedProductId) {
+        showNotice("Selecciona un producto para eliminar.", "error");
+        return;
+      }
+      if (confirm("¿Estás seguro de que deseas eliminar permanentemente este producto del catálogo?")) {
+        state.products = state.products.filter(item => item.id !== state.selectedProductId);
+        state.cart = state.cart.filter(item => item.id !== state.selectedProductId);
+        state.selectedProductId = null;
+        saveData();
+        renderAll();
+        updateCartStats();
+        routeTo("admin");
+        showNotice("Producto eliminado correctamente.", "success");
+      }
     }
 
     function loginAdmin(){
@@ -1154,34 +1207,34 @@
         renderAdmin();
         
         setTimeout(() => {
-          els.adminForm.scrollIntoView({ behavior: "smooth", block: "start" });
+          if(els.adminForm) els.adminForm.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 50);
       }
 
       const galleryImageBtn = event.target.closest("[data-gallery-image]");
       if(galleryImageBtn){
-        els.productImage.value = galleryImageBtn.dataset.galleryImage;
-        els.imagePreview.src = galleryImageBtn.dataset.galleryImage;
+        if(els.productImage) els.productImage.value = galleryImageBtn.dataset.galleryImage;
+        if(els.imagePreview) els.imagePreview.src = galleryImageBtn.dataset.galleryImage;
         renderImageGallery();
       }
     });
 
-    els.whatsappBtn.addEventListener("click", sendWhatsApp);
-    els.clearCartBtn.addEventListener("click", clearCart);
-    els.calculateBtn.addEventListener("click", calculateSystem);
+    if(els.whatsappBtn) els.whatsappBtn.addEventListener("click", sendWhatsApp);
+    if(els.clearCartBtn) els.clearCartBtn.addEventListener("click", clearCart);
+    if(els.calculateBtn) els.calculateBtn.addEventListener("click", calculateSystem);
 
-    els.adminLoginBtn.addEventListener("click", loginAdmin);
-    els.adminPass.addEventListener("keydown", e => {
+    if(els.adminLoginBtn) els.adminLoginBtn.addEventListener("click", loginAdmin);
+    if(els.adminPass) els.adminPass.addEventListener("keydown", e => {
       if(e.key === "Enter") loginAdmin();
     });
 
-    els.adminFilter.addEventListener("change", () => renderAdmin());
-    els.newProductBtn.addEventListener("click", createNewProduct);
-    els.adminForm.addEventListener("submit", saveProduct);
-    els.deleteProductBtn.addEventListener("click", deleteProduct);
-    els.productImage.addEventListener("input", previewImageFromUrl);
+    if(els.adminFilter) els.adminFilter.addEventListener("change", () => renderAdmin());
+    if(els.newProductBtn) els.newProductBtn.addEventListener("click", createNewProduct);
+    if(els.adminForm) els.adminForm.addEventListener("submit", saveProduct);
+    if(els.deleteProductBtn) els.deleteProductBtn.addEventListener("click", deleteProduct);
+    if(els.productImage) els.productImage.addEventListener("input", previewImageFromUrl);
     
-    els.productCategory.addEventListener("change", () => {
+    if(els.productCategory) els.productCategory.addEventListener("change", () => {
       const library = imageLibrary.catalog[els.productCategory.value] || [];
       if(library.length && !library.includes(els.productImage.value.trim())){
         els.productImage.value = library[0];
@@ -1190,10 +1243,12 @@
       renderImageGallery();
     });
 
-    els.refreshGalleryBtn.addEventListener("click", renderImageGallery);
+    if(els.refreshGalleryBtn) els.refreshGalleryBtn.addEventListener("click", renderImageGallery);
 
-    // Inicializar todo seguro
+    // Inicializar todo seguro con LocalStorage
+    loadData();
     renderAll();
+    updateCartStats();
     routeTo("home");
   </script>
 </body>
