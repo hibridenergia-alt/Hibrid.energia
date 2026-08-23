@@ -530,7 +530,6 @@
     </section>
   </main>
 
-  <!-- MODAL DE FORMULARIO -->
   <div id="productModal" class="modal-overlay">
     <div class="modal-content">
       <button id="btnCloseModal" class="btn-close-modal">&times;</button>
@@ -566,8 +565,8 @@
           <strong style="display:block;margin-bottom:var(--space-2)">Selecciona una imagen del catálogo:</strong>
           <div id="modalGalleryGrid" class="gallery-grid"></div>
           
-          <div style="margin-top:var(--space-4); border-top: 1px solid var(--color-border); padding-top: var(--space-3);">
-            <label for="modalProductImageUrl" style="display:block;margin-bottom:.45rem;font-weight:800;font-size:var(--text-sm);">URL personalizada de imagen</label>
+          <div style="margin-top:var(--space-4);">
+            <label for="modalProductImageUrl" style="display:block;margin-bottom:.45rem;font-weight:800">URL personalizada de imagen</label>
             <input id="modalProductImageUrl" class="field" type="url" placeholder="https://ejemplo.com/imagen.jpg">
             <p class="tiny muted" style="margin-top:.4rem">Opcional. Si la completas, tendrá prioridad sobre la imagen de la galería.</p>
           </div>
@@ -712,7 +711,7 @@
       }, 2800);
 
       setTimeout(() => {
-         if(node.parentNode) node.parentNode.removeChild(node);
+         if(node.parentNode) node.remove();
       }, 3400);
     }
 
@@ -720,23 +719,19 @@
       const storedProducts = localStorage.getItem("hibrid_products");
       const storedCart = localStorage.getItem("hibrid_cart");
 
-      if(storedProducts){
-        try{
-          state.products = JSON.parse(storedProducts);
-        }catch(error){
-          state.products = demoProducts.map(item => Object.assign({}, item));
-        }
-      }else{
+      try{
+        const parsedProducts = storedProducts ? JSON.parse(storedProducts) : null;
+        state.products = Array.isArray(parsedProducts) && parsedProducts.length
+            ? parsedProducts
+            : demoProducts.map(item => Object.assign({}, item));
+      }catch(error){
         state.products = demoProducts.map(item => Object.assign({}, item));
       }
 
-      if(storedCart){
-        try{
-          state.cart = JSON.parse(storedCart);
-        }catch(error){
-          state.cart = [];
-        }
-      }else{
+      try{
+        const parsedCart = storedCart ? JSON.parse(storedCart) : [];
+        state.cart = Array.isArray(parsedCart) ? parsedCart : [];
+      }catch(error){
         state.cart = [];
       }
     }
@@ -1129,13 +1124,13 @@
           const item = state.products.find(p => p.id === productId);
           if(!item) return;
 
-          els.modalTitle.textContent = "Editar Producto";
-          els.modalProductId.value = item.id;
-          els.modalProductName.value = item.name;
-          els.modalProductCategory.value = item.category;
-          els.modalProductPrice.value = item.price;
-          els.modalProductDesc.value = item.description;
-          els.modalProductImage.value = productImage(item);
+          if(els.modalTitle) els.modalTitle.textContent = "Editar Producto";
+          if(els.modalProductId) els.modalProductId.value = item.id;
+          if(els.modalProductName) els.modalProductName.value = item.name;
+          if(els.modalProductCategory) els.modalProductCategory.value = item.category;
+          if(els.modalProductPrice) els.modalProductPrice.value = item.price;
+          if(els.modalProductDesc) els.modalProductDesc.value = item.description;
+          if(els.modalProductImage) els.modalProductImage.value = productImage(item);
           
           if(els.modalProductImageUrl){
              const library = imageLibrary.catalog[item.category] || [];
@@ -1146,16 +1141,17 @@
              }
           }
        } else {
-          els.modalTitle.textContent = "Nuevo Producto";
-          els.modalProductId.value = "";
-          els.modalProductName.value = "";
+          if(els.modalTitle) els.modalTitle.textContent = "Nuevo Producto";
+          if(els.modalProductId) els.modalProductId.value = "";
+          if(els.modalProductName) els.modalProductName.value = "";
+          
           const defaultCat = (els.adminFilter && els.adminFilter.value !== "all") ? els.adminFilter.value : "principales";
-          els.modalProductCategory.value = defaultCat;
-          els.modalProductPrice.value = "";
-          els.modalProductDesc.value = "";
+          if(els.modalProductCategory) els.modalProductCategory.value = defaultCat;
+          if(els.modalProductPrice) els.modalProductPrice.value = "";
+          if(els.modalProductDesc) els.modalProductDesc.value = "";
           
           const fallbackImage = (imageLibrary.catalog[defaultCat] || ["paneles.jpg"])[0];
-          els.modalProductImage.value = fallbackImage;
+          if(els.modalProductImage) els.modalProductImage.value = fallbackImage;
           
           if(els.modalProductImageUrl){
             els.modalProductImageUrl.value = "";
@@ -1170,9 +1166,9 @@
 
     function renderModalGallery() {
        if(!els.modalGalleryGrid) return;
-       const category = els.modalProductCategory.value || "principales";
+       const category = els.modalProductCategory ? els.modalProductCategory.value : "principales";
        const images = imageLibrary.catalog[category] || [];
-       const current = els.modalProductImage.value;
+       const current = els.modalProductImage ? els.modalProductImage.value : "";
 
        let html = "";
        images.forEach(img => {
@@ -1188,13 +1184,13 @@
     function saveModalProduct(e){
       e.preventDefault();
 
-      const idVal = els.modalProductId.value.trim();
+      const idVal = els.modalProductId ? els.modalProductId.value.trim() : "";
       const isNew = idVal === "";
 
-      const name = els.modalProductName.value.trim();
-      const description = els.modalProductDesc.value.trim();
-      const price = Number(els.modalProductPrice.value || 0);
-      const category = els.modalProductCategory.value;
+      const name = els.modalProductName ? els.modalProductName.value.trim() : "";
+      const description = els.modalProductDesc ? els.modalProductDesc.value.trim() : "";
+      const price = els.modalProductPrice ? Number(els.modalProductPrice.value || 0) : 0;
+      const category = els.modalProductCategory ? els.modalProductCategory.value : "principales";
       
       const galleryImage = els.modalProductImage ? els.modalProductImage.value.trim() : "";
       const customImage = els.modalProductImageUrl ? els.modalProductImageUrl.value.trim() : "";
