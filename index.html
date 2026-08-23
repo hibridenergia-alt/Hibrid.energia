@@ -122,7 +122,6 @@
     .btn.small{min-height:38px;padding:.6rem .85rem;border-radius:.8rem;font-size:var(--text-xs);}
     .btn.full{width:100%}
 
-    /* REDES SOCIALES CSS */
     .social-links{
       display:flex;
       align-items:center;
@@ -267,7 +266,6 @@
     .small{font-size:var(--text-sm)}
     .tiny{font-size:var(--text-xs)}
 
-    /* NUEVO PANEL ADMIN CSS */
     .admin-inventory{display:grid;gap:var(--space-4);}
     .admin-stats-row{display:grid;grid-template-columns:repeat(3, 1fr);gap:var(--space-3);margin-bottom:var(--space-4);}
     .stat-card{background:rgba(255,255,255,.02);border:1px solid var(--color-border);padding:var(--space-4);border-radius:var(--radius-lg);text-align:center;}
@@ -283,7 +281,6 @@
     .inv-info h4{font-size:var(--text-base);font-weight:800;margin-bottom:.2rem;}
     .inv-actions{display:flex;align-items:center;gap:var(--space-2);}
     
-    /* Toggle Switch */
     .switch{position:relative;display:inline-block;width:44px;height:24px;}
     .switch input{opacity:0;width:0;height:0;}
     .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgba(255,255,255,.1);transition:.3s;border-radius:34px;border:1px solid var(--color-border);}
@@ -291,7 +288,6 @@
     input:checked + .slider{background-color:rgba(40,210,109,.2);border-color:var(--color-primary);}
     input:checked + .slider:before{transform:translateX(20px);background-color:var(--color-primary);}
 
-    /* MODAL CSS */
     .modal-overlay{
       position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);
       z-index:1000;display:flex;align-items:center;justify-content:center;
@@ -326,6 +322,7 @@
       width:min(360px,calc(100vw - 2rem))
     }
     .notice{padding:var(--space-4);display:flex;gap:var(--space-3);align-items:flex-start;border-radius:var(--radius-lg);background:rgba(15,25,33,.98);border:1px solid var(--color-border);box-shadow:var(--shadow-lg)}
+    
     .sticky-cart{
       position:fixed;right:var(--space-4);bottom:var(--space-4);z-index:70;display:flex;align-items:center;gap:var(--space-3);
       padding:.75rem .82rem .75rem 1rem;border-radius:var(--radius-full);border:1px solid var(--color-border);
@@ -368,18 +365,17 @@
         <button class="btn secondary nav-btn" type="button" data-route="home">Productos</button>
         <button class="btn secondary nav-btn" type="button" data-route="calculator">Calculadora</button>
         
-        <!-- REDES SOCIALES -->
         <div class="social-links" aria-label="Redes sociales">
-          <a class="social-link facebook" href="https://www.facebook.com/hibridenergia" target="_blank" rel="noopener noreferrer" title="Facebook">
+          <a class="social-link facebook" href="https://www.facebook.com/hibridenergia" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">
             <i class="fa-brands fa-facebook-f"></i>
           </a>
-          <a class="social-link instagram" href="https://www.instagram.com/hibridenergia/" target="_blank" rel="noopener noreferrer" title="Instagram">
+          <a class="social-link instagram" href="https://www.instagram.com/hibridenergia/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
             <i class="fa-brands fa-instagram"></i>
           </a>
-          <a class="social-link whatsapp" href="https://wa.me/56956139055?text=Hola%20HiBRID%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n" target="_blank" rel="noopener noreferrer" title="WhatsApp">
+          <a class="social-link whatsapp" href="https://wa.me/56956139055?text=Hola%20HiBRID%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp">
             <i class="fa-brands fa-whatsapp"></i>
           </a>
-          <a class="social-link tiktok" href="https://www.tiktok.com/@hibrid976" target="_blank" rel="noopener noreferrer" title="TikTok">
+          <a class="social-link tiktok" href="https://www.tiktok.com/@hibrid976" target="_blank" rel="noopener noreferrer" aria-label="TikTok" title="TikTok">
             <i class="fa-brands fa-tiktok"></i>
           </a>
         </div>
@@ -533,7 +529,6 @@
     </section>
   </main>
 
-  <!-- MODAL DE FORMULARIO -->
   <div id="productModal" class="modal-overlay">
     <div class="modal-content">
       <button id="btnCloseModal" class="btn-close-modal">&times;</button>
@@ -618,11 +613,11 @@
     };
 
     const demoProducts = [
-      { id:"pri-001", name:"Kit Hogar Híbrido 3kW", price:1899000, description:"Sistema base para vivienda con paneles, inversor híbrido y batería. Ideal para consumo medio.", category:"principales", image:"kitsolar.jpg", visible:true },
-      { id:"pri-002", name:"Kit Negocio 5kW Pro", price:3290000, description:"Solución orientativa para locales y oficinas con mejor capacidad de generación y expansión.", category:"principales", image:"inversorcatalogo.png", visible:true },
-      { id:"pri-003", name:"Respaldo Crítico 48V", price:2590000, description:"Banco de respaldo con batería de litio e inversor de onda pura para equipos sensibles.", category:"principales", image:"bateriafcatalogo.jpeg", visible:true },
+      { id:"pri-001", name:"Kit Hogar Híbrido 3kW", price:1899000, description:"Sistema base para vivienda con paneles, inversor híbrido y batería.", category:"principales", image:"kitsolar.jpg", visible:true },
+      { id:"pri-002", name:"Kit Negocio 5kW Pro", price:3290000, description:"Solución orientativa para locales y oficinas con mejor capacidad.", category:"principales", image:"inversorcatalogo.png", visible:true },
+      { id:"pri-003", name:"Respaldo Crítico 48V", price:2590000, description:"Banco de respaldo con batería de litio e inversor de onda pura.", category:"principales", image:"bateriafcatalogo.jpeg", visible:true },
       { id:"pri-004", name:"Solución Parcela 6kW", price:4490000, description:"Paquete mixto para parcela con mayor autonomía y respaldo extendido.", category:"principales", image:"aerogeneradorcatalogo1.jpg", visible:true },
-      { id:"pri-005", name:"Sistema Comercio 8kW", price:5890000, description:"Configuración robusta para alto consumo diurno con enfoque comercial.", category:"principales", image:"panelescatalago.jpg", visible:true },
+      { id:"pri-005", name:"Sistema Comercio 8kW", price:5890000, description:"Configuración robusta para alto consumo diurno comercial.", category:"principales", image:"panelescatalago.jpg", visible:true },
       { id:"pan-001", name:"Panel Monocristalino 550W", price:129990, description:"Panel solar de alto rendimiento para uso residencial.", category:"paneles", image:"panelescatalago.jpg", visible:true },
       { id:"pan-002", name:"Panel Jinko 565W", price:139900, description:"Módulo de alta eficiencia para proyectos residenciales y comerciales.", category:"paneles", image:"paneles.jpg", visible:true },
       { id:"bat-001", name:"Batería Litio 5kWh", price:990000, description:"Respaldo energético para sistemas híbridos.", category:"baterias", image:"bateriacatalogo1.jpg", visible:true },
@@ -638,7 +633,7 @@
     };
 
     const $ = (selector, parent=document) => parent.querySelector(selector);
-    const $$ = (selector, parent=document) => [...parent.querySelectorAll(selector)];
+    const $$ = (selector, parent=document) => Array.from(parent.querySelectorAll(selector));
 
     const els = {
       categoryGrid: $("#categoryGrid"),
@@ -679,13 +674,56 @@
       noticeStack: $("#noticeStack")
     };
 
-    function loadData(){
-      // Limpiamos caché antiguo para que veas la nueva versión fresca
-      localStorage.removeItem("hibrid_products");
-      localStorage.removeItem("hibrid_cart");
+    function escapeHtml(value){
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
 
-      state.products = demoProducts.map(item => Object.assign({}, item));
-      state.cart = [];
+    function showNotice(message, type="info"){
+      const node = document.createElement("div");
+      node.className = "notice " + type;
+      const title = type === "success" ? "Listo" : type === "error" ? "Revisa" : "Info";
+      node.innerHTML = "<div><strong>" + title + "</strong><div class='small muted' style='margin-top:.15rem'>" + escapeHtml(message) + "</div></div>";
+      
+      if(els.noticeStack){
+        els.noticeStack.appendChild(node);
+      }
+
+      setTimeout(() => {
+        node.style.opacity = "0";
+        node.style.transform = "translateY(-4px)";
+      }, 2800);
+
+      setTimeout(() => node.remove(), 3400);
+    }
+
+    function loadData(){
+      const storedProducts = localStorage.getItem("hibrid_products");
+      const storedCart = localStorage.getItem("hibrid_cart");
+
+      if(storedProducts){
+        try{
+          state.products = JSON.parse(storedProducts);
+        }catch(error){
+          state.products = demoProducts.map(item => Object.assign({}, item));
+        }
+      }else{
+        state.products = demoProducts.map(item => Object.assign({}, item));
+      }
+
+      if(storedCart){
+        try{
+          state.cart = JSON.parse(storedCart);
+        }catch(error){
+          state.cart = [];
+        }
+      }else{
+        state.cart = [];
+      }
     }
 
     function saveData() {
@@ -697,15 +735,6 @@
       return new Intl.NumberFormat("es-CL",{style:"currency",currency:"CLP",maximumFractionDigits:0}).format(Number(value || 0));
     }
 
-    function escapeHtml(value){
-      return String(value !== null && value !== undefined ? value : "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
     function slugify(text){
       return String(text || "")
         .toLowerCase()
@@ -714,22 +743,9 @@
         .slice(0,30);
     }
 
-    function showNotice(message, type="info"){
-      const node = document.createElement("div");
-      node.className = "notice";
-      let title = "Info";
-      if(type === "success") title = "Listo";
-      if(type === "error") title = "Revisa";
-
-      node.innerHTML = "<div><strong>" + title + "</strong><div class='small muted' style='margin-top:.15rem'>" + escapeHtml(message) + "</div></div>";
-      if(els.noticeStack) els.noticeStack.appendChild(node);
-      setTimeout(() => { node.style.opacity="0"; node.style.transform="translateY(-4px)"; }, 2800);
-      setTimeout(() => node.remove(), 3400);
-    }
-
     function productImage(product){
       if(!product) return "paneles.jpg";
-      return product.image || product.image_url || product.imagen || "paneles.jpg";
+      return product.image_url || product.image || product.imagen || "paneles.jpg";
     }
 
     function getCategoryLabel(key){
@@ -944,7 +960,7 @@
       }
 
       let total = 0;
-      let text = "Hola, quiero cotizar estos productos de HiBRID:\n\n";
+      let text = "Hola HiBRID, quiero más información sobre estos productos:\n\n";
       items.forEach((item, index) => {
         total += item.subtotal;
         text += (index + 1) + ". " + item.product.name + " | Cant: " + item.quantity + " | Unitario: " + formatPrice(item.product.price) + " | Subtotal: " + formatPrice(item.subtotal) + "\n";
@@ -1011,7 +1027,6 @@
       els.calcResult.innerHTML = html;
     }
 
-    // --- NUEVO ADMINISTRADOR LOGICA ---
     function adminFilteredProducts(){
       if(!els.adminFilter) return state.products.slice();
       const filter = els.adminFilter.value || "all";
@@ -1024,7 +1039,6 @@
     function renderAdmin(){
       if(!state.adminUnlocked || !els.adminInventoryList) return;
 
-      // Stats
       if(els.statTotal) els.statTotal.textContent = state.products.length;
       if(els.statVisible) els.statVisible.textContent = state.products.filter(p => p.visible).length;
       if(els.statHidden) els.statHidden.textContent = state.products.filter(p => !p.visible).length;
@@ -1045,7 +1059,6 @@
         html += "<div class='tiny muted'>Cat: " + getCategoryLabel(item.category) + " | Precio: " + formatPrice(item.price) + "</div></div>";
         
         html += "<div class='inv-actions'>";
-        // Toggle Visibilidad directo
         html += "<label class='switch' title='Activar/Ocultar'><input type='checkbox' data-toggle-id='" + escapeHtml(item.id) + "' " + isChecked + "><span class='slider'></span></label>";
         
         html += "<button class='btn secondary small' style='margin-left:.5rem' type='button' data-edit-id='" + escapeHtml(item.id) + "'>Editar</button>";
@@ -1093,7 +1106,6 @@
       }
     }
 
-    // Modal Form Logic
     function openModal(productId = null) {
        if(!els.productModal) return;
        els.productModal.classList.add("active");
@@ -1108,7 +1120,6 @@
           els.modalProductDesc.value = item.description;
           els.modalProductImage.value = productImage(item);
        } else {
-          // New Product
           els.modalTitle.textContent = "Nuevo Producto";
           els.modalProductId.value = "";
           els.modalProductName.value = "";
@@ -1159,7 +1170,7 @@
           description: els.modalProductDesc.value.trim(),
           image: img,
           image_url: img,
-          visible: isNew ? false : undefined // Keep existing visibility if editing
+          visible: isNew ? false : undefined 
        };
 
        if(!payload.name || !payload.description){
@@ -1172,7 +1183,6 @@
        } else {
           const existing = state.products.find(p => p.id === payloadId);
           if(existing){
-             // Safe update without ...
              existing.category = payload.category;
              existing.name = payload.name;
              existing.price = payload.price;
@@ -1208,13 +1218,10 @@
       if(state.adminUnlocked) renderAdmin();
     }
 
-    // Global Click Listener
     document.addEventListener("click", (event) => {
-      // Routing
       const routeBtn = event.target.closest("[data-route]");
       if(routeBtn) routeTo(routeBtn.dataset.route);
 
-      // Filters
       const catBtn = event.target.closest("[data-select-category]");
       if(catBtn){
         state.filterCategory = catBtn.dataset.selectCategory;
@@ -1234,7 +1241,6 @@
         renderCatalog();
       }
 
-      // Cart
       const addBtn = event.target.closest("[data-add]");
       if(addBtn) addToCart(addBtn.dataset.add);
 
@@ -1247,7 +1253,6 @@
       const removeBtn = event.target.closest("[data-remove]");
       if(removeBtn) removeFromCart(removeBtn.dataset.remove);
 
-      // Admin Actions
       const editBtn = event.target.closest("[data-edit-id]");
       if(editBtn) openModal(editBtn.dataset.editId);
 
@@ -1257,27 +1262,23 @@
       const delBtn = event.target.closest("[data-delete-id]");
       if(delBtn) deleteProduct(delBtn.dataset.deleteId);
 
-      // Modal Gallery image select
       const modalImgBtn = event.target.closest("[data-modal-img]");
       if(modalImgBtn){
          els.modalProductImage.value = modalImgBtn.dataset.modalImg;
          renderModalGallery();
       }
 
-      // Close modal on outside click
       if(event.target === els.productModal){
          closeModal();
       }
     });
 
-    // Toggle Input listener (delegated via change event)
     document.addEventListener("change", (e) => {
        if(e.target.matches("[data-toggle-id]")){
           toggleVisibility(e.target.dataset.toggleId);
        }
     });
 
-    // Listeners bindings
     if(els.whatsappBtn) els.whatsappBtn.addEventListener("click", sendWhatsApp);
     if(els.clearCartBtn) els.clearCartBtn.addEventListener("click", clearCart);
     if(els.calculateBtn) els.calculateBtn.addEventListener("click", calculateSystem);
@@ -1303,7 +1304,6 @@
       });
     }
 
-    // Inicializar todo
     loadData();
     renderAll();
     updateCartStats();
