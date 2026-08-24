@@ -1,674 +1,262 @@
-```react
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { 
-  Sun, Settings, CheckCircle, AlertCircle, 
-  Eye, EyeOff, Trash2, Plus, Edit3, X, Calculator, Send, Loader2
-} from 'lucide-react';
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HiBRID Soluciones Energéticas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8fafc; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
 
-// Extracción segura de variables de entorno (Runtime vs Build time)
-const getRuntimeConfig = () => {
-  if (typeof window !== 'undefined' && window.env) return window.env;
-  return {};
-};
+  <script type="text/babel">
+    const { useState, useEffect, useCallback } = React;
 
-// Utilidad para resolver rutas de imágenes respetando contratos y el BASE_URL
-function resolveImageSrc(rawImage) {
-  if (!rawImage) return null;
-  if (/^https?:\/\//i.test(rawImage)) return rawImage;
-  // Si la ruta ya es absoluta desde la raíz, se respeta; sino, se anexa BASE_URL
-  return rawImage.startsWith('/')
-    ? rawImage
-    : `${import.meta.env.BASE_URL || '/'}${rawImage}`;
-}
+    const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const API_URL = isLocalhost ? "http://localhost:10000" : "TU_URL_DE_RENDER_AQUI"; 
+    const WHATSAPP_NUMBER = "56912345678"; 
 
-// Componente seguro para manejo de imágenes con fallback
-function ProductImage({ product }) {
-  const [failed, setFailed] = useState(false);
-  const src = resolveImageSrc(product.image_url || product.image);
+    // Íconos SVG
+    const IconSun = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>;
+    const IconSend = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>;
+    const IconCheck = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>;
+    const IconAlert = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>;
 
-  if (!src || failed) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-slate-100">
-        <Sun size={48} className="text-amber-500/40" />
-      </div>
-    );
-  }
+    function App() {
+      const isAdminRoute = window.location.hash === '#admin';
+      const [view, setView] = useState(isAdminRoute ? 'admin' : 'catalog');
+      const [products, setProducts] = useState([]);
+      const [assets, setAssets] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState('');
+      const [filter, setFilter] = useState('ver todos');
 
-  return (
-    <img
-      src={src}
-      alt={product.name}
-      className="w-full h-full object-cover"
-      loading="lazy"
-      onError={() => setFailed(true)}
-    />
-  );
-}
+      const [adminToken, setAdminToken] = useState(localStorage.getItem('hibrid_token') || '');
+      const [isAuthenticated, setIsAuthenticated] = useState(false);
+      const [notification, setNotification] = useState(null);
+      const [modal, setModal] = useState({ open: false, product: null });
+      const [formData, setFormData] = useState({});
 
-const emptyForm = {
-  name: '',
-  price: '',
-  description: '',
-  category: 'principales',
-  image: '',
-  visible: true,
-  nominalKW: 0
-};
-
-export default function App() {
-  // Estado de Navegación
-  const [activeTab, setActiveTab] = useState('catalog'); 
-  
-  // Estado de Autenticación Desacoplado
-  const [adminTokenInput, setAdminTokenInput] = useState('');
-  const [sessionToken, setSessionToken] = useState(null);
-  const adminAuthenticated = !!sessionToken;
-  
-  // Estado de Productos
-  const [products, setProducts] = useState([]);
-  const [loadingProducts, setLoadingProducts] = useState(true);
-  const [productsError, setProductsError] = useState('');
-
-  // Estado del Inventario Dinámico de Activos
-  const [repositoryAssets, setRepositoryAssets] = useState([]);
-  const [loadingAssets, setLoadingAssets] = useState(false);
-
-  // Estado del Calculador Solar
-  const [calcKWh, setCalcKWh] = useState(15);
-  const [calcAutonomy, setCalcAutonomy] = useState(1);
-
-  // Estado del Modal de Edición/Creación Admin
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null);
-  const [formData, setFormData] = useState(emptyForm);
-
-  // Estado de Mensajería / Feedback
-  const [notification, setNotification] = useState(null);
-  const notificationTimerRef = useRef(null);
-
-  const showNotify = useCallback((msg, type = 'success') => {
-    setNotification({ msg, type });
-    if (notificationTimerRef.current) {
-      clearTimeout(notificationTimerRef.current);
-    }
-    notificationTimerRef.current = setTimeout(() => {
-      setNotification(null);
-      notificationTimerRef.current = null;
-    }, 4000);
-  }, []);
-
-  const resetForm = useCallback(() => {
-    setFormData(emptyForm);
-  }, []);
-
-  // Función memoizada para cargar/refrescar productos (soporta silent refresh)
-  const fetchProducts = useCallback(async ({ silent = false } = {}) => {
-    if (!silent) setLoadingProducts(true);
-    setProductsError('');
-    try {
-      const headers = adminAuthenticated 
-        ? { Authorization: `Bearer ${sessionToken}` } 
-        : {};
-
-      const res = await fetch('/api/products', { headers });
-      if (!res.ok) throw new Error();
-
-      const data = await res.json();
-      setProducts(data);
-    } catch {
-      setProductsError('No fue posible conectar con el servidor para cargar el catálogo.');
-    } finally {
-      if (!silent) setLoadingProducts(false);
-    }
-  }, [adminAuthenticated, sessionToken]);
-
-  // Carga inicial del catálogo
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
-
-  // Carga dinámica de assets con normalización estricta de contrato
-  useEffect(() => {
-    if (activeTab !== 'admin' || !adminAuthenticated) return;
-
-    let cancelled = false;
-    async function loadRepositoryAssets() {
-      setLoadingAssets(true);
-      try {
-        const res = await fetch('/api/assets', {
-          headers: { Authorization: `Bearer ${sessionToken}` }
-        });
-        if (!res.ok) throw new Error();
-        
-        const data = await res.json();
-        
-        if (!cancelled) {
-          const normalizeAsset = (asset) => {
-            const value = asset?.value || asset?.url || '';
-            const label = asset?.label || asset?.name || value;
-            return value ? { value, label } : null;
-          };
-
-          setRepositoryAssets(
-            Array.isArray(data) ? data.map(normalizeAsset).filter(Boolean) : []
-          );
-        }
-      } catch {
-        if (!cancelled) showNotify("Error al cargar repositorio dinámico de imágenes.", "error");
-      } finally {
-        if (!cancelled) setLoadingAssets(false);
-      }
-    }
-
-    loadRepositoryAssets();
-    return () => { cancelled = true; };
-  }, [activeTab, adminAuthenticated, sessionToken, showNotify]);
-
-  useEffect(() => {
-    return () => {
-      if (notificationTimerRef.current) clearTimeout(notificationTimerRef.current);
-    };
-  }, []);
-
-  const logoutAdmin = (message = "Sesión administrativa finalizada.") => {
-    setSessionToken(null);
-    setAdminTokenInput('');
-    setModalOpen(false);
-    setEditingProduct(null);
-    resetForm();
-    showNotify(message, "error");
-  };
-
-  const publicProducts = useMemo(() => {
-    return products.filter(p => p.visible);
-  }, [products]);
-
-  // Calculadora basada en especificaciones técnicas
-  const calculatedSystem = useMemo(() => {
-    const dailyKWh = Number(calcKWh) || 0;
-    const recommendedKW = Number((dailyKWh / 4.5).toFixed(1)); 
-    const estimatedBatteryKWh = Number((dailyKWh * Number(calcAutonomy)).toFixed(1));
-    
-    const kits = publicProducts
-      .filter(p => p.category === 'principales' && typeof p.nominalKW === 'number')
-      .sort((a, b) => a.nominalKW - b.nominalKW);
-
-    const matchedKit = kits.find(k => k.nominalKW >= recommendedKW) || kits[kits.length - 1] || null;
-    
-    return {
-      recommendedKW: recommendedKW.toFixed(1),
-      estimatedBatteryKWh: estimatedBatteryKWh.toFixed(1),
-      estimatedCost: matchedKit ? matchedKit.price : 0,
-      matchedKit
-    };
-  }, [calcKWh, calcAutonomy, publicProducts]);
-
-  // Validación de Autenticación
-  const handleAdminLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch('/api/admin/session', {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${adminTokenInput}` }
-      });
-
-      if (res.status === 401 || res.status === 403) {
-        showNotify("Token de administrador inválido o expirado.", "error");
-        return;
-      }
-      if (!res.ok) throw new Error();
-
-      setSessionToken(adminTokenInput);
-      setAdminTokenInput('');
-      showNotify("Acceso administrativo concedido correctamente.");
-    } catch {
-      showNotify("No fue posible validar el acceso contra el servidor.", "error");
-    }
-  };
-
-  const handleModalClose = () => {
-    setModalOpen(false);
-    setEditingProduct(null);
-    resetForm();
-  };
-
-  // Verificador de precondiciones
-  const checkPreconditions = async (res) => {
-    if (res.status === 412) {
-      showNotify("Conflicto de versión. Sincronizando catálogo con los últimos cambios...", "error");
-      handleModalClose();
-      await fetchProducts({ silent: true });
-      return false;
-    }
-    if (res.status === 428) {
-      showNotify("La solicitud requiere una precondición (ETag) válida. Revisa tu cliente.", "error");
-      await fetchProducts({ silent: true });
-      return false;
-    }
-    return true;
-  };
-
-  // Operaciones CRUD
-  const handleSaveProduct = async (e) => {
-    e.preventDefault();
-    if (!formData.name || !formData.price || !formData.description) {
-      showNotify("Por favor completa todos los campos obligatorios.", "error");
-      return;
-    }
-
-    try {
-      const payload = {
-        name: formData.name,
-        price: Number(formData.price),
-        description: formData.description,
-        category: formData.category,
-        image: formData.image,
-        image_url: formData.image,
-        visible: formData.visible,
-        nominalKW: Number(formData.nominalKW)
+      const notify = (msg, type = 'success') => {
+        setNotification({ msg, type });
+        setTimeout(() => setNotification(null), 4000);
       };
 
-      if (editingProduct) {
-        const res = await fetch(`/api/products/${editingProduct.id}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${sessionToken}`,
-            'If-Match': editingProduct.etag
-          },
-          body: JSON.stringify(payload)
-        });
+      const fetchProducts = useCallback(async () => {
+        setLoading(true);
+        try {
+          const headers = isAuthenticated ? { Authorization: `Bearer ${adminToken}` } : {};
+          const res = await fetch(`${API_URL}/api/products`, { headers });
+          if (!res.ok) throw new Error();
+          setProducts(await res.json());
+        } catch {
+          setError("Error de conexión. API inactiva o URL incorrecta.");
+        } finally {
+          setLoading(false);
+        }
+      }, [isAuthenticated, adminToken]);
 
-        if (res.status === 401 || res.status === 403) return logoutAdmin("Tu sesión ha expirado.");
-        if (!(await checkPreconditions(res))) return;
-        if (!res.ok) throw new Error();
+      useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
-        const updatedHeaderEtag = res.headers.get('ETag');
-        const updated = await res.json();
-        
-        setProducts(prev => prev.map(p => p.id === updated.id ? { ...updated, etag: updatedHeaderEtag || p.etag } : p));
-        showNotify("Producto actualizado con éxito.");
-      } else {
-        const res = await fetch('/api/products', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${sessionToken}`
-          },
-          body: JSON.stringify(payload)
-        });
+      const loginAdmin = async (e) => {
+        e.preventDefault();
+        try {
+          const res = await fetch(`${API_URL}/api/admin/session`, { headers: { Authorization: `Bearer ${adminToken}` } });
+          if (!res.ok) throw new Error("Token inválido");
+          setIsAuthenticated(true);
+          localStorage.setItem('hibrid_token', adminToken);
+          notify("Acceso concedido");
+          fetchProducts();
+          fetch(`${API_URL}/api/assets`, { headers: { Authorization: `Bearer ${adminToken}` } })
+            .then(r => r.json()).then(setAssets).catch(()=>[]);
+        } catch (e) { notify(e.message, "error"); }
+      };
 
-        if (res.status === 401 || res.status === 403) return logoutAdmin("Tu sesión ha expirado.");
-        if (!res.ok) throw new Error();
+      const saveProduct = async (e) => {
+        e.preventDefault();
+        const payload = { ...formData, price: Number(formData.price), nominalKW: Number(formData.nominalKW), visible: !!formData.visible };
+        const isEditing = !!modal.product;
+        const url = `${API_URL}/api/products${isEditing ? `/${modal.product.id}` : ''}`;
+        const headers = { "Content-Type": "application/json", Authorization: `Bearer ${adminToken}` };
+        if (isEditing) headers["If-Match"] = modal.product.etag;
 
-        const createdHeaderEtag = res.headers.get('ETag');
-        const created = await res.json();
-        
-        setProducts(prev => [{ ...created, etag: createdHeaderEtag }, ...prev]);
-        showNotify("Nuevo producto registrado en el sistema.");
-      }
+        try {
+          const res = await fetch(url, { method: isEditing ? "PATCH" : "POST", headers, body: JSON.stringify(payload) });
+          if (res.status === 412) { notify("Conflicto de edición. Refrescando...", "error"); fetchProducts(); setModal({open: false}); return; }
+          if (!res.ok) throw new Error();
+          notify(isEditing ? "Actualizado" : "Creado");
+          setModal({ open: false, product: null });
+          fetchProducts();
+        } catch { notify("Error al guardar", "error"); }
+      };
 
-      handleModalClose();
-    } catch {
-      showNotify("Error de comunicación al guardar el producto.", "error");
-    }
-  };
+      const deleteProduct = async (p) => {
+        if(!confirm("¿Eliminar definitivamente?")) return;
+        try {
+          const res = await fetch(`${API_URL}/api/products/${p.id}`, { method: "DELETE", headers: { Authorization: `Bearer ${adminToken}`, "If-Match": p.etag } });
+          if (!res.ok && res.status !== 204) throw new Error();
+          notify("Eliminado exitosamente"); fetchProducts();
+        } catch { notify("Error al eliminar", "error"); }
+      };
 
-  const toggleVisibility = async (id) => {
-    const product = products.find(p => p.id === id);
-    if (!product) return;
+      const toggleVis = async (p) => {
+        try {
+          const res = await fetch(`${API_URL}/api/products/${p.id}/visibility`, { method: "PATCH", headers: { "Content-Type": "application/json", Authorization: `Bearer ${adminToken}`, "If-Match": p.etag }, body: JSON.stringify({ visible: !p.visible }) });
+          if (!res.ok) throw new Error();
+          fetchProducts();
+        } catch { notify("Error cambiando visibilidad", "error"); }
+      };
 
-    try {
-      const res = await fetch(`/api/products/${id}/visibility`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${sessionToken}`,
-          'If-Match': product.etag
-        },
-        body: JSON.stringify({ visible: !product.visible })
-      });
+      const sendToWA = (name, price) => {
+        const text = encodeURIComponent(`Hola HiBRID, me interesa cotizar: "${name}" ($${Number(price).toLocaleString('es-CL')}).`);
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank');
+      };
 
-      if (res.status === 401 || res.status === 403) return logoutAdmin("Tu sesión ha expirado.");
-      if (!(await checkPreconditions(res))) return;
-      if (!res.ok) throw new Error();
+      const displayedProducts = products.filter(p => filter === 'ver todos' || p.category === filter);
 
-      const updatedHeaderEtag = res.headers.get('ETag');
-      const updated = await res.json();
-      
-      setProducts(prev => prev.map(p => p.id === updated.id ? { ...updated, etag: updatedHeaderEtag || p.etag } : p));
-      showNotify(`Producto ${updated.visible ? 'publicado' : 'ocultado'} con éxito.`);
-    } catch {
-      showNotify("No se pudo cambiar la visibilidad del producto.", "error");
-    }
-  };
+      return (
+        <div>
+          <header className="bg-slate-900 text-white p-4 shadow-md sticky top-0 z-40 flex justify-between items-center">
+            <div className="flex items-center space-x-2 cursor-pointer" onClick={() => { setView('catalog'); window.location.hash = ''; }}>
+              <IconSun /> <span className="font-bold text-lg">HiBRID</span>
+            </div>
+            <nav className="text-sm font-medium space-x-4">
+              <a href="#" onClick={() => { setView('catalog'); setFilter('ver todos'); }}>Catálogo</a>
+              <a href="#admin" onClick={() => setView('admin')}>Admin</a>
+            </nav>
+          </header>
 
-  const deleteProduct = async (id) => {
-    const product = products.find(p => p.id === id);
-    if (!product) return;
+          {notification && (
+            <div className={`fixed top-20 right-4 p-3 rounded shadow text-white flex items-center space-x-2 z-50 ${notification.type === 'error' ? 'bg-red-500' : 'bg-green-500'}`}>
+              {notification.type === 'error' ? <IconAlert /> : <IconCheck />}
+              <span>{notification.msg}</span>
+            </div>
+          )}
 
-    if (window.confirm("¿Estás seguro de eliminar este producto del inventario?")) {
-      try {
-        const res = await fetch(`/api/products/${id}`, {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${sessionToken}`,
-            'If-Match': product.etag
-          }
-        });
-
-        if (res.status === 401 || res.status === 403) return logoutAdmin("Tu sesión ha expirado.");
-        if (!(await checkPreconditions(res))) return;
-        if (!res.ok && res.status !== 204) throw new Error();
-
-        setProducts(prev => prev.filter(p => p.id !== id));
-        showNotify("Producto eliminado correctamente.");
-      } catch {
-        showNotify("Error al intentar eliminar el producto.", "error");
-      }
-    }
-  };
-
-  const openEditModal = (product) => {
-    setEditingProduct(product);
-    setFormData({
-      name: product.name,
-      price: product.price,
-      description: product.description,
-      category: product.category,
-      image: product.image_url || product.image || '',
-      visible: product.visible,
-      nominalKW: product.nominalKW || 0
-    });
-    setModalOpen(true);
-  };
-
-  const openCreateModal = () => {
-    setEditingProduct(null);
-    resetForm();
-    setModalOpen(true);
-  };
-
-  const sendToWhatsApp = (kitName, price) => {
-    const runtimeConfig = getRuntimeConfig();
-    const whatsappNumber = runtimeConfig.VITE_WHATSAPP_NUMBER || import.meta.env.VITE_WHATSAPP_NUMBER;
-    
-    if (!whatsappNumber) {
-      showNotify("Configuración comercial incompleta: Falta número de WhatsApp.", "error");
-      return;
-    }
-    const text = encodeURIComponent(`Hola HiBRID, me interesa cotizar el sistema "${kitName}" valorado en $${price.toLocaleString('es-CL')}. ¿Me pueden orientar con la factibilidad técnica?`);
-    window.open(`https://wa.me/${whatsappNumber}?text=${text}`, '_blank', 'noopener,noreferrer');
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
-      
-      {/* Notificación flotante */}
-      {notification && (
-        <div className={`fixed top-5 right-5 z-50 px-4 py-3 rounded-xl shadow-lg flex items-center space-x-2 text-white transition-all ${
-          notification.type === 'error' ? 'bg-rose-600' : 'bg-emerald-600'
-        }`}>
-          {notification.type === 'error' ? <AlertCircle size={20} /> : <CheckCircle size={20} />}
-          <span className="text-sm font-medium">{notification.msg}</span>
-        </div>
-      )}
-
-      {/* Cabecera */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex flex-col sm:flex-row items-center justify-between py-2 sm:py-0">
-          <div className="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">
-            <div className="flex items-center space-x-3">
-              <div className="bg-amber-500 p-2 rounded-xl text-white shadow-md flex items-center justify-center">
-                <Sun size={24} />
-              </div>
+          <main className="max-w-6xl mx-auto p-4 py-8">
+            {view === 'catalog' && (
               <div>
-                <h1 className="text-xl font-black tracking-tight text-slate-900">HiBRID</h1>
-                <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Soluciones Energéticas</p>
-              </div>
-            </div>
-          </div>
+                <h1 className="text-3xl font-bold mb-6 text-slate-800">Catálogo de Productos</h1>
+                
+                <div className="flex flex-wrap gap-2 mb-8">
+                  {['ver todos', 'paneles', 'inversores', 'baterias', 'aerogeneradores', 'kits', 'otros'].map(c => (
+                    <button key={c} onClick={() => setFilter(c)} className={`px-4 py-1.5 rounded-full text-sm font-bold uppercase transition ${filter === c ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}`}>
+                      {c}
+                    </button>
+                  ))}
+                </div>
 
-          <nav className="hidden md:flex items-center space-x-1 bg-slate-100 p-1 rounded-xl">
-            <button 
-              onClick={() => setActiveTab('catalog')} 
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'catalog' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
-            >
-              Catálogo y Kits
-            </button>
-            <button 
-              onClick={() => setActiveTab('calculator')} 
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'calculator' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
-            >
-              Calculadora Solar
-            </button>
-            <button 
-              onClick={() => setActiveTab('admin')} 
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'admin' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
-            >
-              Panel Admin
-            </button>
-          </nav>
-        </div>
-
-        {/* Navegación Móvil */}
-        <div className="md:hidden flex items-center justify-between gap-1 px-4 pb-3 border-t border-slate-100 pt-2 bg-white">
-          <button onClick={() => setActiveTab('catalog')} className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-wider ${activeTab === 'catalog' ? 'bg-amber-500 text-white shadow-sm' : 'bg-slate-100 text-slate-600'}`}>Catálogo</button>
-          <button onClick={() => setActiveTab('calculator')} className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-wider ${activeTab === 'calculator' ? 'bg-amber-500 text-white shadow-sm' : 'bg-slate-100 text-slate-600'}`}>Calculadora</button>
-          <button onClick={() => setActiveTab('admin')} className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-wider ${activeTab === 'admin' ? 'bg-amber-500 text-white shadow-sm' : 'bg-slate-100 text-slate-600'}`}>Admin</button>
-        </div>
-      </header>
-
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        {/* VISTA 1: CATÁLOGO */}
-        {activeTab === 'catalog' && (
-          <div className="space-y-8">
-            <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-8 sm:p-12 text-white shadow-xl relative overflow-hidden">
-              <div className="relative z-10 max-w-2xl space-y-4">
-                <span className="bg-amber-500/20 text-amber-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-amber-500/30">
-                  Independencia Energética
-                </span>
-                <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">Energía solar híbrida para tu hogar y negocio</h2>
-                <p className="text-slate-300 text-base sm:text-lg">Diseñamos, importamos y configuramos sistemas solares con respaldo de baterías de última generación.</p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-bold tracking-tight">Kits y Componentes Disponibles</h3>
-              <span className="text-sm font-medium text-slate-500">{publicProducts.length} productos en línea</span>
-            </div>
-
-            {loadingProducts ? (
-              <div className="flex flex-col items-center justify-center py-20 space-y-3">
-                <Loader2 size={36} className="animate-spin text-amber-500" />
-                <p className="text-sm font-medium text-slate-500">Cargando catálogo en tiempo real...</p>
-              </div>
-            ) : productsError ? (
-              <div className="bg-rose-50 border border-rose-200 text-rose-700 p-6 rounded-2xl text-center space-y-2">
-                <AlertCircle size={28} className="mx-auto" />
-                <p className="font-bold">{productsError}</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {publicProducts.map(product => (
-                  <div key={product.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden">
-                    <div className="bg-slate-100 h-48 flex items-center justify-center relative border-b border-slate-100 overflow-hidden">
-                      <ProductImage product={product} />
-                      <span className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-slate-800 text-xs font-bold px-2.5 py-1 rounded-lg uppercase shadow-sm">
-                        {product.category}
-                      </span>
-                    </div>
-                    <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-                      <div className="space-y-2">
-                        <h4 className="font-bold text-lg text-slate-900 leading-snug">{product.name}</h4>
-                        <p className="text-slate-600 text-sm overflow-hidden" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                          {product.description}
-                        </p>
-                      </div>
-                      <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                        <div>
-                          <span className="text-xs font-medium text-slate-400 block">Precio contado</span>
-                          <span className="text-xl font-black text-slate-950">${product.price.toLocaleString('es-CL')}</span>
+                {loading ? <p className="text-slate-500 text-center py-10">Cargando catálogo...</p> : error ? <p className="text-red-500 text-center py-10">{error}</p> : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    {displayedProducts.map(p => (
+                      <div key={p.id} className="bg-white rounded-xl shadow border border-slate-100 overflow-hidden flex flex-col">
+                        <img src={p.image || p.image_url || 'https://via.placeholder.com/300x200?text=HiBRID'} alt={p.name} className="h-48 w-full object-cover" onError={(e) => e.target.src='https://via.placeholder.com/300x200?text=HiBRID'} />
+                        <div className="p-4 flex flex-col flex-grow">
+                          <span className="text-xs text-amber-600 font-bold uppercase mb-1">{p.category}</span>
+                          <h3 className="font-bold text-lg mb-2">{p.name}</h3>
+                          <p className="text-slate-500 text-sm mb-4 line-clamp-2">{p.description}</p>
+                          <div className="mt-auto flex justify-between items-center">
+                            <span className="font-black text-xl">${Number(p.price).toLocaleString('es-CL')}</span>
+                            <button onClick={() => sendToWA(p.name, p.price)} className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg flex items-center space-x-1 text-sm font-bold">
+                              <IconSend /> <span>Cotizar</span>
+                            </button>
+                          </div>
                         </div>
-                        <button 
-                          onClick={() => sendToWhatsApp(product.name, product.price)}
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-xl shadow-md transition-all flex items-center space-x-2 text-sm font-bold"
-                        >
-                          <Send size={16} />
-                          <span>WhatsApp</span>
-                        </button>
                       </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
             )}
-          </div>
-        )}
 
-        {/* VISTA 2: CALCULADORA SOLAR */}
-        {activeTab === 'calculator' && (
-          <div className="max-w-4xl mx-auto space-y-8">
-            <div className="text-center space-y-2">
-              <h2 className="text-3xl font-extrabold tracking-tight">Calculadora de Dimensionamiento Solar</h2>
-              <p className="text-slate-600">Basado en especificaciones técnicas reales de nuestros kits.</p>
-            </div>
-
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Consumo Diario Estimado (kWh/día)</label>
-                  <input 
-                    type="range" min="5" max="60" 
-                    value={calcKWh} onChange={e => setCalcKWh(e.target.value)}
-                    className="w-full accent-amber-500"
-                  />
-                  <div className="flex justify-between text-xs font-semibold text-slate-500 mt-1">
-                    <span>5 kWh</span>
-                    <span className="text-amber-600 font-bold text-base">{calcKWh} kWh/día</span>
-                    <span>60 kWh</span>
+            {view === 'admin' && (
+              <div>
+                {!isAuthenticated ? (
+                  <form onSubmit={loginAdmin} className="max-w-md mx-auto bg-white p-6 rounded-xl shadow space-y-4 border mt-10">
+                    <h2 className="font-bold text-xl">Acceso Admin</h2>
+                    <input type="password" required value={adminToken} onChange={e=>setAdminToken(e.target.value)} placeholder="ADMIN_TOKEN" className="w-full border p-2 rounded" />
+                    <button className="w-full bg-slate-900 text-white font-bold p-2 rounded">Ingresar</button>
+                  </form>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center bg-white p-4 rounded shadow border">
+                      <h2 className="font-bold text-xl">Inventario ({products.length})</h2>
+                      <button onClick={() => { setFormData({name:'', price:'', description:'', category:'kits', visible:true, nominalKW:0}); setModal({open: true, product: null}); }} className="bg-blue-600 text-white px-4 py-2 rounded font-bold text-sm">Nuevo Producto</button>
+                    </div>
+                    
+                    <div className="bg-white rounded shadow overflow-x-auto border">
+                      <table className="w-full text-left text-sm">
+                        <thead className="bg-slate-50 border-b text-slate-500">
+                          <tr><th className="p-3">Producto</th><th className="p-3">Cat</th><th className="p-3">Precio</th><th className="p-3">Est</th><th className="p-3 text-right">Acciones</th></tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {products.map(p => (
+                            <tr key={p.id}>
+                              <td className="p-3 font-semibold">{p.name}</td>
+                              <td className="p-3 uppercase text-xs">{p.category}</td>
+                              <td className="p-3">${Number(p.price).toLocaleString()}</td>
+                              <td className="p-3"><button onClick={()=>toggleVis(p)} className={`px-2 py-1 rounded text-xs text-white ${p.visible ? 'bg-green-500':'bg-slate-400'}`}>{p.visible ? 'Visible':'Oculto'}</button></td>
+                              <td className="p-3 text-right space-x-2">
+                                <button onClick={()=>{setFormData({...p}); setModal({open:true, product:p});}} className="text-blue-500 underline">Editar</button>
+                                <button onClick={()=>deleteProduct(p)} className="text-red-500 underline">Borrar</button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
+                )}
+              </div>
+            )}
+          </main>
 
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Autonomía (Respaldo en Baterías)</label>
-                  <select 
-                    value={calcAutonomy} onChange={e => setCalcAutonomy(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium text-slate-800 focus:ring-2 focus:ring-amber-500"
-                  >
-                    <option value="1">1 Día (Uso estándar)</option>
-                    <option value="2">2 Días (Mayor seguridad)</option>
-                    <option value="3">3 Días (Aislado total)</option>
+          {/* Admin Modal */}
+          {modal.open && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+              <form onSubmit={saveProduct} className="bg-white p-6 rounded-xl shadow-xl max-w-lg w-full space-y-4">
+                <h3 className="font-bold text-lg">{modal.product ? 'Editar Producto' : 'Nuevo Producto'}</h3>
+                <input required placeholder="Nombre del equipo" value={formData.name || ''} onChange={e=>setFormData({...formData, name: e.target.value})} className="w-full border p-2 rounded" />
+                <div className="flex gap-2">
+                  <input required type="number" placeholder="Precio ($)" value={formData.price || ''} onChange={e=>setFormData({...formData, price: e.target.value})} className="w-1/2 border p-2 rounded" />
+                  <input type="number" step="0.1" placeholder="Potencia kW (Opcional)" value={formData.nominalKW || ''} onChange={e=>setFormData({...formData, nominalKW: e.target.value})} className="w-1/2 border p-2 rounded" />
+                </div>
+                <select value={formData.category || 'kits'} onChange={e=>setFormData({...formData, category: e.target.value})} className="w-full border p-2 rounded">
+                  <option value="paneles">Paneles</option><option value="inversores">Inversores</option><option value="baterias">Baterías</option><option value="aerogeneradores">Aerogeneradores</option><option value="kits">Kits</option><option value="otros">Otros</option>
+                </select>
+                <div className="flex gap-2">
+                  <select onChange={e=>setFormData({...formData, image: e.target.value})} className="w-1/2 border p-2 rounded">
+                    <option value="">Selecciona imagen base</option>
+                    {assets.map(a => <option key={a.value} value={a.value}>{a.label}</option>)}
                   </select>
+                  <input placeholder="O URL externa" value={formData.image || formData.image_url || ''} onChange={e=>setFormData({...formData, image: e.target.value})} className="w-1/2 border p-2 rounded" />
                 </div>
-              </div>
-
-              <div className="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-md">
-                <div className="space-y-4">
-                  <span className="text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">
-                    Resultado Estimado
-                  </span>
-                  <h3 className="text-xl font-bold">Sistema Recomendado</h3>
-                  
-                  <div className="space-y-3 pt-2">
-                    <div className="flex justify-between border-b border-slate-800 pb-2">
-                      <span className="text-slate-400 text-sm">Capacidad Solar:</span>
-                      <span className="font-bold text-amber-400">{calculatedSystem.recommendedKW} kWp</span>
-                    </div>
-                    <div className="flex justify-between border-b border-slate-800 pb-2">
-                      <span className="text-slate-400 text-sm">Banco Baterías:</span>
-                      <span className="font-bold text-amber-400">{calculatedSystem.estimatedBatteryKWh} kWh</span>
-                    </div>
-                    
-                    {calculatedSystem.matchedKit ? (
-                      <div className="flex justify-between pb-2">
-                        <span className="text-slate-400 text-sm">Kit Sugerido:</span>
-                        <span className="font-bold text-white text-right max-w-[50%] truncate" title={calculatedSystem.matchedKit.name}>
-                          {calculatedSystem.matchedKit.name}
-                        </span>
-                      </div>
-                    ) : (
-                       <div className="text-xs text-rose-400 italic">No hay kits registrados con atributos técnicos para estimar precio.</div>
-                    )}
-                    
-                  </div>
+                <textarea required placeholder="Descripción técnica" value={formData.description || ''} onChange={e=>setFormData({...formData, description: e.target.value})} className="w-full border p-2 rounded" rows="3"></textarea>
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" checked={formData.visible ?? true} onChange={e=>setFormData({...formData, visible: e.target.checked})} /> 
+                  <span>Visible públicamente</span>
+                </label>
+                <div className="flex justify-end space-x-2 pt-2">
+                  <button type="button" onClick={()=>setModal({open:false})} className="px-4 py-2 border rounded text-slate-600">Cancelar</button>
+                  <button type="submit" className="px-4 py-2 bg-amber-500 text-white font-bold rounded">Guardar Cambios</button>
                 </div>
-
-                <button 
-                  disabled={!calculatedSystem.matchedKit}
-                  onClick={() => sendToWhatsApp(`Cotización: ${calculatedSystem.matchedKit.name} para ${calcKWh}kWh`, calculatedSystem.estimatedCost)}
-                  className={`w-full font-bold py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 ${calculatedSystem.matchedKit ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}`}
-                >
-                  <Send size={18} />
-                  <span>Consultar por WhatsApp</span>
-                </button>
-              </div>
+              </form>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+      );
+    }
 
-        {/* VISTA 3: ADMIN */}
-        {activeTab === 'admin' && (
-          <div className="space-y-6">
-            {!adminAuthenticated ? (
-              <div className="max-w-md mx-auto bg-white rounded-3xl border border-slate-200 shadow-sm p-8 space-y-6 mt-12">
-                <div className="text-center space-y-2">
-                  <div className="bg-slate-100 w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-slate-700">
-                    <Settings size={24} />
-                  </div>
-                  <h3 className="text-xl font-bold">Acceso Administrativo</h3>
-                </div>
-                <form onSubmit={handleAdminLogin} className="space-y-4">
-                  <input 
-                    type="password" 
-                    placeholder="Token de Acceso (ADMIN_TOKEN)" 
-                    value={adminTokenInput}
-                    onChange={e => setAdminTokenInput(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium focus:ring-2 focus:ring-amber-500"
-                    required
-                  />
-                  <button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl shadow-md transition-all">
-                    Validar Acceso
-                  </button>
-                </form>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                  <div>
-                    <h3 className="text-xl font-bold">Catálogo e Inventario</h3>
-                    <p className="text-xs text-slate-500">Conectado a API Express con verificación ETag</p>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <button onClick={openCreateModal} className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-5 py-2.5 rounded-xl shadow-md transition-all flex items-center space-x-2 text-sm">
-                      <Plus size={18} />
-                      <span>Nuevo Producto</span>
-                    </button>
-                    <button onClick={() => logoutAdmin()} className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-xl text-sm transition-all">
-                      Salir
-                    </button>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                          <th className="p-4 sm:px-6">Producto</th>
-                          <th className="p-4 sm:px-6">Categoría</th>
-                          <th className="p-4 sm:px-6">Precio</th>
-                          <th className="p-4 sm:px-6">Estado</th>
-                          <th className="p-4 sm:px-6 text-right">Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 text-sm">
-                        {products.map(prod => (
-                          <tr key={prod.id} className="hover:bg-slate-50/50 transition-all">
-                            <td className="p-4 sm:px-6 font-semibold text-slate-900">
-                              {prod.name}
-                              {prod.nominalKW > 0 && <span className="block text-xs font-normal text-slate-400 mt-0.5">Potencia: {prod.nominalKW} kW</span>}
-                            </td>
-                            <td className="p-
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
 ```
