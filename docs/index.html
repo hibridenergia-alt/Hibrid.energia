@@ -20,27 +20,46 @@
 
       --space-1:.25rem; --space-2:.5rem; --space-3:.75rem; --space-4:1rem; --space-5:1.25rem; --space-6:1.5rem; --space-8:2rem; --space-10:2.5rem; --space-12:3rem; --space-16:4rem;
 
-      --color-border:rgba(28,38,34,.12);
-      --color-divider:rgba(28,38,34,.08);
-      --color-text:#111814;
-      --color-text-muted:#61726b;
-      --color-text-faint:#93a19b;
-      --color-text-inverse:#07100a;
-      --color-primary:#28d26d;
-      --color-primary-hover:#1fbb5e;
-      --color-primary-highlight:rgba(40,210,109,.14);
-      --shadow-sm:0 2px 10px rgba(11,17,24,.06);
-      --shadow-md:0 14px 36px rgba(11,17,24,.08);
-      --shadow-lg:0 24px 58px rgba(11,17,24,.12);
       --radius-sm:.5rem; --radius-md:.85rem; --radius-lg:1.1rem; --radius-xl:1.45rem; --radius-full:999px;
       --font-body:'Satoshi',system-ui,sans-serif;
       --max:1260px;
       --transition:180ms cubic-bezier(.16,1,.3,1);
+
+      /* ---- LIGHT THEME TOKENS ---- */
+      --color-bg-1:#f4f7f5;
+      --color-bg-2:#e9f0eb;
+      --color-surface-1:rgba(255,255,255,.98);
+      --color-surface-2:rgba(247,250,248,.98);
+      --color-surface:#ffffff;
+      --color-well:#eef3f0;
+      --color-topbar:rgba(255,255,255,.9);
+      --color-border:rgba(17,24,20,.12);
+      --color-divider:rgba(17,24,20,.08);
+      --color-text:#0f1713;
+      --color-text-muted:#54645d;
+      --color-text-faint:#889690;
+      --color-text-inverse:#ffffff;
+      --color-primary:#1c9a54;
+      --color-primary-hover:#16803f;
+      --color-primary-highlight:rgba(28,154,84,.12);
+      --color-overlay-1:rgba(17,24,20,.03);
+      --color-overlay-2:rgba(17,24,20,.045);
+      --color-overlay-3:rgba(17,24,20,.06);
+      --color-overlay-6:rgba(17,24,20,.08);
+      --color-backdrop:rgba(15,23,20,.45);
+      --shadow-sm:0 2px 10px rgba(16,30,24,.06);
+      --shadow-md:0 14px 36px rgba(16,30,24,.08);
+      --shadow-lg:0 24px 58px rgba(16,30,24,.12);
     }
 
     [data-theme="dark"]{
-      --color-bg:#081017;
+      --color-bg-1:#071016;
+      --color-bg-2:#0d161e;
+      --color-surface-1:rgba(15,25,33,.98);
+      --color-surface-2:rgba(20,33,42,.98);
       --color-surface:#0f1921;
+      --color-well:#091118;
+      --color-topbar:rgba(10,17,24,.88);
       --color-border:rgba(231,242,237,.12);
       --color-divider:rgba(231,242,237,.08);
       --color-text:#eef7f2;
@@ -50,6 +69,11 @@
       --color-primary:#28d26d;
       --color-primary-hover:#1fbe61;
       --color-primary-highlight:rgba(40,210,109,.12);
+      --color-overlay-1:rgba(255,255,255,.02);
+      --color-overlay-2:rgba(255,255,255,.03);
+      --color-overlay-3:rgba(255,255,255,.04);
+      --color-overlay-6:rgba(255,255,255,.06);
+      --color-backdrop:rgba(0,0,0,.8);
       --shadow-sm:0 2px 10px rgba(0,0,0,.22);
       --shadow-md:0 18px 40px rgba(0,0,0,.28);
       --shadow-lg:0 28px 62px rgba(0,0,0,.36);
@@ -63,19 +87,22 @@
       font-size:var(--text-base);
       line-height:1.6;
       color:var(--color-text);
-      background: linear-gradient(180deg,#071016 0%, #0d161e 100%);
+      background: linear-gradient(180deg,var(--color-bg-1) 0%, var(--color-bg-2) 100%);
       display: flex;
       flex-direction: column;
+      transition: background var(--transition), color var(--transition);
     }
 
     img,svg{display:block;max-width:100%;height:auto}
     button,input,textarea,select{font:inherit;color:inherit}
     button{cursor:pointer;background:none;border:0;text-align:left;}
+    a{color:inherit}
     :focus-visible{outline:2px solid var(--color-primary);outline-offset:3px;border-radius:var(--radius-sm)}
+    @media (prefers-reduced-motion: reduce){ *{animation-duration:.01ms !important; transition-duration:.01ms !important;} }
 
     .topbar{
       position:sticky;top:0;z-index:90;
-      background:rgba(10,17,24,.88);
+      background:var(--color-topbar);
       border-bottom:1px solid var(--color-border);
       backdrop-filter:blur(14px);
     }
@@ -91,17 +118,10 @@
       justify-content:space-between;
     }
 
-    .logo-shell{
-      display:flex;
-      align-items:center;
-    }
-    .logo-img{
-      width:100%;
-      max-width:280px;
-      height:auto;
-      max-height:75px;
-      object-fit:contain;
-    }
+    .logo-shell{ display:flex; align-items:center; }
+    .logo-img{ width:100%; max-width:220px; height:auto; max-height:60px; object-fit:contain; }
+    .logo-fallback{ display:none; align-items:center; gap:.5rem; font-weight:900; font-size:var(--text-lg); letter-spacing:-.02em; }
+    .logo-fallback i{ color:var(--color-primary); }
 
     .nav{display:flex;gap:var(--space-2);flex-wrap:wrap;align-items:center;}
 
@@ -115,38 +135,33 @@
     .btn:hover{transform:translateY(-1px)}
     .btn.primary{background:var(--color-primary);border-color:var(--color-primary);color:var(--color-text-inverse)}
     .btn.primary:hover{background:var(--color-primary-hover);border-color:var(--color-primary-hover)}
-    .btn.secondary{background:rgba(255,255,255,.03);border-color:var(--color-border)}
-    .btn.secondary:hover{background:rgba(255,255,255,.06)}
+    .btn.secondary{background:var(--color-overlay-2);border-color:var(--color-border)}
+    .btn.secondary:hover{background:var(--color-overlay-6)}
     .btn.ghost{background:transparent;border-color:var(--color-border)}
-    .btn.danger{background:rgba(255,113,113,.12);border-color:rgba(255,113,113,.28);color:#ffd1d1}
+    .btn.danger{background:rgba(255,113,113,.12);border-color:rgba(255,113,113,.28);color:#e0524f}
+    [data-theme="dark"] .btn.danger{color:#ffd1d1}
     .btn.small{min-height:38px;padding:.6rem .85rem;border-radius:.8rem;font-size:var(--text-xs);}
     .btn.full{width:100%}
+    .btn.active{background:var(--color-primary);border-color:var(--color-primary);color:var(--color-text-inverse)}
+
+    .icon-btn{
+      width:44px;height:44px;border-radius:var(--radius-full);border:1px solid var(--color-border);
+      display:inline-flex;align-items:center;justify-content:center;background:var(--color-overlay-2);
+      transition:all var(--transition); flex-shrink:0;
+    }
+    .icon-btn:hover{ background:var(--color-overlay-6); transform:translateY(-1px); }
 
     .social-links{
-      display:flex;
-      align-items:center;
-      gap:.45rem;
-      margin-left:.35rem;
-      padding-left:.7rem;
+      display:flex; align-items:center; gap:.45rem; margin-left:.35rem; padding-left:.7rem;
       border-left:1px solid var(--color-border);
     }
     .social-link{
-      width:40px;
-      height:40px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:var(--radius-full);
-      border:1px solid var(--color-border);
-      background:rgba(255,255,255,.04);
-      color:var(--color-text-muted);
-      font-size:1rem;
+      width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;
+      border-radius:var(--radius-full);border:1px solid var(--color-border);
+      background:var(--color-overlay-2);color:var(--color-text-muted);font-size:1rem;
       transition: transform var(--transition), color var(--transition), background var(--transition), border-color var(--transition);
     }
-    .social-link:hover{
-      transform:translateY(-2px);
-      color:#ffffff;
-    }
+    .social-link:hover{ transform:translateY(-2px); color:#ffffff; }
     .social-link.facebook:hover{background:#1877f2; border-color:#1877f2;}
     .social-link.instagram:hover{background:linear-gradient(135deg,#feda75,#d62976,#4f5bd5); border-color:#d62976;}
     .social-link.whatsapp:hover{background:#25d366; border-color:#25d366;}
@@ -157,7 +172,7 @@
     .view.active{display:block}
 
     .panel,.product-card,.cart-card,.summary-card,.admin-card,.notice,.login-card{
-      background:linear-gradient(180deg,rgba(15,25,33,.98),rgba(20,33,42,.98));
+      background:linear-gradient(180deg,var(--color-surface-1),var(--color-surface-2));
       border:1px solid var(--color-border);
       border-radius:var(--radius-xl);
       box-shadow:var(--shadow-md);
@@ -173,55 +188,32 @@
 
     .category-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-10);}
     .category-card{
-      padding:0;
-      display:flex;
-      flex-direction:column;
-      min-height:180px;
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-lg);
-      background: linear-gradient(180deg,rgba(20,32,41,1),rgba(15,25,33,1));
-      transition:all var(--transition);
-      overflow:hidden;
+      padding:0;display:flex;flex-direction:column;min-height:180px;
+      border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+      background: linear-gradient(180deg,var(--color-surface-2),var(--color-surface-1));
+      transition:all var(--transition); overflow:hidden;
     }
-    .category-card:hover{
-      transform:translateY(-4px);
-      border-color:var(--color-primary);
-      box-shadow: var(--shadow-lg);
-    }
-    .category-card.active{
-      border-color:var(--color-primary);
-      box-shadow: 0 0 0 1px rgba(40,210,109,.5);
-    }
-    .cat-img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      background: #ffffff; 
-      border-bottom: 1px solid var(--color-border);
-    }
-    .cat-body {
-      padding: var(--space-3);
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
+    .category-card:hover{ transform:translateY(-4px); border-color:var(--color-primary); box-shadow: var(--shadow-lg); }
+    .category-card.active{ border-color:var(--color-primary); box-shadow: 0 0 0 1px var(--color-primary); }
+    .cat-img { width: 100%; height: 120px; object-fit: cover; background: var(--color-well); border-bottom: 1px solid var(--color-border); }
+    .cat-body { padding: var(--space-3); display: flex; flex-direction: column; flex: 1; }
     .category-card strong {font-size:var(--text-base);font-weight:900; color:var(--color-text); text-transform:uppercase; letter-spacing:.05em;}
     .category-card small {font-size:var(--text-sm);font-weight:400;color:var(--color-text-muted); margin-top:.2rem;}
     .category-card span {margin-top:auto;font-size:var(--text-xs);color:var(--color-text-faint); padding-top: .6rem;}
 
     .field,.select,.textarea{
       width:100%;padding:.95rem 1rem;border-radius:var(--radius-md);border:1px solid var(--color-border);
-      background:rgba(255,255,255,.03);color:var(--color-text);outline:none
+      background:var(--color-overlay-2);color:var(--color-text);outline:none
     }
     .textarea{min-height:110px;resize:vertical}
-    .field:focus,.select:focus,.textarea:focus{border-color:rgba(40,210,109,.5);box-shadow:0 0 0 3px rgba(40,210,109,.12)}
+    .field:focus,.select:focus,.textarea:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px var(--color-primary-highlight)}
 
     .catalog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4)}
     .product-card{
       overflow:hidden;display:grid;grid-template-rows:auto 1fr;
       transition:transform var(--transition),border-color var(--transition),box-shadow var(--transition)
     }
-    .product-card:hover{transform:translateY(-3px);border-color:rgba(40,210,109,.35);box-shadow:var(--shadow-lg)}
+    .product-card:hover{transform:translateY(-3px);border-color:var(--color-primary);box-shadow:var(--shadow-lg)}
     .product-media{aspect-ratio:4/3;background:#ffffff;overflow:hidden; display:flex; align-items:center; justify-content:center;}
     .product-media img{width:100%;height:100%;object-fit:cover}
     .product-body{padding:var(--space-4);display:grid;gap:var(--space-3)}
@@ -233,29 +225,52 @@
       display:inline-flex;align-items:center;gap:.4rem;padding:.34rem .72rem;border-radius:var(--radius-full);
       background:var(--color-primary-highlight);color:var(--color-primary);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.07em
     }
+    .badge.muted{background:var(--color-overlay-3);color:var(--color-text-muted)}
 
     .empty{
       grid-column:1/-1;padding:var(--space-8);text-align:center;color:var(--color-text-muted);
-      border:1px dashed var(--color-border);border-radius:var(--radius-lg);background:rgba(255,255,255,.02)
+      border:1px dashed var(--color-border);border-radius:var(--radius-lg);background:var(--color-overlay-1)
     }
+    .empty strong{display:block;color:var(--color-text);font-size:var(--text-base);margin-bottom:.35rem;}
+    .empty .btn{margin-top:var(--space-4);}
 
     .calc-layout,.cart-layout{display:grid;gap:var(--space-5)}
     .calc-layout{grid-template-columns:.92fr 1.08fr}
     .cart-layout{grid-template-columns:1.18fr .82fr}
 
     .panel,.cart-card,.summary-card,.admin-card,.login-card{padding:var(--space-5)}
-    .bill-box{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--color-border);background:#091118}
-    .bill-box img{width:100%;max-height:450px;object-fit:contain}
     .calc-result{
       margin-top:var(--space-4);padding:var(--space-5);border-radius:var(--radius-lg);
-      background:rgba(40,210,109,.06);border:1px solid rgba(40,210,109,.34)
+      background:var(--color-primary-highlight);border:1px solid var(--color-primary)
     }
     .calc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
+    .calc-slider-row{ margin-bottom:var(--space-4); }
+    .calc-slider-row label{ display:flex; justify-content:space-between; gap:var(--space-2); margin-bottom:.5rem; font-weight:800; }
+    .calc-slider-row output{ color:var(--color-primary); font-variant-numeric:tabular-nums; }
+    input[type="range"]{ width:100%; accent-color:var(--color-primary); }
+
+    .advanced-toggle{
+      display:flex;align-items:center;gap:.5rem;margin:var(--space-4) 0;cursor:pointer;
+      color:var(--color-text-muted);font-size:var(--text-sm);font-weight:800;user-select:none;
+    }
+    .advanced-toggle i{transition:transform var(--transition);}
+    .advanced-toggle.open i{transform:rotate(90deg);}
+    .advanced-panel{ display:none; padding-top:var(--space-2); border-top:1px solid var(--color-divider); margin-top:var(--space-2); }
+    .advanced-panel.open{ display:block; }
+    .radio-row{ display:flex; flex-direction:column; gap:var(--space-2); margin-top:var(--space-2); }
+    .radio-option{
+      display:flex; align-items:flex-start; gap:.6rem; padding:var(--space-3); border-radius:var(--radius-md);
+      border:1px solid var(--color-border); cursor:pointer; transition:all var(--transition);
+    }
+    .radio-option:hover{ border-color:var(--color-primary); }
+    .radio-option input{ margin-top:.2rem; accent-color:var(--color-primary); }
+    .radio-option strong{ display:block; font-size:var(--text-sm); }
+    .radio-option span{ display:block; font-size:var(--text-xs); color:var(--color-text-muted); margin-top:.15rem; }
 
     .cart-list{display:grid;gap:var(--space-4)}
     .cart-item{
       display:grid;grid-template-columns:96px 1fr auto;gap:var(--space-4);padding:var(--space-4);
-      border-radius:var(--radius-lg);background:rgba(255,255,255,.02);border:1px solid var(--color-border)
+      border-radius:var(--radius-lg);background:var(--color-overlay-1);border:1px solid var(--color-border)
     }
     .cart-item img{width:96px;height:96px;border-radius:var(--radius-md);object-fit:cover;background:#ffffff;}
     .qty-row{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-3)}
@@ -268,28 +283,28 @@
 
     .admin-inventory{display:grid;gap:var(--space-4);}
     .admin-stats-row{display:grid;grid-template-columns:repeat(3, 1fr);gap:var(--space-3);margin-bottom:var(--space-4);}
-    .stat-card{background:rgba(255,255,255,.02);border:1px solid var(--color-border);padding:var(--space-4);border-radius:var(--radius-lg);text-align:center;}
+    .stat-card{background:var(--color-overlay-1);border:1px solid var(--color-border);padding:var(--space-4);border-radius:var(--radius-lg);text-align:center;}
     .stat-card h4{font-size:var(--text-xl);color:var(--color-primary);margin-bottom:.2rem;}
-    .admin-controls{display:flex;gap:var(--space-3);justify-content:space-between;align-items:center;margin-bottom:var(--space-4);}
-    
+    .admin-controls{display:flex;gap:var(--space-3);justify-content:space-between;align-items:center;margin-bottom:var(--space-4);flex-wrap:wrap;}
+
     .inventory-list{display:grid;grid-template-columns:1fr;gap:var(--space-3);}
     .inv-item{
       display:grid;grid-template-columns:80px 1fr auto;gap:var(--space-4);align-items:center;
-      padding:var(--space-3);border-radius:var(--radius-lg);background:rgba(255,255,255,.02);border:1px solid var(--color-border);
+      padding:var(--space-3);border-radius:var(--radius-lg);background:var(--color-overlay-1);border:1px solid var(--color-border);
     }
     .inv-item img{width:80px;height:80px;object-fit:cover;border-radius:var(--radius-md);background:#fff;}
     .inv-info h4{font-size:var(--text-base);font-weight:800;margin-bottom:.2rem;}
-    .inv-actions{display:flex;align-items:center;gap:var(--space-2);}
-    
-    .switch{position:relative;display:inline-block;width:44px;height:24px;}
+    .inv-actions{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;}
+
+    .switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;}
     .switch input{opacity:0;width:0;height:0;}
-    .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgba(255,255,255,.1);transition:.3s;border-radius:34px;border:1px solid var(--color-border);}
+    .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:var(--color-overlay-6);transition:.3s;border-radius:34px;border:1px solid var(--color-border);}
     .slider:before{position:absolute;content:"";height:16px;width:16px;left:3px;bottom:3px;background-color:var(--color-text-muted);transition:.3s;border-radius:50%;}
-    input:checked + .slider{background-color:rgba(40,210,109,.2);border-color:var(--color-primary);}
+    input:checked + .slider{background-color:var(--color-primary-highlight);border-color:var(--color-primary);}
     input:checked + .slider:before{transform:translateX(20px);background-color:var(--color-primary);}
 
     .modal-overlay{
-      position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);
+      position:fixed;top:0;left:0;width:100%;height:100%;background:var(--color-backdrop);backdrop-filter:blur(5px);
       z-index:1000;display:flex;align-items:center;justify-content:center;
       opacity:0;visibility:hidden;transition:all var(--transition);
     }
@@ -302,36 +317,57 @@
     .modal-overlay.active .modal-content{transform:translateY(0);}
     .btn-close-modal{
       position:absolute;top:var(--space-4);right:var(--space-4);background:transparent;border:0;
-      color:var(--color-text-muted);font-size:1.5rem;cursor:pointer;
+      color:var(--color-text-muted);font-size:1.5rem;cursor:pointer;line-height:1;
     }
     .btn-close-modal:hover{color:var(--color-text);}
-    
+
     .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
-    .gallery-panel{border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);background:rgba(255,255,255,.02);margin-top:var(--space-4);}
+    .preview-box{
+      border:1px solid var(--color-border);border-radius:var(--radius-lg);overflow:hidden;
+      background:var(--color-well);height:160px;display:flex;align-items:center;justify-content:center;
+      margin-top:var(--space-4);
+    }
+    .preview-box img{width:100%;height:100%;object-fit:cover;}
+    .preview-box .preview-empty{color:var(--color-text-faint);font-size:var(--text-sm);text-align:center;padding:var(--space-4);}
+    .gallery-panel{border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);background:var(--color-overlay-1);margin-top:var(--space-4);}
     .gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);max-height:200px;overflow:auto;}
     .gallery-item{
-      border:2px solid transparent;background:rgba(255,255,255,.02);border-radius:var(--radius-md);
-      overflow:hidden;cursor:pointer;transition:all var(--transition);
+      border:2px solid transparent;background:var(--color-overlay-1);border-radius:var(--radius-md);
+      overflow:hidden;cursor:pointer;transition:all var(--transition);position:relative;
     }
-    .gallery-item:hover{border-color:rgba(40,210,109,.5);}
-    .gallery-item.active{border-color:var(--color-primary);box-shadow:0 0 0 2px rgba(40,210,109,.2);}
+    .gallery-item:hover{border-color:var(--color-primary);opacity:.85;}
+    .gallery-item.active{border-color:var(--color-primary);box-shadow:0 0 0 2px var(--color-primary-highlight);}
+    .gallery-item.active:after{
+      content:"✓"; position:absolute; top:4px; right:4px; width:20px; height:20px; border-radius:50%;
+      background:var(--color-primary); color:#fff; font-size:12px; display:flex; align-items:center; justify-content:center; font-weight:900;
+    }
     .gallery-item img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#ffffff;}
 
     .notice-stack{
       position:fixed;top:100px;right:var(--space-4);z-index:1200;display:grid;gap:var(--space-3);
       width:min(360px,calc(100vw - 2rem))
     }
-    .notice{padding:var(--space-4);display:flex;gap:var(--space-3);align-items:flex-start;border-radius:var(--radius-lg);background:rgba(15,25,33,.98);border:1px solid var(--color-border);box-shadow:var(--shadow-lg)}
-    
+    .notice{padding:var(--space-4);display:flex;gap:var(--space-3);align-items:flex-start;border-radius:var(--radius-lg);background:var(--color-surface);border:1px solid var(--color-border);box-shadow:var(--shadow-lg)}
+    .notice i{margin-top:.15rem;}
+    .notice.success i{color:var(--color-primary);}
+    .notice.error i{color:#e0524f;}
+    .notice.info i{color:var(--color-text-muted);}
+
     .sticky-cart{
       position:fixed;right:var(--space-4);bottom:var(--space-4);z-index:70;display:flex;align-items:center;gap:var(--space-3);
       padding:.75rem .82rem .75rem 1rem;border-radius:var(--radius-full);border:1px solid var(--color-border);
-      background:rgba(15,25,33,.94);backdrop-filter:blur(12px);box-shadow:var(--shadow-lg)
+      background:var(--color-surface);backdrop-filter:blur(12px);box-shadow:var(--shadow-lg)
     }
     .sticky-cart strong{display:block;font-size:var(--text-sm)}
     .sticky-cart span{display:block;font-size:var(--text-xs);color:var(--color-text-muted)}
 
-    .site-footer { text-align: center; padding: var(--space-8); margin-top: var(--space-12); border-top: 1px solid var(--color-border); padding-bottom: 120px; }
+    .site-footer { text-align: center; padding: var(--space-8); margin-top: var(--space-12); border-top: 1px solid var(--color-border); padding-bottom: 120px; color:var(--color-text-faint); font-size:var(--text-xs); }
+
+    .spinner{
+      width:22px;height:22px;border-radius:50%;border:3px solid var(--color-overlay-6);
+      border-top-color:var(--color-primary);animation:spin .8s linear infinite;margin:0 auto var(--space-3);
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
 
     @media (max-width:1160px){
       .calc-layout,.cart-layout{grid-template-columns:1fr}
@@ -350,7 +386,7 @@
       .sticky-cart{left:var(--space-3);right:var(--space-3);bottom:var(--space-3);justify-content:space-between;border-radius:var(--radius-xl)}
       .notice-stack{left:var(--space-3);right:var(--space-3);width:auto}
       .admin-stats-row{grid-template-columns:1fr;}
-      .admin-controls{flex-direction:column;}
+      .admin-controls{flex-direction:column;align-items:stretch;}
     }
   </style>
 </head>
@@ -359,25 +395,22 @@
   <header class="topbar">
     <div class="topbar-inner">
       <div class="logo-shell">
-        <img src="./logotipohibrid.png" alt="Logo HiBRID" class="logo-img" loading="eager" onerror="this.onerror=null; this.style.display='none';">
+        <img src="./logotipohibrid.png" alt="Logo HiBRID" class="logo-img" loading="eager" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
+        <div class="logo-fallback" id="logoFallback"><i class="fa-solid fa-sun"></i> HiBRID</div>
       </div>
       <nav class="nav" aria-label="Navegación principal">
-        <button class="btn secondary nav-btn" type="button" data-route="home">Productos</button>
+        <button class="btn secondary nav-btn" type="button" data-route="home">Catálogo</button>
         <button class="btn secondary nav-btn" type="button" data-route="calculator">Calculadora</button>
-        
+        <button class="btn secondary nav-btn" type="button" data-route="admin-entry">Admin</button>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Cambiar tema" title="Cambiar tema claro/oscuro">
+          <i class="fa-solid fa-moon" id="themeIcon"></i>
+        </button>
+
         <div class="social-links" aria-label="Redes sociales">
-          <a class="social-link facebook" href="https://www.facebook.com/hibridenergia" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">
-            <i class="fa-brands fa-facebook-f"></i>
-          </a>
-          <a class="social-link instagram" href="https://www.instagram.com/hibridenergia/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
-            <i class="fa-brands fa-instagram"></i>
-          </a>
-          <a class="social-link whatsapp" href="https://wa.me/56956139055?text=Hola%20HiBRID%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp">
-            <i class="fa-brands fa-whatsapp"></i>
-          </a>
-          <a class="social-link tiktok" href="https://www.tiktok.com/@hibrid976" target="_blank" rel="noopener noreferrer" aria-label="TikTok" title="TikTok">
-            <i class="fa-brands fa-tiktok"></i>
-          </a>
+          <a class="social-link facebook" href="https://www.facebook.com/hibridenergia" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a class="social-link instagram" href="https://www.instagram.com/hibridenergia/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a class="social-link whatsapp" href="https://wa.me/56956139055?text=Hola%20HiBRID%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+          <a class="social-link tiktok" href="https://www.tiktok.com/@hibrid976" target="_blank" rel="noopener noreferrer" aria-label="TikTok" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
         </div>
       </nav>
     </div>
@@ -407,7 +440,7 @@
       <div class="section-head" style="margin-top:0">
         <div>
           <h3>Calculadora Solar Inteligente</h3>
-          <p>Calcula tu kit ideal basado en lo que consumes al mes.</p>
+          <p>Calcula tu kit ideal basado en lo que consumes por día.</p>
         </div>
         <button class="btn ghost" type="button" data-route="home">Volver</button>
       </div>
@@ -415,34 +448,50 @@
       <div class="calc-layout">
         <article class="panel">
           <h3 style="margin-bottom:.6rem">Referencia visual</h3>
-          <p class="small muted" style="margin-bottom:1rem">Revisa el apartado de "Consumo" en tu boleta de luz para ingresar el valor exacto.</p>
-          <div class="bill-box">
-            <img src="./boleta.jpg" alt="Referencia de boleta de luz" width="900" height="1200" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
+          <p class="small muted" style="margin-bottom:1rem">Revisa el apartado de "Consumo" en tu boleta de luz y divídelo por 30 para estimar tu consumo diario.</p>
+          <div class="preview-box" style="height:auto;aspect-ratio:3/4;">
+            <img src="./boleta.jpg" alt="Referencia de boleta de luz" loading="lazy" onerror="this.parentElement.innerHTML='<div class=&quot;preview-empty&quot;>Imagen de referencia no disponible</div>';">
           </div>
         </article>
 
         <article class="panel">
           <h3 style="margin-bottom:.6rem">Ingresa tus datos</h3>
-          <p class="small muted">Simularemos un sistema con paneles de 550W (alta eficiencia) basándonos en tu requerimiento energético real.</p>
-          <div class="calc-grid" style="margin-top:1rem">
-            <div>
-              <label for="powerInput" style="display:block;margin-bottom:.45rem;font-weight:800;color:var(--color-primary);">Consumo mensual (kWh)</label>
-              <input id="powerInput" class="field" type="number" min="1" step="10" placeholder="Ej: 250">
-            </div>
-            <div>
-              <label for="batteryPercent" style="display:block;margin-bottom:.45rem;font-weight:800">Autonomía en Baterías (%)</label>
-              <input id="batteryPercent" class="field" type="number" min="0" max="100" step="10" value="50" placeholder="Ej: 50">
-            </div>
-            <div>
-              <label for="projectUse" style="display:block;margin-bottom:.45rem;font-weight:800">Tipo de proyecto</label>
-              <select id="projectUse" class="select">
-                <option value="hogar">Residencial / Hogar</option>
-                <option value="comercial">Comercial / Negocio</option>
-                <option value="parcela">Parcela / Off-Grid (Aislado)</option>
-              </select>
+          <p class="small muted" style="margin-bottom:1rem">Simulamos con paneles de 550W de alta eficiencia.</p>
+
+          <div class="calc-slider-row">
+            <label for="calcKwh">Consumo diario estimado <output id="calcKwhOut">10</output> kWh/día</label>
+            <input id="calcKwh" type="range" min="2" max="80" step="1" value="10">
+          </div>
+          <div class="calc-slider-row">
+            <label for="calcAutonomia">Días de autonomía (respaldo sin sol) <output id="calcAutonomiaOut">1</output></label>
+            <input id="calcAutonomia" type="range" min="1" max="5" step="1" value="1">
+          </div>
+          <div class="calc-slider-row">
+            <label for="calcTipo" style="margin-bottom:.5rem;">Tipo de proyecto</label>
+            <select id="calcTipo" class="select">
+              <option value="hogar">Residencial / Hogar</option>
+              <option value="comercial">Comercial / Negocio</option>
+              <option value="parcela">Parcela / Off-Grid (Aislado)</option>
+            </select>
+          </div>
+
+          <button type="button" class="advanced-toggle" id="advancedToggle" aria-expanded="false">
+            <i class="fa-solid fa-chevron-right"></i> Opciones avanzadas (enfoque de cotización)
+          </button>
+          <div class="advanced-panel" id="advancedPanel">
+            <div class="radio-row">
+              <label class="radio-option">
+                <input type="radio" name="enfoque" value="auto" checked>
+                <span><strong>Selección automática de inversor</strong><span>Muestra el desglose técnico completo: paneles, inversor, baterías y área de techo.</span></span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="enfoque" value="rapida">
+                <span><strong>Cotización rápida</strong><span>Solo el resumen esencial, ideal para pedir precio de inmediato.</span></span>
+              </label>
             </div>
           </div>
-          <div style="margin-top:1rem">
+
+          <div style="margin-top:1.25rem">
             <button id="calculateBtn" class="btn primary full" type="button">Calcular mi sistema ideal</button>
           </div>
           <div id="calcResult"></div>
@@ -484,8 +533,9 @@
         <button class="btn ghost" type="button" data-route="home">Volver al inicio</button>
       </div>
       <div class="login-card" style="max-width:520px; margin: auto;">
-        <label for="adminPass" style="display:block;margin-bottom:.45rem;font-weight:800">Contraseña de acceso</label>
-        <input id="adminPass" class="field" type="password" placeholder="Ingresa contraseña">
+        <label for="adminPass" style="display:block;margin-bottom:.45rem;font-weight:800">Token de acceso</label>
+        <input id="adminPass" class="field" type="password" placeholder="Ingresa tu token de administrador" autocomplete="off">
+        <p id="loginError" class="tiny" style="color:#e0524f;margin-top:.5rem;display:none;">Token inválido. Verifica e intenta de nuevo.</p>
         <div style="display:grid;gap:var(--space-3);margin-top:1rem">
           <button id="adminLoginBtn" class="btn primary full" type="button">Entrar al panel</button>
         </div>
@@ -498,23 +548,14 @@
           <h3>Inventario HiBRID</h3>
           <p>Gestiona todo tu catálogo de forma simple y rápida.</p>
         </div>
-        <button class="btn ghost" type="button" data-route="home">Salir</button>
+        <button class="btn ghost" type="button" id="adminLogoutBtn">Cerrar sesión</button>
       </div>
 
       <div class="admin-inventory">
         <div class="admin-stats-row">
-          <div class="stat-card">
-            <h4 id="statTotal">0</h4>
-            <span class="small muted">Total Productos</span>
-          </div>
-          <div class="stat-card">
-            <h4 id="statVisible" style="color:var(--color-primary)">0</h4>
-            <span class="small muted">Publicados</span>
-          </div>
-          <div class="stat-card">
-            <h4 id="statHidden" style="color:#ffc1c1">0</h4>
-            <span class="small muted">Ocultos</span>
-          </div>
+          <div class="stat-card"><h4 id="statTotal">0</h4><span class="small muted">Total Productos</span></div>
+          <div class="stat-card"><h4 id="statVisible" style="color:var(--color-primary)">0</h4><span class="small muted">Publicados</span></div>
+          <div class="stat-card"><h4 id="statHidden" style="color:#e0524f">0</h4><span class="small muted">Ocultos</span></div>
         </div>
 
         <div class="admin-controls">
@@ -531,11 +572,12 @@
 
   <div id="productModal" class="modal-overlay">
     <div class="modal-content">
-      <button id="btnCloseModal" class="btn-close-modal">&times;</button>
+      <button id="btnCloseModal" class="btn-close-modal" aria-label="Cerrar">&times;</button>
       <h3 id="modalTitle" style="margin-bottom:var(--space-4);">Nuevo Producto</h3>
-      
+
       <form id="modalForm">
         <input type="hidden" id="modalProductId">
+        <input type="hidden" id="modalProductEtag">
         <input type="hidden" id="modalProductImage">
 
         <div class="form-grid">
@@ -560,26 +602,31 @@
           </div>
         </div>
 
+        <label style="display:block;margin:var(--space-4) 0 .3rem;font-weight:800">Vista previa de imagen</label>
+        <div class="preview-box" id="modalPreviewBox"><div class="preview-empty">Selecciona una imagen abajo</div></div>
+
         <div class="gallery-panel">
-          <strong style="display:block;margin-bottom:var(--space-2)">Selecciona una imagen del catálogo:</strong>
+          <strong style="display:block;margin-bottom:var(--space-2)">Selecciona una imagen del catálogo (recomendado):</strong>
           <div id="modalGalleryGrid" class="gallery-grid"></div>
-          
-          <div style="margin-top:var(--space-4);">
-            <label for="modalProductImageUrl" style="display:block;margin-bottom:.45rem;font-weight:800">URL personalizada de imagen</label>
+
+          <button type="button" class="advanced-toggle" id="customImgToggle" aria-expanded="false" style="margin-top:var(--space-4);">
+            <i class="fa-solid fa-chevron-right"></i> Usar una URL personalizada en su lugar
+          </button>
+          <div class="advanced-panel" id="customImgPanel">
             <input id="modalProductImageUrl" class="field" type="url" placeholder="https://ejemplo.com/imagen.jpg">
-            <p class="tiny muted" style="margin-top:.4rem">Opcional. Si la completas, tendrá prioridad sobre la imagen de la galería.</p>
+            <p class="tiny muted" style="margin-top:.4rem">Si la completas, reemplaza la selección de la galería. Verifica la vista previa antes de guardar.</p>
           </div>
         </div>
 
         <div style="margin-top:var(--space-5); display:flex; gap:var(--space-3);">
-          <button type="submit" class="btn primary full">Guardar Producto</button>
+          <button type="submit" class="btn primary full" id="modalSubmitBtn">Guardar Producto</button>
         </div>
       </form>
     </div>
   </div>
 
   <footer class="site-footer">
-    <button class="btn ghost small" type="button" data-route="admin-login" style="color: var(--color-text-faint); border-color: transparent;">Acceso Administrador (Oculto)</button>
+    <p>HiBRID Soluciones Energéticas — cotizaciones y precios de referencia, sujetos a evaluación técnica.</p>
   </footer>
 
   <div class="sticky-cart">
@@ -592,743 +639,6 @@
 
   <div id="noticeStack" class="notice-stack" aria-live="polite" aria-atomic="true"></div>
 
-  <script>
-    // --- INTEGRACIÓN RENDER & WHATSAPP CORREGIDA FINAL ---
-    const API_URL = "https://hibrid-energia.onrender.com";
-    const WHATSAPP_NUMBER = "56956139055";
-
-    const categories = [
-      { key:"principales", label:"Principales", blurb:"Equipos destacados", image:"kitsolar.jpg" },
-      { key:"paneles", label:"Paneles", blurb:"Módulos solares", image:"paneles.jpg" },
-      { key:"baterias", label:"Baterías", blurb:"Litio y respaldo", image:"bateria.jpg" },
-      { key:"inversores", label:"Inversores", blurb:"Control y conversión", image:"inversor.jpg" },
-      { key:"kits", label:"Kits solar", blurb:"Paquetes listos", image:"kitsolar.jpg" },
-      { key:"eolico", label:"Eólica", blurb:"Energía del viento", image:"eolica.jpg" },
-      { key:"otros", label:"Otros", blurb:"Focos, cables y más", image:"focosolar1.jpg" }
-    ];
-
-    const imageLibrary = {
-      catalog: {
-        paneles:["panelescatalago.jpg","paneles.jpg"],
-        baterias:["bateriacatalalogo1.jpg","bateriacatalogo1.jpg","bateriadeyecatalogo.jpeg","bateriafcatalogo.jpeg","bateria.jpg"],
-        inversores:["inversorcatalogo.png","inversordeyecatalogo.jpg","inversor.jpg"],
-        kits:["kitsolar.jpg","panelescatalago.jpg","bateriacatalogo1.jpg","inversorcatalogo.png"],
-        eolico:["aerogeneradorcatalogo1.jpg","aerogeneradorcatalogo2.jpg","eolica.jpg"],
-        principales:["kitsolar.jpg","panelescatalago.jpg","bateriacatalogo1.jpg","inversorcatalogo.png","aerogeneradorcatalogo1.jpg"],
-        otros:["focosolar1.jpg", "focosolarproducto.jpeg", "camarasproductos.jpeg"]
-      }
-    };
-
-    const state = {
-      route: "home",
-      products: [],
-      cart: [],
-      filterCategory: "all",
-      adminUnlocked: false,
-      adminToken: localStorage.getItem("hibrid_token") || ""
-    };
-
-    const $ = (selector, parent = document) => parent.querySelector(selector);
-    const $$ = (selector, parent = document) => Array.from(parent.querySelectorAll(selector));
-
-    const els = {
-      categoryGrid: $("#categoryGrid"), catalogGrid: $("#catalogGrid"),
-      catalogTitle: $("#catalogTitle"), catalogMeta: $("#catalogMeta"),
-      clearFiltersBtn: $("#clearFiltersBtn"), cartList: $("#cartList"),
-      summaryBox: $("#summaryBox"), stickyCartCount: $("#stickyCartCount"),
-      stickyCartTotal: $("#stickyCartTotal"), whatsappBtn: $("#whatsappBtn"),
-      clearCartBtn: $("#clearCartBtn"), powerInput: $("#powerInput"),
-      batteryPercent: $("#batteryPercent"), projectUse: $("#projectUse"),
-      calculateBtn: $("#calculateBtn"), calcResult: $("#calcResult"),
-      adminPass: $("#adminPass"), adminLoginBtn: $("#adminLoginBtn"),
-      adminFilter: $("#adminFilter"), adminInventoryList: $("#adminInventoryList"),
-      btnOpenNewProduct: $("#btnOpenNewProduct"), productModal: $("#productModal"),
-      btnCloseModal: $("#btnCloseModal"), modalForm: $("#modalForm"),
-      modalTitle: $("#modalTitle"), modalProductId: $("#modalProductId"),
-      modalProductName: $("#modalProductName"), modalProductCategory: $("#modalProductCategory"),
-      modalProductPrice: $("#modalProductPrice"), modalProductDesc: $("#modalProductDesc"),
-      modalProductImage: $("#modalProductImage"), modalProductImageUrl: $("#modalProductImageUrl"),
-      modalGalleryGrid: $("#modalGalleryGrid"), statTotal: $("#statTotal"),
-      statVisible: $("#statVisible"), statHidden: $("#statHidden"),
-      noticeStack: $("#noticeStack")
-    };
-
-    function escapeHtml(value){
-      return String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    }
-
-    function showNotice(message, type="info"){
-      const node = document.createElement("div");
-      node.className = "notice " + type;
-      const title = type === "success" ? "Listo" : type === "error" ? "Error" : "Info";
-      node.innerHTML = "<div><strong>" + title + "</strong><div class='small muted' style='margin-top:.15rem'>" + escapeHtml(message) + "</div></div>";
-      if(els.noticeStack) els.noticeStack.appendChild(node);
-      setTimeout(() => { node.style.opacity = "0"; node.style.transform = "translateY(-4px)"; }, 2800);
-      setTimeout(() => { if(node.parentNode) node.remove(); }, 3400);
-    }
-
-    // --- MANEJO DE ERRORES CENTRALIZADO ---
-    function handleApiError(res) {
-      if (res.status === 401 || res.status === 403) {
-        state.adminUnlocked = false;
-        state.adminToken = "";
-        localStorage.removeItem("hibrid_token");
-        routeTo("home");
-        throw new Error("Sesión expirada. Por favor, vuelve a ingresar al panel.");
-      }
-      if (res.status === 412) throw new Error("Conflicto de edición. Refrescando datos...");
-      throw new Error("El servidor rechazó la operación.");
-    }
-
-    function loadCartData(){
-      const storedCart = localStorage.getItem("hibrid_cart");
-      try{
-        const parsedCart = storedCart ? JSON.parse(storedCart) : [];
-        state.cart = Array.isArray(parsedCart) ? parsedCart : [];
-      }catch(error){ state.cart = []; }
-    }
-
-    function saveCartData() {
-      localStorage.setItem("hibrid_cart", JSON.stringify(state.cart));
-    }
-
-    // --- CONEXIÓN A RENDER ---
-    async function fetchProducts() {
-      if(state.products.length === 0 && els.catalogGrid) {
-         els.catalogGrid.innerHTML = "<div class='empty'><i class='fa-solid fa-spinner fa-spin' style='color:var(--color-primary); margin-bottom:10px; font-size:1.5rem;'></i><br>Conectando con el servidor...</div>";
-      }
-      
-      try {
-        let res;
-        if (state.adminToken) {
-          res = await fetch(`${API_URL}/api/products`, {
-            headers: { "Authorization": `Bearer ${state.adminToken}` }
-          });
-          if (res.status === 401 || res.status === 403) {
-            state.adminUnlocked = false;
-            state.adminToken = "";
-            localStorage.removeItem("hibrid_token");
-            res = await fetch(`${API_URL}/api/products`);
-          } else {
-            state.adminUnlocked = true;
-          }
-        } else {
-          res = await fetch(`${API_URL}/api/products`);
-        }
-
-        if (res.ok) {
-          state.products = await res.json();
-          renderAll();
-        }
-      } catch (error) {
-        if(els.catalogGrid) els.catalogGrid.innerHTML = "<div class='empty'>Error conectando al servidor de Render.</div>";
-        console.error(error);
-      }
-    }
-
-    function formatPrice(value){
-      return new Intl.NumberFormat("es-CL",{style:"currency",currency:"CLP",maximumFractionDigits:0}).format(Number(value || 0));
-    }
-
-    function slugify(text){
-      return String(text || "").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,30);
-    }
-
-    function productImage(product){
-      if(!product) return "./paneles.jpg";
-      const img = product.image_url || product.image || "paneles.jpg";
-      if(img.startsWith('http') || img.startsWith('/')) return img;
-      return './' + img;
-    }
-
-    function getCategoryLabel(key){
-      if(key === "all") return "Todos los productos";
-      const cat = categories.find(item => item.key === key);
-      return cat ? cat.label : key;
-    }
-
-    function routeTo(route){
-      state.route = route;
-      $$(".view").forEach(view => { view.classList.toggle("active", view.id === route); });
-      $$(".nav-btn").forEach(btn => {
-        const active = btn.dataset.route === route;
-        btn.classList.toggle("primary", active);
-        btn.classList.toggle("secondary", !active);
-      });
-
-      if(route === "cart") renderCart();
-      if(route === "admin") renderAdmin();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    function visibleProducts(){
-      if (state.adminUnlocked && state.route === "admin") return state.products;
-      return state.products.filter(item => item.visible === true);
-    }
-
-    function filteredProducts(){
-      return visibleProducts().filter(item => {
-        if(state.filterCategory === "all") return true;
-        return item.category === state.filterCategory;
-      });
-    }
-
-    function renderCategoryButtons(){
-      if(!els.categoryGrid) return;
-      let html = "";
-      categories.forEach(cat => {
-        const count = state.products.filter(item => item.category === cat.key && item.visible === true).length;
-        const imgSrc = cat.image.startsWith('http') || cat.image.startsWith('/') ? cat.image : './' + cat.image;
-        const activeClass = state.filterCategory === cat.key ? "active" : "";
-        html += "<button class='category-card " + activeClass + "' type='button' data-select-category='" + cat.key + "'>";
-        html += "<img src='" + imgSrc + "' class='cat-img' alt='" + cat.label + "' loading='lazy' onerror=\"this.onerror=null;this.src='https://via.placeholder.com/400x300?text=HiBRID';\">";
-        html += "<div class='cat-body'><strong>" + cat.label + "</strong><small>" + cat.blurb + "</small><span>" + count + " productos</span></div></button>";
-      });
-      els.categoryGrid.innerHTML = html;
-
-      if(els.adminFilter){
-        let opts = "<option value='all'>Todas las categorías</option>";
-        categories.forEach(cat => { opts += "<option value='" + cat.key + "'>" + cat.label + "</option>"; });
-        els.adminFilter.innerHTML = opts;
-      }
-      if(els.modalProductCategory){
-        let mOpts = "";
-        categories.forEach(cat => { mOpts += "<option value='" + cat.key + "'>" + cat.label + "</option>"; });
-        els.modalProductCategory.innerHTML = mOpts;
-      }
-    }
-
-    function renderCatalog(){
-      if(!els.catalogGrid) return;
-      const list = filteredProducts();
-      
-      if(els.catalogTitle) els.catalogTitle.textContent = state.filterCategory === "all" ? "Todos los productos" : "Mostrando: " + getCategoryLabel(state.filterCategory);
-      if(els.catalogMeta) els.catalogMeta.textContent = state.filterCategory === "all" ? "Catálogo completo." : "Filtrado por categoría.";
-      if(els.clearFiltersBtn) els.clearFiltersBtn.style.display = state.filterCategory === "all" ? "none" : "inline-flex";
-
-      if(list.length === 0){
-        els.catalogGrid.innerHTML = "<div class='empty'>No hay productos visibles para esta categoría.</div>";
-        return;
-      }
-
-      let html = "";
-      list.forEach(item => {
-        html += "<article class='product-card'>";
-        html += "<div class='product-media'><img src='" + escapeHtml(productImage(item)) + "' alt='" + escapeHtml(item.name) + "' loading='lazy' onerror=\"this.onerror=null;this.src='https://via.placeholder.com/400x300?text=HiBRID';\"></div>";
-        html += "<div class='product-body'><div class='product-top'><div><span class='badge'>" + getCategoryLabel(item.category) + "</span>";
-        html += "<h4 class='product-title' style='margin-top:.7rem'>" + escapeHtml(item.name) + "</h4></div>";
-        html += "<div class='price'>" + formatPrice(item.price) + "</div></div>";
-        html += "<p class='small muted'>" + escapeHtml(item.description) + "</p>";
-        html += "<button class='btn primary full' type='button' data-add='" + escapeHtml(item.id) + "'>Agregar al carrito</button>";
-        html += "</div></article>";
-      });
-      els.catalogGrid.innerHTML = html;
-    }
-
-    function getProductById(id){ return state.products.find(item => item.id === id); }
-    function syncCart(){ state.cart = state.cart.filter(item => getProductById(item.id)); }
-
-    function detailedCart(){
-      syncCart();
-      const result = [];
-      state.cart.forEach(item => {
-        const product = getProductById(item.id);
-        if(product){ result.push({ id: item.id, quantity: item.quantity, product: product, subtotal: (product.price || 0) * item.quantity }); }
-      });
-      return result;
-    }
-
-    function addToCart(id){
-      const item = state.cart.find(row => row.id === id);
-      if(item){
-         item.quantity += 1;
-      } else {
-         state.cart.push({ id: id, quantity: 1 });
-      }
-      saveCartData();
-      updateCartStats();
-      showNotice("Producto agregado al carrito.", "success");
-    }
-
-    function changeQty(id, delta){
-      const item = state.cart.find(row => row.id === id);
-      if(!item) return;
-      item.quantity += delta;
-      if(item.quantity <= 0){
-         state.cart = state.cart.filter(row => row.id !== id);
-      }
-      saveCartData();
-      renderCart();
-      updateCartStats();
-    }
-
-    function removeFromCart(id){
-      state.cart = state.cart.filter(item => item.id !== id);
-      saveCartData();
-      renderCart();
-      updateCartStats();
-      showNotice("Producto quitado del carrito.", "info");
-    }
-
-    function clearCart(){
-      state.cart = [];
-      saveCartData();
-      renderCart();
-      updateCartStats();
-      showNotice("Carrito vaciado.", "info");
-    }
-
-    function renderCart(){
-      if(!els.cartList || !els.summaryBox) return;
-      const items = detailedCart();
-      
-      if(items.length === 0){
-        els.cartList.innerHTML = "<div class='empty'>Tu carrito está vacío. Agrega productos desde el catálogo.</div>";
-        els.summaryBox.innerHTML = "<div class='summary-line'><span>Productos</span><strong>0</strong></div><div class='summary-line'><span>Total</span><strong>" + formatPrice(0) + "</strong></div>";
-        return;
-      }
-
-      let html = "";
-      items.forEach(item => {
-        html += "<article class='cart-item'>";
-        html += "<img src='" + escapeHtml(productImage(item.product)) + "' alt='img' loading='lazy' onerror=\"this.onerror=null;this.src='https://via.placeholder.com/400x300?text=HiBRID';\">";
-        html += "<div><span class='badge'>" + getCategoryLabel(item.product.category) + "</span>";
-        html += "<h4 style='margin-top:.6rem;font-weight:900'>" + escapeHtml(item.product.name) + "</h4>";
-        html += "<p class='small muted' style='margin-top:.3rem'>" + escapeHtml(item.product.description) + "</p>";
-        html += "<div class='qty-row'>";
-        html += "<button class='btn secondary small' type='button' data-qty='minus' data-id='" + escapeHtml(item.id) + "'>−</button>";
-        html += "<button class='btn secondary small' type='button' data-qty='plus' data-id='" + escapeHtml(item.id) + "'>+</button>";
-        html += "<button class='btn ghost small' type='button' data-remove='" + escapeHtml(item.id) + "'>Quitar</button>";
-        html += "</div></div>";
-        html += "<div style='text-align:right'><div class='tiny muted'>Cantidad: " + item.quantity + "</div>";
-        html += "<div class='tiny muted' style='margin-top:.35rem'>Unitario: " + formatPrice(item.product.price) + "</div>";
-        html += "<strong style='display:block;margin-top:.65rem'>" + formatPrice(item.subtotal) + "</strong></div></article>";
-      });
-      els.cartList.innerHTML = html;
-
-      let totalUnits = 0;
-      let total = 0;
-      items.forEach(item => { totalUnits += item.quantity; total += item.subtotal; });
-      
-      let sumHtml = "<div class='summary-line'><span>Líneas cotizadas</span><strong>" + items.length + "</strong></div>";
-      sumHtml += "<div class='summary-line'><span>Unidades totales</span><strong>" + totalUnits + "</strong></div>";
-      sumHtml += "<div class='summary-line'><span>Total estimado</span><strong>" + formatPrice(total) + "</strong></div>";
-      els.summaryBox.innerHTML = sumHtml;
-    }
-
-    function updateCartStats(){
-      const items = detailedCart();
-      let qty = 0;
-      let total = 0;
-      items.forEach(item => { qty += item.quantity; total += item.subtotal; });
-      
-      if(els.stickyCartCount){
-        els.stickyCartCount.textContent = qty + (qty === 1 ? " producto" : " productos");
-      }
-      if(els.stickyCartTotal){
-        els.stickyCartTotal.textContent = formatPrice(total);
-      }
-    }
-
-    function sendWhatsApp(){
-      const items = detailedCart();
-
-      if(items.length === 0){
-        showNotice("Primero agrega productos al carrito.", "error");
-        return;
-      }
-
-      let total = 0;
-      let text = "Hola HiBRID, quiero más información sobre estos productos:\n\n";
-
-      items.forEach((item, index) => {
-        total += item.subtotal;
-        text += (index + 1) + ". " + item.product.name + " | Cant: " + item.quantity + " | Unitario: " + formatPrice(item.product.price) + " | Subtotal: " + formatPrice(item.subtotal) + "\n";
-      });
-
-      text += "\nTotal estimado: " + formatPrice(total) + "\n\nNota: Esta simulación y sus precios son estrictamente de referencia. La configuración final debe ser verificada por nuestro equipo técnico.";
-      
-      window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(text), "_blank", "noopener");
-    }
-
-    function calculateSystem(){
-      if(!els.powerInput || !els.batteryPercent || !els.projectUse || !els.calcResult) return;
-
-      const monthlyKwh = Number(els.powerInput.value || 0);
-      const batteryRatio = Number(els.batteryPercent.value || 0) / 100;
-      const use = els.projectUse.value;
-
-      if(!monthlyKwh || monthlyKwh <= 0){
-        els.calcResult.innerHTML = "<p class='small' style='color:#ffc1c1;margin-top:1rem'>Ingresa tu consumo mensual en kWh.</p>";
-        return;
-      }
-
-      const dailyKwh = monthlyKwh / 30;
-      let hsp = 4.5; 
-      let efficiency = 0.80;
-      
-      if(use === "parcela") {
-         hsp = 2.5; 
-         efficiency = 0.70; 
-      }
-
-      const panelPowerKw = 0.55; 
-      const areaPerPanel = 2.5;
-
-      const requiredKw = dailyKwh / (hsp * efficiency);
-      let panels = Math.ceil(requiredKw / panelPowerKw);
-      if(panels < 1) panels = 1;
-      
-      const totalInstalledKwNumber = panels * panelPowerKw;
-      const area = panels * areaPerPanel;
-      const batteryKwh = (dailyKwh * batteryRatio).toFixed(1);
-      
-      let numBatteries = Math.ceil(batteryKwh / 5.12);
-      if(numBatteries < 1) numBatteries = 1;
-
-      let inverter = "Inversor Monofásico 3kW - 5kW";
-      if(totalInstalledKwNumber > 5 && totalInstalledKwNumber <= 10) inverter = "Inversor Monofásico 8kW u Off-Grid 6kW";
-      if(totalInstalledKwNumber > 10) inverter = "Inversores en Paralelo o Sistema Trifásico";
-
-      let useNote = "Cálculo On-Grid/Híbrido: Dimensionado con el promedio solar.";
-      if(use === "parcela") {
-        useNote = "Cálculo Off-Grid/Aislado: Dimensionado para funcionar de forma estable incluso en meses de invierno.";
-      }
-
-      let html = "<div class='calc-result'><h4 style='margin-bottom:.7rem; color:var(--color-primary);'>Solución Recomendada</h4>";
-      html += "<p class='small' style='margin-bottom:1rem'>Para un consumo de <strong>" + monthlyKwh + " kWh/mes</strong>:</p>";
-      html += "<div class='calc-grid'>";
-      html += "<div><strong>Paneles Solares:</strong><br>" + panels + " módulos de 550W<br><span class='tiny muted'>Potencia: " + totalInstalledKwNumber.toFixed(2) + " kWp</span></div>";
-      html += "<div><strong>Inversor Sugerido:</strong><br>" + inverter + "<br><span class='tiny muted'>Según capacidad</span></div>";
-      html += "<div><strong>Banco de Baterías:</strong><br>" + numBatteries + "x Litio 5.12kWh<br><span class='tiny muted'>Respaldo: " + batteryKwh + " kWh</span></div>";
-      html += "<div><strong>Espacio en Techo:</strong><br>" + area + " m²<br><span class='tiny muted'>Área libre de sombras</span></div>";
-      html += "</div><p class='small muted' style='margin-top:1rem'>" + useNote + "</p>";
-      
-      const wText = `Hola HiBRID, usé su calculadora web.\nNecesito cotizar un sistema con:\n- Consumo: ${monthlyKwh} kWh/mes\n- Autonomía Baterías: ${els.batteryPercent.value}%\n- Uso: ${use}\n\n*Nota: Entiendo que esto es de referencia y requiere evaluación.*`;
-      html += `<button type='button' class='btn primary' style='margin-top:1rem; width:100%;' onclick="window.open('https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(wText)}', '_blank')">Cotizar este Sistema por WhatsApp</button>`;
-      
-      html += "<p class='tiny muted' style='margin-top:1rem; border-top:1px solid var(--color-border); padding-top:.5rem;'>Nota: Esta simulación y sus precios son estrictamente de referencia.</p></div>";
-      
-      els.calcResult.innerHTML = html;
-    }
-
-    function adminFilteredProducts(){
-      if(!els.adminFilter) return state.products.slice();
-      const filter = els.adminFilter.value || "all";
-      if(filter === "all"){
-         return state.products.slice();
-      }
-      return state.products.filter(item => item.category === filter);
-    }
-
-    function renderAdmin(){
-      if(!state.adminUnlocked || !els.adminInventoryList) return;
-
-      if(els.statTotal) els.statTotal.textContent = state.products.length;
-      if(els.statVisible) els.statVisible.textContent = state.products.filter(p => p.visible === true).length;
-      if(els.statHidden) els.statHidden.textContent = state.products.filter(p => p.visible === false).length;
-
-      const list = adminFilteredProducts();
-      
-      if(list.length === 0){
-        els.adminInventoryList.innerHTML = "<div class='empty'>No hay productos en esta categoría.</div>";
-        return;
-      }
-
-      let html = "";
-      list.forEach(item => {
-        let isChecked = item.visible ? "checked" : "";
-        html += "<div class='inv-item'>";
-        html += "<img src='" + escapeHtml(productImage(item)) + "' alt='img' onerror=\"this.onerror=null;this.src='https://via.placeholder.com/400x300?text=HiBRID';\">";
-        html += "<div class='inv-info'><h4>" + escapeHtml(item.name) + "</h4>";
-        html += "<div class='tiny muted'>Cat: " + getCategoryLabel(item.category) + " | Precio: " + formatPrice(item.price) + "</div></div>";
-        
-        html += "<div class='inv-actions'>";
-        html += "<label class='switch' title='Activar/Ocultar'><input type='checkbox' data-toggle-id='" + escapeHtml(item.id) + "' " + isChecked + "><span class='slider'></span></label>";
-        
-        html += "<button class='btn secondary small' style='margin-left:.5rem' type='button' data-edit-id='" + escapeHtml(item.id) + "'>Editar</button>";
-        html += "<button class='btn secondary small' type='button' data-duplicate-id='" + escapeHtml(item.id) + "'>Duplicar</button>";
-        html += "<button class='btn danger small' type='button' data-delete-id='" + escapeHtml(item.id) + "'><i class='fa-solid fa-trash'></i></button>";
-        html += "</div></div>";
-      });
-
-      els.adminInventoryList.innerHTML = html;
-    }
-
-    // --- ACCIONES ADMIN CONECTADAS A RENDER ---
-    async function toggleVisibility(id) {
-       const item = state.products.find(p => p.id === id);
-       if(!item) return;
-
-       try {
-         const res = await fetch(`${API_URL}/api/products/${id}/visibility`, {
-           method: "PATCH",
-           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${state.adminToken}`, "If-Match": item.etag },
-           body: JSON.stringify({ visible: !item.visible })
-         });
-         if (!res.ok) handleApiError(res);
-         
-         showNotice(!item.visible ? "Producto Publicado" : "Producto Oculto", "info");
-         await fetchProducts();
-       } catch(e) { 
-         showNotice(e.message, "error"); 
-         if (e.message.includes("Conflicto")) await fetchProducts();
-       }
-    }
-
-    async function duplicateProduct(id) {
-       const original = state.products.find(p => p.id === id);
-       if(!original) return;
-
-       const payload = {
-          name: original.name + " (Copia)",
-          price: original.price,
-          description: original.description,
-          category: original.category,
-          image_url: original.image_url || original.image,
-          visible: false // SIEMPRE BORRADOR POR DEFECTO
-       };
-
-       try {
-         const res = await fetch(`${API_URL}/api/products`, {
-           method: "POST",
-           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${state.adminToken}` },
-           body: JSON.stringify(payload)
-         });
-         if(!res.ok) handleApiError(res);
-
-         showNotice("Producto duplicado como borrador.", "success");
-         await fetchProducts();
-       } catch(e) { showNotice(e.message, "error"); }
-    }
-
-    async function deleteProduct(id) {
-      if (!confirm("¿Estás seguro de que deseas eliminar permanentemente este producto del catálogo?")) return;
-      const item = state.products.find(p => p.id === id);
-      if(!item) return;
-
-      try {
-        const res = await fetch(`${API_URL}/api/products/${id}`, {
-          method: "DELETE",
-          headers: { "Authorization": `Bearer ${state.adminToken}`, "If-Match": item.etag }
-        });
-        if (!res.ok && res.status !== 204) handleApiError(res);
-
-        state.cart = state.cart.filter(row => row.id !== id);
-        saveCartData();
-        showNotice("Producto eliminado correctamente.", "success");
-        await fetchProducts();
-      } catch(e) { showNotice(e.message, "error"); }
-    }
-
-    async function saveModalProduct(e) {
-      e.preventDefault();
-
-      const idVal = els.modalProductId ? els.modalProductId.value.trim() : "";
-      const isNew = idVal === "";
-
-      const name = els.modalProductName ? els.modalProductName.value.trim() : "";
-      const description = els.modalProductDesc ? els.modalProductDesc.value.trim() : "";
-      const price = els.modalProductPrice ? Number(els.modalProductPrice.value || 0) : 0;
-      const category = els.modalProductCategory ? els.modalProductCategory.value : "principales";
-      
-      const galleryImage = els.modalProductImage ? els.modalProductImage.value.trim() : "";
-      const customImage = els.modalProductImageUrl ? els.modalProductImageUrl.value.trim() : "";
-      const image = customImage !== "" ? customImage : galleryImage;
-
-      if (!name || !description) { showNotice("Nombre y descripción obligatorios.", "error"); return; }
-      if (!Number.isFinite(price) || price < 0) { showNotice("Precio inválido.", "error"); return; }
-      if (!image) { showNotice("Selecciona una imagen.", "error"); return; }
-
-      const existing = isNew ? null : state.products.find(p => p.id === idVal);
-      if (!isNew && !existing) { showNotice("El producto ya no existe.", "error"); return; }
-
-      // UNIFICADO A image_url - SI ES NUEVO NACE COMO BORRADOR
-      const payload = { 
-        name, 
-        description, 
-        price, 
-        category, 
-        image_url: image, 
-        visible: isNew ? false : existing.visible 
-      };
-
-      const url = `${API_URL}/api/products${isNew ? '' : `/${existing.id}`}`;
-      const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${state.adminToken}` };
-      if (!isNew) headers["If-Match"] = existing.etag;
-
-      try {
-        const res = await fetch(url, { method: isNew ? "POST" : "PATCH", headers, body: JSON.stringify(payload) });
-        if (!res.ok) handleApiError(res);
-
-        showNotice(isNew ? "Producto creado como borrador" : "Producto actualizado", "success");
-        closeModal();
-        await fetchProducts();
-      } catch (error) { showNotice(error.message, "error"); }
-    }
-
-    async function loginAdmin() {
-      if (!els.adminPass) return;
-      const token = els.adminPass.value.trim();
-      try {
-        const res = await fetch(`${API_URL}/api/admin/session`, {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (!res.ok) throw new Error();
-
-        state.adminUnlocked = true;
-        state.adminToken = token;
-        localStorage.setItem("hibrid_token", token);
-        els.adminPass.value = "";
-        routeTo("admin");
-        showNotice("Acceso concedido.", "success");
-        await fetchProducts();
-      } catch (e) { showNotice("Contraseña incorrecta.", "error"); }
-    }
-
-    function openModal(productId = null) {
-       if(!els.productModal) return;
-       els.productModal.classList.add("active");
-       
-       if(productId){
-          const item = state.products.find(p => p.id === productId);
-          if(!item) return;
-
-          if(els.modalTitle) els.modalTitle.textContent = "Editar Producto";
-          if(els.modalProductId) els.modalProductId.value = item.id;
-          if(els.modalProductName) els.modalProductName.value = item.name;
-          if(els.modalProductCategory) els.modalProductCategory.value = item.category;
-          if(els.modalProductPrice) els.modalProductPrice.value = item.price;
-          if(els.modalProductDesc) els.modalProductDesc.value = item.description;
-          
-          const rawImg = item.image_url || item.image || "";
-          if(els.modalProductImage) els.modalProductImage.value = rawImg.replace('./', '');
-          
-          if(els.modalProductImageUrl){
-             const library = imageLibrary.catalog[item.category] || [];
-             if(rawImg && !library.includes(rawImg)){
-                els.modalProductImageUrl.value = rawImg || "";
-             } else { els.modalProductImageUrl.value = ""; }
-          }
-       } else {
-          if(els.modalTitle) els.modalTitle.textContent = "Nuevo Producto";
-          if(els.modalProductId) els.modalProductId.value = "";
-          if(els.modalProductName) els.modalProductName.value = "";
-          const defaultCat = (els.adminFilter && els.adminFilter.value !== "all") ? els.adminFilter.value : "principales";
-          if(els.modalProductCategory) els.modalProductCategory.value = defaultCat;
-          if(els.modalProductPrice) els.modalProductPrice.value = "";
-          if(els.modalProductDesc) els.modalProductDesc.value = "";
-          
-          const fallbackImage = (imageLibrary.catalog[defaultCat] || ["paneles.jpg"])[0];
-          if(els.modalProductImage) els.modalProductImage.value = fallbackImage;
-          if(els.modalProductImageUrl) els.modalProductImageUrl.value = "";
-       }
-       renderModalGallery();
-    }
-
-    function closeModal() { if(els.productModal) els.productModal.classList.remove("active"); }
-
-    function renderModalGallery() {
-       if(!els.modalGalleryGrid) return;
-       const category = els.modalProductCategory ? els.modalProductCategory.value : "principales";
-       const images = imageLibrary.catalog[category] || [];
-       const current = els.modalProductImage ? els.modalProductImage.value : "";
-
-       let html = "";
-       images.forEach(img => {
-          const activeClass = current === img ? "active" : "";
-          const imgSrc = img.startsWith('http') || img.startsWith('/') ? img : './' + img;
-          html += "<button class='gallery-item " + activeClass + "' type='button' data-modal-img='" + escapeHtml(img) + "'>";
-          html += "<img src='" + escapeHtml(imgSrc) + "' loading='lazy' onerror=\"this.onerror=null;this.src='https://via.placeholder.com/400x300?text=HiBRID';\"></button>";
-       });
-       if(images.length === 0) html = "<div class='small muted'>No hay imágenes para esta categoría.</div>";
-       els.modalGalleryGrid.innerHTML = html;
-    }
-
-    function renderAll(){
-      renderCategoryButtons();
-      renderCatalog();
-      renderCart();
-      if(state.adminUnlocked) renderAdmin();
-    }
-
-    document.addEventListener("click", (event) => {
-      const routeBtn = event.target.closest("[data-route]");
-      if(routeBtn) routeTo(routeBtn.dataset.route);
-
-      const catBtn = event.target.closest("[data-select-category]");
-      if(catBtn){
-        state.filterCategory = catBtn.dataset.selectCategory;
-        renderCategoryButtons(); renderCatalog();
-        if(state.route !== "home") routeTo("home");
-        setTimeout(() => {
-          const catalogSection = document.getElementById("catalogMetaJump");
-          if(catalogSection) catalogSection.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 50);
-      }
-
-      const clearBtn = event.target.closest("#clearFiltersBtn");
-      if(clearBtn){ state.filterCategory = "all"; renderCategoryButtons(); renderCatalog(); }
-
-      const addBtn = event.target.closest("[data-add]");
-      if(addBtn) addToCart(addBtn.dataset.add);
-
-      const qtyBtn = event.target.closest("[data-qty]");
-      if(qtyBtn){
-         if(qtyBtn.dataset.qty === "plus") changeQty(qtyBtn.dataset.id, 1);
-         else changeQty(qtyBtn.dataset.id, -1);
-      }
-
-      const removeBtn = event.target.closest("[data-remove]");
-      if(removeBtn) removeFromCart(removeBtn.dataset.remove);
-
-      const editBtn = event.target.closest("[data-edit-id]");
-      if(editBtn) openModal(editBtn.dataset.editId);
-
-      const dupBtn = event.target.closest("[data-duplicate-id]");
-      if(dupBtn) duplicateProduct(dupBtn.dataset.duplicateId);
-
-      const delBtn = event.target.closest("[data-delete-id]");
-      if(delBtn) deleteProduct(delBtn.dataset.deleteId);
-
-      const modalImgBtn = event.target.closest("[data-modal-img]");
-      if(modalImgBtn){
-         if(els.modalProductImage) els.modalProductImage.value = modalImgBtn.dataset.modalImg;
-         if(els.modalProductImageUrl) els.modalProductImageUrl.value = "";
-         renderModalGallery();
-      }
-
-      if(event.target === els.productModal) closeModal();
-    });
-
-    document.addEventListener("change", (e) => {
-       if(e.target.matches("[data-toggle-id]")) toggleVisibility(e.target.dataset.toggleId);
-    });
-
-    if(els.whatsappBtn) els.whatsappBtn.addEventListener("click", sendWhatsApp);
-    if(els.clearCartBtn) els.clearCartBtn.addEventListener("click", clearCart);
-    if(els.calculateBtn) els.calculateBtn.addEventListener("click", calculateSystem);
-    if(els.adminLoginBtn) els.adminLoginBtn.addEventListener("click", loginAdmin);
-    if(els.adminPass) els.adminPass.addEventListener("keydown", e => { if(e.key === "Enter") loginAdmin(); });
-    if(els.adminFilter) els.adminFilter.addEventListener("change", () => renderAdmin());
-    if(els.btnOpenNewProduct) els.btnOpenNewProduct.addEventListener("click", () => openModal(null));
-    if(els.btnCloseModal) els.btnCloseModal.addEventListener("click", closeModal);
-    if(els.modalForm) els.modalForm.addEventListener("submit", saveModalProduct);
-    
-    if(els.modalProductCategory){
-      els.modalProductCategory.addEventListener("change", () => {
-        const category = els.modalProductCategory.value;
-        const library = imageLibrary.catalog[category] || [];
-        if(library.length > 0 && (!els.modalProductImage || !library.includes(els.modalProductImage.value))){
-           if(els.modalProductImage) els.modalProductImage.value = library[0];
-        }
-        renderModalGallery();
-      });
-    }
-
-    loadCartData();
-    fetchProducts();
-    routeTo("home");
-  </script>
+  <script src="./hibrid.js"></script>
 </body>
 </html>
