@@ -1,1368 +1,674 @@
-```html
-<!DOCTYPE html>
-<html lang="es" data-theme="dark">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HiBRID | Tienda y Cotizador Energético</title>
-  <meta name="description" content="Tienda y cotizador de energía solar y eólica con catálogo, carrito, calculadora y administrador.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+```react
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { 
+  Sun, Settings, CheckCircle, AlertCircle, 
+  Eye, EyeOff, Trash2, Plus, Edit3, X, Calculator, Send, Loader2
+} from 'lucide-react';
 
-  <style>
-    :root,[data-theme="light"]{
-      --text-xs:clamp(.75rem,.7rem + .25vw,.875rem);
-      --text-sm:clamp(.875rem,.8rem + .35vw,1rem);
-      --text-base:clamp(1rem,.95rem + .25vw,1.08rem);
-      --text-lg:clamp(1.125rem,1rem + .75vw,1.45rem);
-      --text-xl:clamp(1.5rem,1.25rem + 1.15vw,2rem);
+// Extracción segura de variables de entorno (Runtime vs Build time)
+const getRuntimeConfig = () => {
+  if (typeof window !== 'undefined' && window.env) return window.env;
+  return {};
+};
 
-      --space-1:.25rem; --space-2:.5rem; --space-3:.75rem; --space-4:1rem; --space-5:1.25rem; --space-6:1.5rem; --space-8:2rem; --space-10:2.5rem; --space-12:3rem; --space-16:4rem;
+// Utilidad para resolver rutas de imágenes respetando contratos y el BASE_URL
+function resolveImageSrc(rawImage) {
+  if (!rawImage) return null;
+  if (/^https?:\/\//i.test(rawImage)) return rawImage;
+  // Si la ruta ya es absoluta desde la raíz, se respeta; sino, se anexa BASE_URL
+  return rawImage.startsWith('/')
+    ? rawImage
+    : `${import.meta.env.BASE_URL || '/'}${rawImage}`;
+}
 
-      --color-border:rgba(28,38,34,.12);
-      --color-divider:rgba(28,38,34,.08);
-      --color-text:#111814;
-      --color-text-muted:#61726b;
-      --color-text-faint:#93a19b;
-      --color-text-inverse:#07100a;
-      --color-primary:#28d26d;
-      --color-primary-hover:#1fbb5e;
-      --color-primary-highlight:rgba(40,210,109,.14);
-      --shadow-sm:0 2px 10px rgba(11,17,24,.06);
-      --shadow-md:0 14px 36px rgba(11,17,24,.08);
-      --shadow-lg:0 24px 58px rgba(11,17,24,.12);
-      --radius-sm:.5rem; --radius-md:.85rem; --radius-lg:1.1rem; --radius-xl:1.45rem; --radius-full:999px;
-      --font-body:'Satoshi',system-ui,sans-serif;
-      --max:1260px;
-      --transition:180ms cubic-bezier(.16,1,.3,1);
-    }
+// Componente seguro para manejo de imágenes con fallback
+function ProductImage({ product }) {
+  const [failed, setFailed] = useState(false);
+  const src = resolveImageSrc(product.image_url || product.image);
 
-    [data-theme="dark"]{
-      --color-bg:#081017;
-      --color-surface:#0f1921;
-      --color-border:rgba(231,242,237,.12);
-      --color-divider:rgba(231,242,237,.08);
-      --color-text:#eef7f2;
-      --color-text-muted:#a4b7b2;
-      --color-text-faint:#7d918b;
-      --color-text-inverse:#06100b;
-      --color-primary:#28d26d;
-      --color-primary-hover:#1fbe61;
-      --color-primary-highlight:rgba(40,210,109,.12);
-      --shadow-sm:0 2px 10px rgba(0,0,0,.22);
-      --shadow-md:0 18px 40px rgba(0,0,0,.28);
-      --shadow-lg:0 28px 62px rgba(0,0,0,.36);
-    }
-
-    *,:before,:after{box-sizing:border-box;margin:0;padding:0}
-    html{-webkit-text-size-adjust:none;text-size-adjust:none;scroll-behavior:smooth}
-    body{
-      min-height:100dvh;
-      font-family:var(--font-body);
-      font-size:var(--text-base);
-      line-height:1.6;
-      color:var(--color-text);
-      background: linear-gradient(180deg,#071016 0%, #0d161e 100%);
-      display: flex;
-      flex-direction: column;
-    }
-
-    img,svg{display:block;max-width:100%;height:auto}
-    button,input,textarea,select{font:inherit;color:inherit}
-    button{cursor:pointer;background:none;border:0;text-align:left;}
-    :focus-visible{outline:2px solid var(--color-primary);outline-offset:3px;border-radius:var(--radius-sm)}
-
-    .topbar{
-      position:sticky;top:0;z-index:90;
-      background:rgba(10,17,24,.88);
-      border-bottom:1px solid var(--color-border);
-      backdrop-filter:blur(14px);
-    }
-
-    .topbar-inner{
-      width:min(calc(100% - 24px), var(--max));
-      margin:auto;
-      padding:var(--space-3) 0;
-      display:flex;
-      flex-wrap:wrap;
-      gap:var(--space-4);
-      align-items:center;
-      justify-content:space-between;
-    }
-
-    .logo-shell{
-      display:flex;
-      align-items:center;
-    }
-    .logo-img{
-      width:100%;
-      max-width:280px;
-      height:auto;
-      max-height:75px;
-      object-fit:contain;
-    }
-
-    .nav{display:flex;gap:var(--space-2);flex-wrap:wrap;align-items:center;}
-
-    .btn{
-      min-height:46px;padding:.85rem 1rem;border-radius:var(--radius-md);
-      display:inline-flex;align-items:center;justify-content:center;gap:.55rem;
-      border:1px solid transparent;font-size:var(--text-sm);font-weight:800;
-      transition:all var(--transition);
-      text-align:center;
-    }
-    .btn:hover{transform:translateY(-1px)}
-    .btn.primary{background:var(--color-primary);border-color:var(--color-primary);color:var(--color-text-inverse)}
-    .btn.primary:hover{background:var(--color-primary-hover);border-color:var(--color-primary-hover)}
-    .btn.secondary{background:rgba(255,255,255,.03);border-color:var(--color-border)}
-    .btn.secondary:hover{background:rgba(255,255,255,.06)}
-    .btn.ghost{background:transparent;border-color:var(--color-border)}
-    .btn.danger{background:rgba(255,113,113,.12);border-color:rgba(255,113,113,.28);color:#ffd1d1}
-    .btn.small{min-height:38px;padding:.6rem .85rem;border-radius:.8rem;font-size:var(--text-xs);}
-    .btn.full{width:100%}
-
-    .social-links{
-      display:flex;
-      align-items:center;
-      gap:.45rem;
-      margin-left:.35rem;
-      padding-left:.7rem;
-      border-left:1px solid var(--color-border);
-    }
-    .social-link{
-      width:40px;
-      height:40px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:var(--radius-full);
-      border:1px solid var(--color-border);
-      background:rgba(255,255,255,.04);
-      color:var(--color-text-muted);
-      font-size:1rem;
-      transition: transform var(--transition), color var(--transition), background var(--transition), border-color var(--transition);
-    }
-    .social-link:hover{
-      transform:translateY(-2px);
-      color:#ffffff;
-    }
-    .social-link.facebook:hover{background:#1877f2; border-color:#1877f2;}
-    .social-link.instagram:hover{background:linear-gradient(135deg,#feda75,#d62976,#4f5bd5); border-color:#d62976;}
-    .social-link.whatsapp:hover{background:#25d366; border-color:#25d366;}
-    .social-link.tiktok:hover{background:#111111; border-color:#ffffff;}
-
-    .page{flex: 1; width:min(calc(100% - 24px), var(--max));margin:auto;padding:var(--space-8) 0 var(--space-16)}
-    .view{display:none}
-    .view.active{display:block}
-
-    .panel,.product-card,.cart-card,.summary-card,.admin-card,.notice,.login-card{
-      background:linear-gradient(180deg,rgba(15,25,33,.98),rgba(20,33,42,.98));
-      border:1px solid var(--color-border);
-      border-radius:var(--radius-xl);
-      box-shadow:var(--shadow-md);
-    }
-
-    .section-head{
-      display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);
-      margin:0 0 var(--space-4);
-      scroll-margin-top: 120px;
-    }
-    .section-head h3{font-size:var(--text-lg);font-weight:900;letter-spacing:-.02em}
-    .section-head p{font-size:var(--text-sm);color:var(--color-text-muted);margin-top:.2rem;}
-
-    .category-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-10);}
-    .category-card{
-      padding:0;
-      display:flex;
-      flex-direction:column;
-      min-height:180px;
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-lg);
-      background: linear-gradient(180deg,rgba(20,32,41,1),rgba(15,25,33,1));
-      transition:all var(--transition);
-      overflow:hidden;
-    }
-    .category-card:hover{
-      transform:translateY(-4px);
-      border-color:var(--color-primary);
-      box-shadow: var(--shadow-lg);
-    }
-    .category-card.active{
-      border-color:var(--color-primary);
-      box-shadow: 0 0 0 1px rgba(40,210,109,.5);
-    }
-    .cat-img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      background: #ffffff; 
-      border-bottom: 1px solid var(--color-border);
-    }
-    .cat-body {
-      padding: var(--space-3);
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-    .category-card strong {font-size:var(--text-base);font-weight:900; color:var(--color-text); text-transform:uppercase; letter-spacing:.05em;}
-    .category-card small {font-size:var(--text-sm);font-weight:400;color:var(--color-text-muted); margin-top:.2rem;}
-    .category-card span {margin-top:auto;font-size:var(--text-xs);color:var(--color-text-faint); padding-top: .6rem;}
-
-    .field,.select,.textarea{
-      width:100%;padding:.95rem 1rem;border-radius:var(--radius-md);border:1px solid var(--color-border);
-      background:rgba(255,255,255,.03);color:var(--color-text);outline:none
-    }
-    .textarea{min-height:110px;resize:vertical}
-    .field:focus,.select:focus,.textarea:focus{border-color:rgba(40,210,109,.5);box-shadow:0 0 0 3px rgba(40,210,109,.12)}
-
-    .catalog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4)}
-    .product-card{
-      overflow:hidden;display:grid;grid-template-rows:auto 1fr;
-      transition:transform var(--transition),border-color var(--transition),box-shadow var(--transition)
-    }
-    .product-card:hover{transform:translateY(-3px);border-color:rgba(40,210,109,.35);box-shadow:var(--shadow-lg)}
-    .product-media{aspect-ratio:4/3;background:#ffffff;overflow:hidden; display:flex; align-items:center; justify-content:center;}
-    .product-media img{width:100%;height:100%;object-fit:cover}
-    .product-body{padding:var(--space-4);display:grid;gap:var(--space-3)}
-    .product-top{display:flex;gap:var(--space-3);justify-content:space-between;align-items:start}
-    .product-title{font-size:var(--text-base);font-weight:900;line-height:1.15}
-    .price{font-size:var(--text-lg);font-weight:900;color:var(--color-primary);white-space:nowrap;font-variant-numeric:tabular-nums}
-
-    .badge{
-      display:inline-flex;align-items:center;gap:.4rem;padding:.34rem .72rem;border-radius:var(--radius-full);
-      background:var(--color-primary-highlight);color:var(--color-primary);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.07em
-    }
-
-    .empty{
-      grid-column:1/-1;padding:var(--space-8);text-align:center;color:var(--color-text-muted);
-      border:1px dashed var(--color-border);border-radius:var(--radius-lg);background:rgba(255,255,255,.02)
-    }
-
-    .calc-layout,.cart-layout{display:grid;gap:var(--space-5)}
-    .calc-layout{grid-template-columns:.92fr 1.08fr}
-    .cart-layout{grid-template-columns:1.18fr .82fr}
-
-    .panel,.cart-card,.summary-card,.admin-card,.login-card{padding:var(--space-5)}
-    .bill-box{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--color-border);background:#091118}
-    .bill-box img{width:100%;max-height:450px;object-fit:contain}
-    .calc-result{
-      margin-top:var(--space-4);padding:var(--space-5);border-radius:var(--radius-lg);
-      background:rgba(40,210,109,.06);border:1px solid rgba(40,210,109,.34)
-    }
-    .calc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
-
-    .cart-list{display:grid;gap:var(--space-4)}
-    .cart-item{
-      display:grid;grid-template-columns:96px 1fr auto;gap:var(--space-4);padding:var(--space-4);
-      border-radius:var(--radius-lg);background:rgba(255,255,255,.02);border:1px solid var(--color-border)
-    }
-    .cart-item img{width:96px;height:96px;border-radius:var(--radius-md);object-fit:cover;background:#ffffff;}
-    .qty-row{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-3)}
-    .summary-line{display:flex;justify-content:space-between;gap:var(--space-3);padding:var(--space-3) 0;border-bottom:1px solid var(--color-divider)}
-    .summary-line:last-child{border-bottom:0;padding-top:var(--space-4);font-size:var(--text-lg);font-weight:900}
-
-    .small,.tiny,.muted{color:var(--color-text-muted)}
-    .small{font-size:var(--text-sm)}
-    .tiny{font-size:var(--text-xs)}
-
-    .admin-inventory{display:grid;gap:var(--space-4);}
-    .admin-stats-row{display:grid;grid-template-columns:repeat(3, 1fr);gap:var(--space-3);margin-bottom:var(--space-4);}
-    .stat-card{background:rgba(255,255,255,.02);border:1px solid var(--color-border);padding:var(--space-4);border-radius:var(--radius-lg);text-align:center;}
-    .stat-card h4{font-size:var(--text-xl);color:var(--color-primary);margin-bottom:.2rem;}
-    .admin-controls{display:flex;gap:var(--space-3);justify-content:space-between;align-items:center;margin-bottom:var(--space-4);}
-    
-    .inventory-list{display:grid;grid-template-columns:1fr;gap:var(--space-3);}
-    .inv-item{
-      display:grid;grid-template-columns:80px 1fr auto;gap:var(--space-4);align-items:center;
-      padding:var(--space-3);border-radius:var(--radius-lg);background:rgba(255,255,255,.02);border:1px solid var(--color-border);
-    }
-    .inv-item img{width:80px;height:80px;object-fit:cover;border-radius:var(--radius-md);background:#fff;}
-    .inv-info h4{font-size:var(--text-base);font-weight:800;margin-bottom:.2rem;}
-    .inv-actions{display:flex;align-items:center;gap:var(--space-2);}
-    
-    .switch{position:relative;display:inline-block;width:44px;height:24px;}
-    .switch input{opacity:0;width:0;height:0;}
-    .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:rgba(255,255,255,.1);transition:.3s;border-radius:34px;border:1px solid var(--color-border);}
-    .slider:before{position:absolute;content:"";height:16px;width:16px;left:3px;bottom:3px;background-color:var(--color-text-muted);transition:.3s;border-radius:50%;}
-    input:checked + .slider{background-color:rgba(40,210,109,.2);border-color:var(--color-primary);}
-    input:checked + .slider:before{transform:translateX(20px);background-color:var(--color-primary);}
-
-    .modal-overlay{
-      position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);
-      z-index:1000;display:flex;align-items:center;justify-content:center;
-      opacity:0;visibility:hidden;transition:all var(--transition);
-    }
-    .modal-overlay.active{opacity:1;visibility:visible;}
-    .modal-content{
-      background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);
-      width:100%;max-width:700px;max-height:90vh;overflow-y:auto;padding:var(--space-6);
-      position:relative;transform:translateY(20px);transition:all var(--transition);
-    }
-    .modal-overlay.active .modal-content{transform:translateY(0);}
-    .btn-close-modal{
-      position:absolute;top:var(--space-4);right:var(--space-4);background:transparent;border:0;
-      color:var(--color-text-muted);font-size:1.5rem;cursor:pointer;
-    }
-    .btn-close-modal:hover{color:var(--color-text);}
-    
-    .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
-    .gallery-panel{border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);background:rgba(255,255,255,.02);margin-top:var(--space-4);}
-    .gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);max-height:200px;overflow:auto;}
-    .gallery-item{
-      border:2px solid transparent;background:rgba(255,255,255,.02);border-radius:var(--radius-md);
-      overflow:hidden;cursor:pointer;transition:all var(--transition);
-    }
-    .gallery-item:hover{border-color:rgba(40,210,109,.5);}
-    .gallery-item.active{border-color:var(--color-primary);box-shadow:0 0 0 2px rgba(40,210,109,.2);}
-    .gallery-item img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#ffffff;}
-
-    .notice-stack{
-      position:fixed;top:100px;right:var(--space-4);z-index:1200;display:grid;gap:var(--space-3);
-      width:min(360px,calc(100vw - 2rem))
-    }
-    .notice{padding:var(--space-4);display:flex;gap:var(--space-3);align-items:flex-start;border-radius:var(--radius-lg);background:rgba(15,25,33,.98);border:1px solid var(--color-border);box-shadow:var(--shadow-lg)}
-    
-    .sticky-cart{
-      position:fixed;right:var(--space-4);bottom:var(--space-4);z-index:70;display:flex;align-items:center;gap:var(--space-3);
-      padding:.75rem .82rem .75rem 1rem;border-radius:var(--radius-full);border:1px solid var(--color-border);
-      background:rgba(15,25,33,.94);backdrop-filter:blur(12px);box-shadow:var(--shadow-lg)
-    }
-    .sticky-cart strong{display:block;font-size:var(--text-sm)}
-    .sticky-cart span{display:block;font-size:var(--text-xs);color:var(--color-text-muted)}
-
-    .site-footer { text-align: center; padding: var(--space-8); margin-top: var(--space-12); border-top: 1px solid var(--color-border); padding-bottom: 120px; }
-
-    @media (max-width:1160px){
-      .calc-layout,.cart-layout{grid-template-columns:1fr}
-      .catalog-grid{grid-template-columns:repeat(2,1fr)}
-    }
-    @media (max-width:760px){
-      .topbar-inner{flex-direction:column; padding: var(--space-3); gap: var(--space-3);}
-      .logo-shell { justify-content:center; }
-      .nav{justify-content:center; width:100%;}
-      .social-links{width:100%; justify-content:center; margin-left:0; padding-left:0; padding-top:.65rem; border-left:0; border-top:1px solid var(--color-border);}
-      .category-grid{grid-template-columns:repeat(2,1fr); gap:var(--space-3);}
-      .catalog-grid,.form-grid,.calc-grid{grid-template-columns:1fr}
-      .cart-item,.inv-item{grid-template-columns:1fr; text-align:center;}
-      .inv-actions{justify-content:center;}
-      .cart-item img,.inv-item img{width:100%;height:auto;aspect-ratio:4/3;margin:auto;}
-      .sticky-cart{left:var(--space-3);right:var(--space-3);bottom:var(--space-3);justify-content:space-between;border-radius:var(--radius-xl)}
-      .notice-stack{left:var(--space-3);right:var(--space-3);width:auto}
-      .admin-stats-row{grid-template-columns:1fr;}
-      .admin-controls{flex-direction:column;}
-    }
-  </style>
-</head>
-<body>
-
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="logo-shell">
-        <img src="logotipohibrid.png" alt="Logo HiBRID" class="logo-img" loading="eager" onerror="this.onerror=null; this.style.display='none';">
+  if (!src || failed) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-slate-100">
+        <Sun size={48} className="text-amber-500/40" />
       </div>
-      <nav class="nav" aria-label="Navegación principal">
-        <button class="btn secondary nav-btn" type="button" data-route="home">Productos</button>
-        <button class="btn secondary nav-btn" type="button" data-route="calculator">Calculadora</button>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={product.name}
+      className="w-full h-full object-cover"
+      loading="lazy"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
+const emptyForm = {
+  name: '',
+  price: '',
+  description: '',
+  category: 'principales',
+  image: '',
+  visible: true,
+  nominalKW: 0
+};
+
+export default function App() {
+  // Estado de Navegación
+  const [activeTab, setActiveTab] = useState('catalog'); 
+  
+  // Estado de Autenticación Desacoplado
+  const [adminTokenInput, setAdminTokenInput] = useState('');
+  const [sessionToken, setSessionToken] = useState(null);
+  const adminAuthenticated = !!sessionToken;
+  
+  // Estado de Productos
+  const [products, setProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [productsError, setProductsError] = useState('');
+
+  // Estado del Inventario Dinámico de Activos
+  const [repositoryAssets, setRepositoryAssets] = useState([]);
+  const [loadingAssets, setLoadingAssets] = useState(false);
+
+  // Estado del Calculador Solar
+  const [calcKWh, setCalcKWh] = useState(15);
+  const [calcAutonomy, setCalcAutonomy] = useState(1);
+
+  // Estado del Modal de Edición/Creación Admin
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [formData, setFormData] = useState(emptyForm);
+
+  // Estado de Mensajería / Feedback
+  const [notification, setNotification] = useState(null);
+  const notificationTimerRef = useRef(null);
+
+  const showNotify = useCallback((msg, type = 'success') => {
+    setNotification({ msg, type });
+    if (notificationTimerRef.current) {
+      clearTimeout(notificationTimerRef.current);
+    }
+    notificationTimerRef.current = setTimeout(() => {
+      setNotification(null);
+      notificationTimerRef.current = null;
+    }, 4000);
+  }, []);
+
+  const resetForm = useCallback(() => {
+    setFormData(emptyForm);
+  }, []);
+
+  // Función memoizada para cargar/refrescar productos (soporta silent refresh)
+  const fetchProducts = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) setLoadingProducts(true);
+    setProductsError('');
+    try {
+      const headers = adminAuthenticated 
+        ? { Authorization: `Bearer ${sessionToken}` } 
+        : {};
+
+      const res = await fetch('/api/products', { headers });
+      if (!res.ok) throw new Error();
+
+      const data = await res.json();
+      setProducts(data);
+    } catch {
+      setProductsError('No fue posible conectar con el servidor para cargar el catálogo.');
+    } finally {
+      if (!silent) setLoadingProducts(false);
+    }
+  }, [adminAuthenticated, sessionToken]);
+
+  // Carga inicial del catálogo
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  // Carga dinámica de assets con normalización estricta de contrato
+  useEffect(() => {
+    if (activeTab !== 'admin' || !adminAuthenticated) return;
+
+    let cancelled = false;
+    async function loadRepositoryAssets() {
+      setLoadingAssets(true);
+      try {
+        const res = await fetch('/api/assets', {
+          headers: { Authorization: `Bearer ${sessionToken}` }
+        });
+        if (!res.ok) throw new Error();
         
-        <div class="social-links" aria-label="Redes sociales">
-          <a class="social-link facebook" href="https://www.facebook.com/hibridenergia" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">
-            <i class="fa-brands fa-facebook-f"></i>
-          </a>
-          <a class="social-link instagram" href="https://www.instagram.com/hibridenergia/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
-            <i class="fa-brands fa-instagram"></i>
-          </a>
-          <a class="social-link whatsapp" href="https://wa.me/56956139055?text=Hola%20HiBRID%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp">
-            <i class="fa-brands fa-whatsapp"></i>
-          </a>
-          <a class="social-link tiktok" href="https://www.tiktok.com/@hibrid976" target="_blank" rel="noopener noreferrer" aria-label="TikTok" title="TikTok">
-            <i class="fa-brands fa-tiktok"></i>
-          </a>
-        </div>
-      </nav>
-    </div>
-  </header>
+        const data = await res.json();
+        
+        if (!cancelled) {
+          const normalizeAsset = (asset) => {
+            const value = asset?.value || asset?.url || '';
+            const label = asset?.label || asset?.name || value;
+            return value ? { value, label } : null;
+          };
 
-  <main id="mainContent" class="page">
-    <section id="home" class="view active">
-      <div class="section-head">
-        <div>
-          <h3>Categorías</h3>
-          <p>Encuentra rápidamente la familia de producto que buscas.</p>
-        </div>
-      </div>
-      <div id="categoryGrid" class="category-grid"></div>
-
-      <div class="section-head" id="catalogMetaJump" style="margin-top: var(--space-6);">
-        <div>
-          <h3 id="catalogTitle">Todos los productos</h3>
-          <p id="catalogMeta">Catálogo completo.</p>
-        </div>
-        <button id="clearFiltersBtn" class="btn secondary small" type="button" style="display:none;">Ver todos</button>
-      </div>
-      <div id="catalogGrid" class="catalog-grid"></div>
-    </section>
-
-    <section id="calculator" class="view">
-      <div class="section-head" style="margin-top:0">
-        <div>
-          <h3>Calculadora Solar Inteligente</h3>
-          <p>Calcula tu kit ideal basado en lo que consumes al mes.</p>
-        </div>
-        <button class="btn ghost" type="button" data-route="home">Volver</button>
-      </div>
-
-      <div class="calc-layout">
-        <article class="panel">
-          <h3 style="margin-bottom:.6rem">Referencia visual</h3>
-          <p class="small muted" style="margin-bottom:1rem">Revisa el apartado de "Consumo" en tu boleta de luz para ingresar el valor exacto.</p>
-          <div class="bill-box">
-            <img src="boleta.jpg" alt="Referencia de boleta de luz" width="900" height="1200" loading="lazy" onerror="this.onerror=null; this.style.display='none';">
-          </div>
-        </article>
-
-        <article class="panel">
-          <h3 style="margin-bottom:.6rem">Ingresa tus datos</h3>
-          <p class="small muted">Simularemos un sistema con paneles de 550W (alta eficiencia) basándonos en tu requerimiento energético real.</p>
-          <div class="calc-grid" style="margin-top:1rem">
-            <div>
-              <label for="powerInput" style="display:block;margin-bottom:.45rem;font-weight:800;color:var(--color-primary);">Consumo mensual (kWh)</label>
-              <input id="powerInput" class="field" type="number" min="1" step="10" placeholder="Ej: 250">
-            </div>
-            <div>
-              <label for="batteryPercent" style="display:block;margin-bottom:.45rem;font-weight:800">Autonomía en Baterías (%)</label>
-              <input id="batteryPercent" class="field" type="number" min="0" max="100" step="10" value="50" placeholder="Ej: 50">
-            </div>
-            <div>
-              <label for="projectUse" style="display:block;margin-bottom:.45rem;font-weight:800">Tipo de proyecto</label>
-              <select id="projectUse" class="select">
-                <option value="hogar">Residencial / Hogar</option>
-                <option value="comercial">Comercial / Negocio</option>
-                <option value="parcela">Parcela / Off-Grid (Aislado)</option>
-              </select>
-            </div>
-          </div>
-          <div style="margin-top:1rem">
-            <button id="calculateBtn" class="btn primary full" type="button">Calcular mi sistema ideal</button>
-          </div>
-          <div id="calcResult"></div>
-        </article>
-      </div>
-    </section>
-
-    <section id="cart" class="view">
-      <div class="section-head" style="margin-top:0">
-        <div>
-          <h3>Carrito y cotización</h3>
-          <p>Revisa productos, cantidades, imagen, unitario, subtotal y total final.</p>
-        </div>
-        <button class="btn ghost" type="button" data-route="home">Seguir comprando</button>
-      </div>
-
-      <div class="cart-layout">
-        <article class="cart-card">
-          <div id="cartList" class="cart-list"></div>
-        </article>
-        <aside class="summary-card">
-          <h3 style="margin-bottom:.8rem">Resumen final</h3>
-          <div id="summaryBox"></div>
-          <div style="display:grid;gap:var(--space-3);margin-top:var(--space-5)">
-            <button id="whatsappBtn" class="btn primary full" type="button">Enviar a WhatsApp</button>
-            <button id="clearCartBtn" class="btn danger full" type="button">Vaciar carrito</button>
-            <p class="tiny muted">El mensaje incluirá productos, cantidades, subtotales y total estimado.</p>
-          </div>
-        </aside>
-      </div>
-    </section>
-
-    <section id="admin-login" class="view">
-      <div class="section-head" style="margin-top:0">
-        <div>
-          <h3>Administrador</h3>
-          <p>Acceso restringido para gestión de catálogo.</p>
-        </div>
-        <button class="btn ghost" type="button" data-route="home">Volver al inicio</button>
-      </div>
-      <div class="login-card" style="max-width:520px; margin: auto;">
-        <label for="adminPass" style="display:block;margin-bottom:.45rem;font-weight:800">Contraseña de acceso</label>
-        <input id="adminPass" class="field" type="password" placeholder="Ingresa contraseña">
-        <div style="display:grid;gap:var(--space-3);margin-top:1rem">
-          <button id="adminLoginBtn" class="btn primary full" type="button">Entrar al panel</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="admin" class="view">
-      <div class="section-head" style="margin-top:0">
-        <div>
-          <h3>Inventario HiBRID</h3>
-          <p>Gestiona todo tu catálogo de forma simple y rápida.</p>
-        </div>
-        <button class="btn ghost" type="button" data-route="home">Salir</button>
-      </div>
-
-      <div class="admin-inventory">
-        <div class="admin-stats-row">
-          <div class="stat-card">
-            <h4 id="statTotal">0</h4>
-            <span class="small muted">Total Productos</span>
-          </div>
-          <div class="stat-card">
-            <h4 id="statVisible" style="color:var(--color-primary)">0</h4>
-            <span class="small muted">Publicados</span>
-          </div>
-          <div class="stat-card">
-            <h4 id="statHidden" style="color:#ffc1c1">0</h4>
-            <span class="small muted">Ocultos</span>
-          </div>
-        </div>
-
-        <div class="admin-controls">
-          <select id="adminFilter" class="select" style="max-width:250px;"></select>
-          <div style="display:flex; gap:var(--space-2);">
-            <button id="btnOpenNewProduct" class="btn primary" type="button">Nuevo producto</button>
-          </div>
-        </div>
-
-        <div id="adminInventoryList" class="inventory-list"></div>
-      </div>
-    </section>
-  </main>
-
-  <div id="productModal" class="modal-overlay">
-    <div class="modal-content">
-      <button id="btnCloseModal" class="btn-close-modal">&times;</button>
-      <h3 id="modalTitle" style="margin-bottom:var(--space-4);">Nuevo Producto</h3>
-      
-      <form id="modalForm">
-        <input type="hidden" id="modalProductId">
-        <input type="hidden" id="modalProductImage">
-
-        <div class="form-grid">
-          <div>
-            <label style="display:block;margin-bottom:.45rem;font-weight:800">Nombre del producto *</label>
-            <input id="modalProductName" class="field" type="text" placeholder="Ej: Batería Litio 5kWh" required>
-          </div>
-          <div>
-            <label style="display:block;margin-bottom:.45rem;font-weight:800">Categoría *</label>
-            <select id="modalProductCategory" class="select" required></select>
-          </div>
-        </div>
-
-        <div class="form-grid" style="margin-top:var(--space-4);">
-          <div>
-            <label style="display:block;margin-bottom:.45rem;font-weight:800">Precio de referencia *</label>
-            <input id="modalProductPrice" class="field" type="number" min="0" step="1000" placeholder="0" required>
-          </div>
-          <div>
-            <label style="display:block;margin-bottom:.45rem;font-weight:800">Descripción *</label>
-            <input id="modalProductDesc" class="field" type="text" placeholder="Descripción breve" required>
-          </div>
-        </div>
-
-        <div class="gallery-panel">
-          <strong style="display:block;margin-bottom:var(--space-2)">Selecciona una imagen del catálogo:</strong>
-          <div id="modalGalleryGrid" class="gallery-grid"></div>
-          
-          <div style="margin-top:var(--space-4);">
-            <label for="modalProductImageUrl" style="display:block;margin-bottom:.45rem;font-weight:800">URL personalizada de imagen</label>
-            <input id="modalProductImageUrl" class="field" type="url" placeholder="https://ejemplo.com/imagen.jpg">
-            <p class="tiny muted" style="margin-top:.4rem">Opcional. Si la completas, tendrá prioridad sobre la imagen de la galería.</p>
-          </div>
-        </div>
-
-        <div style="margin-top:var(--space-5); display:flex; gap:var(--space-3);">
-          <button type="submit" class="btn primary full">Guardar Producto</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <footer class="site-footer">
-    <button class="btn ghost small" type="button" data-route="admin-login" style="color: var(--color-text-faint); border-color: transparent;">Acceso Administrador (Oculto)</button>
-  </footer>
-
-  <div class="sticky-cart">
-    <div>
-      <strong id="stickyCartCount">0 productos</strong>
-      <span id="stickyCartTotal">$0</span>
-    </div>
-    <button class="btn primary" type="button" data-route="cart">Ver carrito</button>
-  </div>
-
-  <div id="noticeStack" class="notice-stack" aria-live="polite" aria-atomic="true"></div>
-
-  <script>
-    const ADMIN_PASSWORD = "Hibrid2026";
-    const WHATSAPP_NUMBER = "56956139055";
-
-    const categories = [
-      { key:"principales", label:"Principales", blurb:"Equipos destacados", image:"kitsolar.jpg" },
-      { key:"paneles", label:"Paneles", blurb:"Módulos solares", image:"paneles.jpg" },
-      { key:"baterias", label:"Baterías", blurb:"Litio y respaldo", image:"bateria.jpg" },
-      { key:"inversores", label:"Inversores", blurb:"Control y conversión", image:"inversor.jpg" },
-      { key:"kits", label:"Kits solar", blurb:"Paquetes listos", image:"kitsolar.jpg" },
-      { key:"eolico", label:"Eólica", blurb:"Energía del viento", image:"eolica.jpg" },
-      { key:"otros", label:"Otros", blurb:"Focos, cables y más", image:"focosolar1.jpg" }
-    ];
-
-    const imageLibrary = {
-      catalog: {
-        paneles:["panelescatalago.jpg","paneles.jpg"],
-        baterias:["bateriacatalalogo1.jpg","bateriacatalogo1.jpg","bateriadeyecatalogo.jpeg","bateriafcatalogo.jpeg","bateria.jpg"],
-        inversores:["inversorcatalogo.png","inversordeyecatalogo.jpg","inversor.jpg"],
-        kits:["kitsolar.jpg","panelescatalago.jpg","bateriacatalogo1.jpg","inversorcatalogo.png"],
-        eolico:["aerogeneradorcatalogo1.jpg","aerogeneradorcatalogo2.jpg","eolica.jpg"],
-        principales:["kitsolar.jpg","panelescatalago.jpg","bateriacatalogo1.jpg","inversorcatalogo.png","aerogeneradorcatalogo1.jpg"],
-        otros:["focosolar1.jpg", "focosolarproducto.jpeg", "camarasproductos.jpeg"]
-      }
-    };
-
-    const demoProducts = [
-      { id:"pri-001", name:"Kit Hogar Híbrido 3kW", price:1899000, description:"Sistema base para vivienda con paneles, inversor híbrido y batería.", category:"principales", image:"kitsolar.jpg", visible:true },
-      { id:"pri-002", name:"Kit Negocio 5kW Pro", price:3290000, description:"Solución orientativa para locales y oficinas con mejor capacidad.", category:"principales", image:"inversorcatalogo.png", visible:true },
-      { id:"pri-003", name:"Respaldo Crítico 48V", price:2590000, description:"Banco de respaldo con batería de litio e inversor de onda pura.", category:"principales", image:"bateriafcatalogo.jpeg", visible:true },
-      { id:"pri-004", name:"Solución Parcela 6kW", price:4490000, description:"Paquete mixto para parcela con mayor autonomía y respaldo extendido.", category:"principales", image:"aerogeneradorcatalogo1.jpg", visible:true },
-      { id:"pri-005", name:"Sistema Comercio 8kW", price:5890000, description:"Configuración robusta para alto consumo diurno comercial.", category:"principales", image:"panelescatalago.jpg", visible:true },
-      { id:"pan-001", name:"Panel Monocristalino 550W", price:129990, description:"Panel solar de alto rendimiento para uso residencial.", category:"paneles", image:"panelescatalago.jpg", visible:true },
-      { id:"pan-002", name:"Panel Jinko 565W", price:139900, description:"Módulo de alta eficiencia para proyectos residenciales y comerciales.", category:"paneles", image:"paneles.jpg", visible:true },
-      { id:"bat-001", name:"Batería Litio 5kWh", price:990000, description:"Respaldo energético para sistemas híbridos.", category:"baterias", image:"bateriacatalogo1.jpg", visible:true },
-      { id:"inv-001", name:"Inversor Híbrido 5kW", price:790000, description:"Control y conversión para instalaciones solares.", category:"inversores", image:"inversor.jpg", visible:true }
-    ];
-
-    const state = {
-      route: "home",
-      products: [],
-      cart: [],
-      filterCategory: "all",
-      adminUnlocked: false
-    };
-
-    const $ = (selector, parent = document) => parent.querySelector(selector);
-    const $$ = (selector, parent = document) => Array.from(parent.querySelectorAll(selector));
-
-    const els = {
-      categoryGrid: $("#categoryGrid"),
-      catalogGrid: $("#catalogGrid"),
-      catalogTitle: $("#catalogTitle"),
-      catalogMeta: $("#catalogMeta"),
-      clearFiltersBtn: $("#clearFiltersBtn"),
-      cartList: $("#cartList"),
-      summaryBox: $("#summaryBox"),
-      stickyCartCount: $("#stickyCartCount"),
-      stickyCartTotal: $("#stickyCartTotal"),
-      whatsappBtn: $("#whatsappBtn"),
-      clearCartBtn: $("#clearCartBtn"),
-      powerInput: $("#powerInput"),
-      batteryPercent: $("#batteryPercent"),
-      projectUse: $("#projectUse"),
-      calculateBtn: $("#calculateBtn"),
-      calcResult: $("#calcResult"),
-      adminPass: $("#adminPass"),
-      adminLoginBtn: $("#adminLoginBtn"),
-      adminFilter: $("#adminFilter"),
-      adminInventoryList: $("#adminInventoryList"),
-      btnOpenNewProduct: $("#btnOpenNewProduct"),
-      productModal: $("#productModal"),
-      btnCloseModal: $("#btnCloseModal"),
-      modalForm: $("#modalForm"),
-      modalTitle: $("#modalTitle"),
-      modalProductId: $("#modalProductId"),
-      modalProductName: $("#modalProductName"),
-      modalProductCategory: $("#modalProductCategory"),
-      modalProductPrice: $("#modalProductPrice"),
-      modalProductDesc: $("#modalProductDesc"),
-      modalProductImage: $("#modalProductImage"),
-      modalProductImageUrl: $("#modalProductImageUrl"),
-      modalGalleryGrid: $("#modalGalleryGrid"),
-      statTotal: $("#statTotal"),
-      statVisible: $("#statVisible"),
-      statHidden: $("#statHidden"),
-      noticeStack: $("#noticeStack")
-    };
-
-    function escapeHtml(value){
-      return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    function showNotice(message, type="info"){
-      const node = document.createElement("div");
-      node.className = "notice " + type;
-      
-      const title = type === "success" ? "Listo" : type === "error" ? "Revisa" : "Info";
-
-      node.innerHTML = "<div><strong>" + title + "</strong><div class='small muted' style='margin-top:.15rem'>" + escapeHtml(message) + "</div></div>";
-      
-      if(els.noticeStack){
-        els.noticeStack.appendChild(node);
-      }
-
-      setTimeout(() => {
-        node.style.opacity = "0";
-        node.style.transform = "translateY(-4px)";
-      }, 2800);
-
-      setTimeout(() => {
-         if(node.parentNode) node.remove();
-      }, 3400);
-    }
-
-    function loadData(){
-      const storedProducts = localStorage.getItem("hibrid_products");
-      const storedCart = localStorage.getItem("hibrid_cart");
-
-      try{
-        const parsedProducts = storedProducts ? JSON.parse(storedProducts) : null;
-        state.products = Array.isArray(parsedProducts) && parsedProducts.length
-            ? parsedProducts
-            : demoProducts.map(item => Object.assign({}, item));
-      }catch(error){
-        state.products = demoProducts.map(item => Object.assign({}, item));
-      }
-
-      try{
-        const parsedCart = storedCart ? JSON.parse(storedCart) : [];
-        state.cart = Array.isArray(parsedCart) ? parsedCart : [];
-      }catch(error){
-        state.cart = [];
-      }
-    }
-
-    function saveData() {
-      localStorage.setItem("hibrid_products", JSON.stringify(state.products));
-      localStorage.setItem("hibrid_cart", JSON.stringify(state.cart));
-    }
-
-    function formatPrice(value){
-      return new Intl.NumberFormat("es-CL",{style:"currency",currency:"CLP",maximumFractionDigits:0}).format(Number(value || 0));
-    }
-
-    function slugify(text){
-      return String(text || "")
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g,"-")
-        .replace(/^-+|-+$/g,"")
-        .slice(0,30);
-    }
-
-    function productImage(product){
-      if(!product) return "paneles.jpg";
-      return product.image_url || product.image || product.imagen || "paneles.jpg";
-    }
-
-    function getCategoryLabel(key){
-      if(key === "all") return "Todos los productos";
-      const cat = categories.find(item => item.key === key);
-      return cat ? cat.label : key;
-    }
-
-    function routeTo(route){
-      state.route = route;
-
-      $$(".view").forEach(view => {
-        view.classList.toggle("active", view.id === route);
-      });
-
-      $$(".nav-btn").forEach(btn => {
-        const active = btn.dataset.route === route;
-        btn.classList.toggle("primary", active);
-        btn.classList.toggle("secondary", !active);
-      });
-
-      if(route === "cart") renderCart();
-      if(route === "admin") renderAdmin();
-      
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    function visibleProducts(){
-      return state.products.filter(item => item.visible === true);
-    }
-
-    function filteredProducts(){
-      return visibleProducts().filter(item => {
-        if(state.filterCategory === "all") return true;
-        return item.category === state.filterCategory;
-      });
-    }
-
-    function renderCategoryButtons(){
-      if(!els.categoryGrid) return;
-      let html = "";
-      categories.forEach(cat => {
-        const count = state.products.filter(item => item.category === cat.key && item.visible === true).length;
-        const imgSrc = cat.image || 'paneles.jpg';
-        const activeClass = state.filterCategory === cat.key ? "active" : "";
-        html += "<button class='category-card " + activeClass + "' type='button' data-select-category='" + cat.key + "'>";
-        html += "<img src='" + imgSrc + "' class='cat-img' alt='" + cat.label + "' loading='lazy'>";
-        html += "<div class='cat-body'><strong>" + cat.label + "</strong><small>" + cat.blurb + "</small><span>" + count + " productos</span></div></button>";
-      });
-      els.categoryGrid.innerHTML = html;
-
-      if(els.adminFilter){
-        let opts = "<option value='all'>Todas las categorías</option>";
-        categories.forEach(cat => { opts += "<option value='" + cat.key + "'>" + cat.label + "</option>"; });
-        els.adminFilter.innerHTML = opts;
-      }
-      if(els.modalProductCategory){
-        let mOpts = "";
-        categories.forEach(cat => { mOpts += "<option value='" + cat.key + "'>" + cat.label + "</option>"; });
-        els.modalProductCategory.innerHTML = mOpts;
-      }
-    }
-
-    function renderCatalog(){
-      if(!els.catalogGrid) return;
-      const list = filteredProducts();
-      
-      if(els.catalogTitle) els.catalogTitle.textContent = state.filterCategory === "all" ? "Todos los productos" : "Mostrando: " + getCategoryLabel(state.filterCategory);
-      if(els.catalogMeta) els.catalogMeta.textContent = state.filterCategory === "all" ? "Catálogo completo." : "Filtrado por categoría.";
-      if(els.clearFiltersBtn) els.clearFiltersBtn.style.display = state.filterCategory === "all" ? "none" : "inline-flex";
-
-      if(list.length === 0){
-        els.catalogGrid.innerHTML = "<div class='empty'>No hay productos visibles para esta categoría.</div>";
-        return;
-      }
-
-      let html = "";
-      list.forEach(item => {
-        html += "<article class='product-card'>";
-        html += "<div class='product-media'><img src='" + escapeHtml(productImage(item)) + "' alt='" + escapeHtml(item.name) + "' loading='lazy'></div>";
-        html += "<div class='product-body'><div class='product-top'><div><span class='badge'>" + getCategoryLabel(item.category) + "</span>";
-        html += "<h4 class='product-title' style='margin-top:.7rem'>" + escapeHtml(item.name) + "</h4></div>";
-        html += "<div class='price'>" + formatPrice(item.price) + "</div></div>";
-        html += "<p class='small muted'>" + escapeHtml(item.description) + "</p>";
-        html += "<div class='tiny muted'>ID: " + escapeHtml(item.id) + "</div>";
-        html += "<button class='btn primary full' type='button' data-add='" + escapeHtml(item.id) + "'>Agregar al carrito</button>";
-        html += "</div></article>";
-      });
-      els.catalogGrid.innerHTML = html;
-    }
-
-    function getProductById(id){
-      return state.products.find(item => item.id === id);
-    }
-
-    function syncCart(){
-      state.cart = state.cart.filter(item => getProductById(item.id));
-    }
-
-    function detailedCart(){
-      syncCart();
-      const result = [];
-      state.cart.forEach(item => {
-        const product = getProductById(item.id);
-        if(product){
-           result.push({ id: item.id, quantity: item.quantity, product: product, subtotal: (product.price || 0) * item.quantity });
+          setRepositoryAssets(
+            Array.isArray(data) ? data.map(normalizeAsset).filter(Boolean) : []
+          );
         }
-      });
-      return result;
-    }
-
-    function addToCart(id){
-      const item = state.cart.find(row => row.id === id);
-      if(item){
-         item.quantity += 1;
-      } else {
-         state.cart.push({ id: id, quantity: 1 });
-      }
-      saveData();
-      updateCartStats();
-      showNotice("Producto agregado al carrito.", "success");
-    }
-
-    function changeQty(id, delta){
-      const item = state.cart.find(row => row.id === id);
-      if(!item) return;
-      item.quantity += delta;
-      if(item.quantity <= 0){
-         state.cart = state.cart.filter(row => row.id !== id);
-      }
-      saveData();
-      renderCart();
-      updateCartStats();
-    }
-
-    function removeFromCart(id){
-      state.cart = state.cart.filter(item => item.id !== id);
-      saveData();
-      renderCart();
-      updateCartStats();
-      showNotice("Producto quitado del carrito.", "info");
-    }
-
-    function clearCart(){
-      state.cart = [];
-      saveData();
-      renderCart();
-      updateCartStats();
-      showNotice("Carrito vaciado.", "info");
-    }
-
-    function renderCart(){
-      if(!els.cartList || !els.summaryBox) return;
-      const items = detailedCart();
-      
-      if(items.length === 0){
-        els.cartList.innerHTML = "<div class='empty'>Tu carrito está vacío. Agrega productos desde el catálogo.</div>";
-        els.summaryBox.innerHTML = "<div class='summary-line'><span>Productos</span><strong>0</strong></div><div class='summary-line'><span>Total</span><strong>" + formatPrice(0) + "</strong></div>";
-        return;
-      }
-
-      let html = "";
-      items.forEach(item => {
-        html += "<article class='cart-item'>";
-        html += "<img src='" + escapeHtml(productImage(item.product)) + "' alt='img' loading='lazy'>";
-        html += "<div><span class='badge'>" + getCategoryLabel(item.product.category) + "</span>";
-        html += "<h4 style='margin-top:.6rem;font-weight:900'>" + escapeHtml(item.product.name) + "</h4>";
-        html += "<p class='small muted' style='margin-top:.3rem'>" + escapeHtml(item.product.description) + "</p>";
-        html += "<div class='qty-row'>";
-        html += "<button class='btn secondary small' type='button' data-qty='minus' data-id='" + escapeHtml(item.id) + "'>−</button>";
-        html += "<button class='btn secondary small' type='button' data-qty='plus' data-id='" + escapeHtml(item.id) + "'>+</button>";
-        html += "<button class='btn ghost small' type='button' data-remove='" + escapeHtml(item.id) + "'>Quitar</button>";
-        html += "</div></div>";
-        html += "<div style='text-align:right'><div class='tiny muted'>Cantidad: " + item.quantity + "</div>";
-        html += "<div class='tiny muted' style='margin-top:.35rem'>Unitario: " + formatPrice(item.product.price) + "</div>";
-        html += "<strong style='display:block;margin-top:.65rem'>" + formatPrice(item.subtotal) + "</strong></div></article>";
-      });
-      els.cartList.innerHTML = html;
-
-      let totalUnits = 0;
-      let total = 0;
-      items.forEach(item => { totalUnits += item.quantity; total += item.subtotal; });
-      
-      let sumHtml = "<div class='summary-line'><span>Líneas cotizadas</span><strong>" + items.length + "</strong></div>";
-      sumHtml += "<div class='summary-line'><span>Unidades totales</span><strong>" + totalUnits + "</strong></div>";
-      sumHtml += "<div class='summary-line'><span>Total estimado</span><strong>" + formatPrice(total) + "</strong></div>";
-      els.summaryBox.innerHTML = sumHtml;
-    }
-
-    function updateCartStats(){
-      const items = detailedCart();
-      let qty = 0;
-      let total = 0;
-      items.forEach(item => { qty += item.quantity; total += item.subtotal; });
-      
-      if(els.stickyCartCount){
-        els.stickyCartCount.textContent = qty + (qty === 1 ? " producto" : " productos");
-      }
-      if(els.stickyCartTotal){
-        els.stickyCartTotal.textContent = formatPrice(total);
+      } catch {
+        if (!cancelled) showNotify("Error al cargar repositorio dinámico de imágenes.", "error");
+      } finally {
+        if (!cancelled) setLoadingAssets(false);
       }
     }
 
-    function sendWhatsApp(){
-      const items = detailedCart();
+    loadRepositoryAssets();
+    return () => { cancelled = true; };
+  }, [activeTab, adminAuthenticated, sessionToken, showNotify]);
 
-      if(items.length === 0){
-        showNotice("Primero agrega productos al carrito.", "error");
-        return;
-      }
+  useEffect(() => {
+    return () => {
+      if (notificationTimerRef.current) clearTimeout(notificationTimerRef.current);
+    };
+  }, []);
 
-      let total = 0;
-      let text = "Hola HiBRID, quiero más información sobre estos productos:\n\n";
+  const logoutAdmin = (message = "Sesión administrativa finalizada.") => {
+    setSessionToken(null);
+    setAdminTokenInput('');
+    setModalOpen(false);
+    setEditingProduct(null);
+    resetForm();
+    showNotify(message, "error");
+  };
 
-      items.forEach((item, index) => {
-        total += item.subtotal;
-        text += (index + 1) + ". " + item.product.name + " | Cant: " + item.quantity + " | Unitario: " + formatPrice(item.product.price) + " | Subtotal: " + formatPrice(item.subtotal) + "\n";
+  const publicProducts = useMemo(() => {
+    return products.filter(p => p.visible);
+  }, [products]);
+
+  // Calculadora basada en especificaciones técnicas
+  const calculatedSystem = useMemo(() => {
+    const dailyKWh = Number(calcKWh) || 0;
+    const recommendedKW = Number((dailyKWh / 4.5).toFixed(1)); 
+    const estimatedBatteryKWh = Number((dailyKWh * Number(calcAutonomy)).toFixed(1));
+    
+    const kits = publicProducts
+      .filter(p => p.category === 'principales' && typeof p.nominalKW === 'number')
+      .sort((a, b) => a.nominalKW - b.nominalKW);
+
+    const matchedKit = kits.find(k => k.nominalKW >= recommendedKW) || kits[kits.length - 1] || null;
+    
+    return {
+      recommendedKW: recommendedKW.toFixed(1),
+      estimatedBatteryKWh: estimatedBatteryKWh.toFixed(1),
+      estimatedCost: matchedKit ? matchedKit.price : 0,
+      matchedKit
+    };
+  }, [calcKWh, calcAutonomy, publicProducts]);
+
+  // Validación de Autenticación
+  const handleAdminLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/admin/session', {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${adminTokenInput}` }
       });
 
-      text += "\nTotal estimado: " + formatPrice(total) + "\n\nNota: Esta simulación y sus precios son estrictamente de referencia. La configuración final debe ser verificada por nuestro equipo técnico.";
-      
-      window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(text), "_blank", "noopener");
-    }
-
-    function calculateSystem(){
-      if(!els.powerInput || !els.batteryPercent || !els.projectUse || !els.calcResult) return;
-
-      const monthlyKwh = Number(els.powerInput.value || 0);
-      const batteryRatio = Number(els.batteryPercent.value || 0) / 100;
-      const use = els.projectUse.value;
-
-      if(!monthlyKwh || monthlyKwh <= 0){
-        els.calcResult.innerHTML = "<p class='small' style='color:#ffc1c1;margin-top:1rem'>Ingresa tu consumo mensual en kWh.</p>";
+      if (res.status === 401 || res.status === 403) {
+        showNotify("Token de administrador inválido o expirado.", "error");
         return;
       }
+      if (!res.ok) throw new Error();
 
-      const dailyKwh = monthlyKwh / 30;
-      let hsp = 4.5; 
-      let efficiency = 0.80;
-      
-      if(use === "parcela") {
-         hsp = 2.5; 
-         efficiency = 0.70; 
-      }
+      setSessionToken(adminTokenInput);
+      setAdminTokenInput('');
+      showNotify("Acceso administrativo concedido correctamente.");
+    } catch {
+      showNotify("No fue posible validar el acceso contra el servidor.", "error");
+    }
+  };
 
-      const panelPowerKw = 0.55; 
-      const areaPerPanel = 2.5;
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setEditingProduct(null);
+    resetForm();
+  };
 
-      const requiredKw = dailyKwh / (hsp * efficiency);
-      let panels = Math.ceil(requiredKw / panelPowerKw);
-      if(panels < 1) panels = 1;
-      
-      const totalInstalledKwNumber = panels * panelPowerKw;
-      const area = panels * areaPerPanel;
-      const batteryKwh = (dailyKwh * batteryRatio).toFixed(1);
-      
-      let numBatteries = Math.ceil(batteryKwh / 5.12);
-      if(numBatteries < 1) numBatteries = 1;
+  // Verificador de precondiciones
+  const checkPreconditions = async (res) => {
+    if (res.status === 412) {
+      showNotify("Conflicto de versión. Sincronizando catálogo con los últimos cambios...", "error");
+      handleModalClose();
+      await fetchProducts({ silent: true });
+      return false;
+    }
+    if (res.status === 428) {
+      showNotify("La solicitud requiere una precondición (ETag) válida. Revisa tu cliente.", "error");
+      await fetchProducts({ silent: true });
+      return false;
+    }
+    return true;
+  };
 
-      let inverter = "Inversor Monofásico 3kW - 5kW";
-      if(totalInstalledKwNumber > 5 && totalInstalledKwNumber <= 10) inverter = "Inversor Monofásico 8kW u Off-Grid 6kW";
-      if(totalInstalledKwNumber > 10) inverter = "Inversores en Paralelo o Sistema Trifásico";
-
-      let useNote = "Cálculo On-Grid/Híbrido: Dimensionado con el promedio solar.";
-      if(use === "parcela") {
-        useNote = "Cálculo Off-Grid/Aislado: Dimensionado para funcionar de forma estable incluso en meses de invierno.";
-      }
-
-      let html = "<div class='calc-result'><h4 style='margin-bottom:.7rem; color:var(--color-primary);'>Solución Recomendada</h4>";
-      html += "<p class='small' style='margin-bottom:1rem'>Para un consumo de <strong>" + monthlyKwh + " kWh/mes</strong>:</p>";
-      html += "<div class='calc-grid'>";
-      html += "<div><strong>Paneles Solares:</strong><br>" + panels + " módulos de 550W<br><span class='tiny muted'>Potencia: " + totalInstalledKwNumber.toFixed(2) + " kWp</span></div>";
-      html += "<div><strong>Inversor Sugerido:</strong><br>" + inverter + "<br><span class='tiny muted'>Según capacidad</span></div>";
-      html += "<div><strong>Banco de Baterías:</strong><br>" + numBatteries + "x Litio 5.12kWh<br><span class='tiny muted'>Respaldo: " + batteryKwh + " kWh</span></div>";
-      html += "<div><strong>Espacio en Techo:</strong><br>" + area + " m²<br><span class='tiny muted'>Área libre de sombras</span></div>";
-      html += "</div><p class='small muted' style='margin-top:1rem'>" + useNote + "</p>";
-      html += "<p class='tiny muted' style='margin-top:1rem; border-top:1px solid var(--color-border); padding-top:.5rem;'>Nota: Esta simulación y sus precios son estrictamente de referencia.</p></div>";
-      
-      els.calcResult.innerHTML = html;
+  // Operaciones CRUD
+  const handleSaveProduct = async (e) => {
+    e.preventDefault();
+    if (!formData.name || !formData.price || !formData.description) {
+      showNotify("Por favor completa todos los campos obligatorios.", "error");
+      return;
     }
 
-    function adminFilteredProducts(){
-      if(!els.adminFilter) return state.products.slice();
-      const filter = els.adminFilter.value || "all";
-      if(filter === "all"){
-         return state.products.slice();
-      }
-      return state.products.filter(item => item.category === filter);
-    }
+    try {
+      const payload = {
+        name: formData.name,
+        price: Number(formData.price),
+        description: formData.description,
+        category: formData.category,
+        image: formData.image,
+        image_url: formData.image,
+        visible: formData.visible,
+        nominalKW: Number(formData.nominalKW)
+      };
 
-    function renderAdmin(){
-      if(!state.adminUnlocked || !els.adminInventoryList) return;
-
-      if(els.statTotal) els.statTotal.textContent = state.products.length;
-      if(els.statVisible) els.statVisible.textContent = state.products.filter(p => p.visible).length;
-      if(els.statHidden) els.statHidden.textContent = state.products.filter(p => !p.visible).length;
-
-      const list = adminFilteredProducts();
-      
-      if(list.length === 0){
-        els.adminInventoryList.innerHTML = "<div class='empty'>No hay productos en esta categoría.</div>";
-        return;
-      }
-
-      let html = "";
-      list.forEach(item => {
-        let isChecked = item.visible ? "checked" : "";
-        html += "<div class='inv-item'>";
-        html += "<img src='" + escapeHtml(productImage(item)) + "' alt='img'>";
-        html += "<div class='inv-info'><h4>" + escapeHtml(item.name) + "</h4>";
-        html += "<div class='tiny muted'>Cat: " + getCategoryLabel(item.category) + " | Precio: " + formatPrice(item.price) + "</div></div>";
-        
-        html += "<div class='inv-actions'>";
-        html += "<label class='switch' title='Activar/Ocultar'><input type='checkbox' data-toggle-id='" + escapeHtml(item.id) + "' " + isChecked + "><span class='slider'></span></label>";
-        
-        html += "<button class='btn secondary small' style='margin-left:.5rem' type='button' data-edit-id='" + escapeHtml(item.id) + "'>Editar</button>";
-        html += "<button class='btn secondary small' type='button' data-duplicate-id='" + escapeHtml(item.id) + "'>Duplicar</button>";
-        html += "<button class='btn danger small' type='button' data-delete-id='" + escapeHtml(item.id) + "'><i class='fa-solid fa-trash'></i></button>";
-        html += "</div></div>";
-      });
-
-      els.adminInventoryList.innerHTML = html;
-    }
-
-    function toggleVisibility(id) {
-       const item = state.products.find(p => p.id === id);
-       if(item){
-          item.visible = !item.visible;
-          saveData();
-          renderAdmin();
-          renderCatalog();
-          showNotice(item.visible ? "Producto Publicado" : "Producto Oculto", "info");
-       }
-    }
-
-    function duplicateProduct(id) {
-       const original = state.products.find(p => p.id === id);
-       if(!original) return;
-       const copy = Object.assign({}, original);
-       copy.id = "prod-" + slugify(original.name) + "-" + Date.now().toString().slice(-4);
-       copy.name = original.name + " (Copia)";
-       copy.visible = false; 
-       
-       state.products.unshift(copy);
-       saveData();
-       renderAdmin();
-       showNotice("Producto duplicado como borrador.", "success");
-    }
-
-    function deleteProduct(id) {
-      if (confirm("¿Estás seguro de que deseas eliminar permanentemente este producto del catálogo?")) {
-        state.products = state.products.filter(item => item.id !== id);
-        state.cart = state.cart.filter(item => item.id !== id);
-        saveData();
-        renderAll();
-        updateCartStats();
-        showNotice("Producto eliminado correctamente.", "success");
-      }
-    }
-
-    function openModal(productId = null) {
-       if(!els.productModal) return;
-       els.productModal.classList.add("active");
-       
-       if(productId){
-          const item = state.products.find(p => p.id === productId);
-          
-          if(!item) return;
-
-          if(els.modalTitle){
-            els.modalTitle.textContent = "Editar Producto";
-          }
-
-          if(els.modalProductId) els.modalProductId.value = item.id;
-          if(els.modalProductName) els.modalProductName.value = item.name;
-          if(els.modalProductCategory) els.modalProductCategory.value = item.category;
-          if(els.modalProductPrice) els.modalProductPrice.value = item.price;
-          if(els.modalProductDesc) els.modalProductDesc.value = item.description;
-          if(els.modalProductImage) els.modalProductImage.value = productImage(item);
-          
-          if(els.modalProductImageUrl){
-             const library = imageLibrary.catalog[item.category] || [];
-             if(item.image_url && !library.includes(item.image_url)){
-                els.modalProductImageUrl.value = item.image_url || "";
-             } else {
-                els.modalProductImageUrl.value = "";
-             }
-          }
-       } else {
-          if(els.modalTitle) els.modalTitle.textContent = "Nuevo Producto";
-          if(els.modalProductId) els.modalProductId.value = "";
-          if(els.modalProductName) els.modalProductName.value = "";
-          const defaultCat = (els.adminFilter && els.adminFilter.value !== "all") ? els.adminFilter.value : "principales";
-          if(els.modalProductCategory) els.modalProductCategory.value = defaultCat;
-          if(els.modalProductPrice) els.modalProductPrice.value = "";
-          if(els.modalProductDesc) els.modalProductDesc.value = "";
-          
-          const fallbackImage = (imageLibrary.catalog[defaultCat] || ["paneles.jpg"])[0];
-          if(els.modalProductImage) els.modalProductImage.value = fallbackImage;
-          
-          if(els.modalProductImageUrl){
-            els.modalProductImageUrl.value = "";
-          }
-       }
-       renderModalGallery();
-    }
-
-    function closeModal() {
-       if(els.productModal) els.productModal.classList.remove("active");
-    }
-
-    function renderModalGallery() {
-       if(!els.modalGalleryGrid) return;
-       const category = els.modalProductCategory ? els.modalProductCategory.value : "principales";
-       const images = imageLibrary.catalog[category] || [];
-       const current = els.modalProductImage ? els.modalProductImage.value : "";
-
-       let html = "";
-       images.forEach(img => {
-          const activeClass = current === img ? "active" : "";
-          html += "<button class='gallery-item " + activeClass + "' type='button' data-modal-img='" + escapeHtml(img) + "'>";
-          html += "<img src='" + escapeHtml(img) + "' loading='lazy'></button>";
-       });
-       if(images.length === 0) html = "<div class='small muted'>No hay imágenes para esta categoría.</div>";
-       
-       els.modalGalleryGrid.innerHTML = html;
-    }
-
-    function saveModalProduct(e){
-      e.preventDefault();
-
-      const idVal = els.modalProductId ? els.modalProductId.value.trim() : "";
-      const isNew = idVal === "";
-
-      const name = els.modalProductName ? els.modalProductName.value.trim() : "";
-      const description = els.modalProductDesc ? els.modalProductDesc.value.trim() : "";
-      const price = els.modalProductPrice ? Number(els.modalProductPrice.value || 0) : 0;
-      const category = els.modalProductCategory ? els.modalProductCategory.value : "principales";
-      
-      const galleryImage = els.modalProductImage ? els.modalProductImage.value.trim() : "";
-      const customImage = els.modalProductImageUrl ? els.modalProductImageUrl.value.trim() : "";
-      const image = customImage !== "" ? customImage : galleryImage;
-
-      if(!name || !description){
-        showNotice("Nombre y descripción son obligatorios.", "error");
-        return;
-      }
-
-      if(!Number.isFinite(price) || price < 0){
-        showNotice("El precio no es válido.", "error");
-        return;
-      }
-
-      if(!image){
-        showNotice("Selecciona una imagen.", "error");
-        return;
-      }
-
-      const productId = isNew ? "prod-" + slugify(name) + "-" + Date.now().toString().slice(-4) : idVal;
-
-      if(isNew){
-        state.products.unshift({
-          id: productId,
-          category: category,
-          name: name,
-          price: price,
-          description: description,
-          image: image,
-          image_url: image,
-          visible: false
+      if (editingProduct) {
+        const res = await fetch(`/api/products/${editingProduct.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${sessionToken}`,
+            'If-Match': editingProduct.etag
+          },
+          body: JSON.stringify(payload)
         });
 
-        showNotice("Producto creado como borrador.", "success");
+        if (res.status === 401 || res.status === 403) return logoutAdmin("Tu sesión ha expirado.");
+        if (!(await checkPreconditions(res))) return;
+        if (!res.ok) throw new Error();
+
+        const updatedHeaderEtag = res.headers.get('ETag');
+        const updated = await res.json();
+        
+        setProducts(prev => prev.map(p => p.id === updated.id ? { ...updated, etag: updatedHeaderEtag || p.etag } : p));
+        showNotify("Producto actualizado con éxito.");
       } else {
-        const existing = state.products.find(product => product.id === productId);
+        const res = await fetch('/api/products', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${sessionToken}`
+          },
+          body: JSON.stringify(payload)
+        });
 
-        if(!existing){
-          showNotice("Producto no encontrado.", "error");
-          return;
-        }
+        if (res.status === 401 || res.status === 403) return logoutAdmin("Tu sesión ha expirado.");
+        if (!res.ok) throw new Error();
 
-        existing.category = category;
-        existing.name = name;
-        existing.price = price;
-        existing.description = description;
-        existing.image = image;
-        existing.image_url = image;
-
-        showNotice("Producto actualizado.", "success");
+        const createdHeaderEtag = res.headers.get('ETag');
+        const created = await res.json();
+        
+        setProducts(prev => [{ ...created, etag: createdHeaderEtag }, ...prev]);
+        showNotify("Nuevo producto registrado en el sistema.");
       }
 
-      saveData();
-      renderAll();
-      updateCartStats();
-      closeModal();
+      handleModalClose();
+    } catch {
+      showNotify("Error de comunicación al guardar el producto.", "error");
     }
+  };
 
-    function loginAdmin(){
-      if(!els.adminPass) return;
-      if(els.adminPass.value.toLowerCase() !== ADMIN_PASSWORD.toLowerCase()){
-        showNotice("Contraseña incorrecta.", "error");
-        return;
-      }
-      state.adminUnlocked = true;
-      els.adminPass.value = "";
-      routeTo("admin");
-      renderAdmin();
-      showNotice("Acceso concedido al administrador.", "success");
-    }
+  const toggleVisibility = async (id) => {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
 
-    function renderAll(){
-      renderCategoryButtons();
-      renderCatalog();
-      renderCart();
-      if(state.adminUnlocked) renderAdmin();
-    }
-
-    document.addEventListener("click", (event) => {
-      const routeBtn = event.target.closest("[data-route]");
-      if(routeBtn) routeTo(routeBtn.dataset.route);
-
-      const catBtn = event.target.closest("[data-select-category]");
-      if(catBtn){
-        state.filterCategory = catBtn.dataset.selectCategory;
-        renderCategoryButtons();
-        renderCatalog();
-        if(state.route !== "home") routeTo("home");
-        setTimeout(() => {
-          const catalogSection = document.getElementById("catalogMetaJump");
-          if(catalogSection) catalogSection.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 50);
-      }
-
-      const clearBtn = event.target.closest("#clearFiltersBtn");
-      if(clearBtn){
-        state.filterCategory = "all";
-        renderCategoryButtons();
-        renderCatalog();
-      }
-
-      const addBtn = event.target.closest("[data-add]");
-      if(addBtn) addToCart(addBtn.dataset.add);
-
-      const qtyBtn = event.target.closest("[data-qty]");
-      if(qtyBtn){
-         if(qtyBtn.dataset.qty === "plus") changeQty(qtyBtn.dataset.id, 1);
-         else changeQty(qtyBtn.dataset.id, -1);
-      }
-
-      const removeBtn = event.target.closest("[data-remove]");
-      if(removeBtn) removeFromCart(removeBtn.dataset.remove);
-
-      const editBtn = event.target.closest("[data-edit-id]");
-      if(editBtn) openModal(editBtn.dataset.editId);
-
-      const dupBtn = event.target.closest("[data-duplicate-id]");
-      if(dupBtn) duplicateProduct(dupBtn.dataset.duplicateId);
-
-      const delBtn = event.target.closest("[data-delete-id]");
-      if(delBtn) deleteProduct(delBtn.dataset.deleteId);
-
-      const modalImgBtn = event.target.closest("[data-modal-img]");
-      if(modalImgBtn){
-         if(els.modalProductImage) els.modalProductImage.value = modalImgBtn.dataset.modalImg;
-         if(els.modalProductImageUrl) els.modalProductImageUrl.value = "";
-         renderModalGallery();
-      }
-
-      if(event.target === els.productModal){
-         closeModal();
-      }
-    });
-
-    document.addEventListener("change", (e) => {
-       if(e.target.matches("[data-toggle-id]")){
-          toggleVisibility(e.target.dataset.toggleId);
-       }
-    });
-
-    if(els.whatsappBtn) els.whatsappBtn.addEventListener("click", sendWhatsApp);
-    if(els.clearCartBtn) els.clearCartBtn.addEventListener("click", clearCart);
-    if(els.calculateBtn) els.calculateBtn.addEventListener("click", calculateSystem);
-
-    if(els.adminLoginBtn) els.adminLoginBtn.addEventListener("click", loginAdmin);
-    if(els.adminPass) els.adminPass.addEventListener("keydown", e => {
-      if(e.key === "Enter") loginAdmin();
-    });
-
-    if(els.adminFilter) els.adminFilter.addEventListener("change", () => renderAdmin());
-    if(els.btnOpenNewProduct) els.btnOpenNewProduct.addEventListener("click", () => openModal(null));
-    if(els.btnCloseModal) els.btnCloseModal.addEventListener("click", closeModal);
-    if(els.modalForm) els.modalForm.addEventListener("submit", saveModalProduct);
-    
-    if(els.modalProductCategory){
-      els.modalProductCategory.addEventListener("change", () => {
-        const category = els.modalProductCategory.value;
-        const library = imageLibrary.catalog[category] || [];
-        if(library.length > 0 && (!els.modalProductImage || !library.includes(els.modalProductImage.value))){
-           if(els.modalProductImage) els.modalProductImage.value = library[0];
-        }
-        renderModalGallery();
+    try {
+      const res = await fetch(`/api/products/${id}/visibility`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${sessionToken}`,
+          'If-Match': product.etag
+        },
+        body: JSON.stringify({ visible: !product.visible })
       });
-    }
 
-    loadData();
-    renderAll();
-    updateCartStats();
-    routeTo("home");
-  </script>
-</body>
-</html>
+      if (res.status === 401 || res.status === 403) return logoutAdmin("Tu sesión ha expirado.");
+      if (!(await checkPreconditions(res))) return;
+      if (!res.ok) throw new Error();
+
+      const updatedHeaderEtag = res.headers.get('ETag');
+      const updated = await res.json();
+      
+      setProducts(prev => prev.map(p => p.id === updated.id ? { ...updated, etag: updatedHeaderEtag || p.etag } : p));
+      showNotify(`Producto ${updated.visible ? 'publicado' : 'ocultado'} con éxito.`);
+    } catch {
+      showNotify("No se pudo cambiar la visibilidad del producto.", "error");
+    }
+  };
+
+  const deleteProduct = async (id) => {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+
+    if (window.confirm("¿Estás seguro de eliminar este producto del inventario?")) {
+      try {
+        const res = await fetch(`/api/products/${id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${sessionToken}`,
+            'If-Match': product.etag
+          }
+        });
+
+        if (res.status === 401 || res.status === 403) return logoutAdmin("Tu sesión ha expirado.");
+        if (!(await checkPreconditions(res))) return;
+        if (!res.ok && res.status !== 204) throw new Error();
+
+        setProducts(prev => prev.filter(p => p.id !== id));
+        showNotify("Producto eliminado correctamente.");
+      } catch {
+        showNotify("Error al intentar eliminar el producto.", "error");
+      }
+    }
+  };
+
+  const openEditModal = (product) => {
+    setEditingProduct(product);
+    setFormData({
+      name: product.name,
+      price: product.price,
+      description: product.description,
+      category: product.category,
+      image: product.image_url || product.image || '',
+      visible: product.visible,
+      nominalKW: product.nominalKW || 0
+    });
+    setModalOpen(true);
+  };
+
+  const openCreateModal = () => {
+    setEditingProduct(null);
+    resetForm();
+    setModalOpen(true);
+  };
+
+  const sendToWhatsApp = (kitName, price) => {
+    const runtimeConfig = getRuntimeConfig();
+    const whatsappNumber = runtimeConfig.VITE_WHATSAPP_NUMBER || import.meta.env.VITE_WHATSAPP_NUMBER;
+    
+    if (!whatsappNumber) {
+      showNotify("Configuración comercial incompleta: Falta número de WhatsApp.", "error");
+      return;
+    }
+    const text = encodeURIComponent(`Hola HiBRID, me interesa cotizar el sistema "${kitName}" valorado en $${price.toLocaleString('es-CL')}. ¿Me pueden orientar con la factibilidad técnica?`);
+    window.open(`https://wa.me/${whatsappNumber}?text=${text}`, '_blank', 'noopener,noreferrer');
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+      
+      {/* Notificación flotante */}
+      {notification && (
+        <div className={`fixed top-5 right-5 z-50 px-4 py-3 rounded-xl shadow-lg flex items-center space-x-2 text-white transition-all ${
+          notification.type === 'error' ? 'bg-rose-600' : 'bg-emerald-600'
+        }`}>
+          {notification.type === 'error' ? <AlertCircle size={20} /> : <CheckCircle size={20} />}
+          <span className="text-sm font-medium">{notification.msg}</span>
+        </div>
+      )}
+
+      {/* Cabecera */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex flex-col sm:flex-row items-center justify-between py-2 sm:py-0">
+          <div className="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">
+            <div className="flex items-center space-x-3">
+              <div className="bg-amber-500 p-2 rounded-xl text-white shadow-md flex items-center justify-center">
+                <Sun size={24} />
+              </div>
+              <div>
+                <h1 className="text-xl font-black tracking-tight text-slate-900">HiBRID</h1>
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Soluciones Energéticas</p>
+              </div>
+            </div>
+          </div>
+
+          <nav className="hidden md:flex items-center space-x-1 bg-slate-100 p-1 rounded-xl">
+            <button 
+              onClick={() => setActiveTab('catalog')} 
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'catalog' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+            >
+              Catálogo y Kits
+            </button>
+            <button 
+              onClick={() => setActiveTab('calculator')} 
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'calculator' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+            >
+              Calculadora Solar
+            </button>
+            <button 
+              onClick={() => setActiveTab('admin')} 
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'admin' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+            >
+              Panel Admin
+            </button>
+          </nav>
+        </div>
+
+        {/* Navegación Móvil */}
+        <div className="md:hidden flex items-center justify-between gap-1 px-4 pb-3 border-t border-slate-100 pt-2 bg-white">
+          <button onClick={() => setActiveTab('catalog')} className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-wider ${activeTab === 'catalog' ? 'bg-amber-500 text-white shadow-sm' : 'bg-slate-100 text-slate-600'}`}>Catálogo</button>
+          <button onClick={() => setActiveTab('calculator')} className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-wider ${activeTab === 'calculator' ? 'bg-amber-500 text-white shadow-sm' : 'bg-slate-100 text-slate-600'}`}>Calculadora</button>
+          <button onClick={() => setActiveTab('admin')} className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-wider ${activeTab === 'admin' ? 'bg-amber-500 text-white shadow-sm' : 'bg-slate-100 text-slate-600'}`}>Admin</button>
+        </div>
+      </header>
+
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        {/* VISTA 1: CATÁLOGO */}
+        {activeTab === 'catalog' && (
+          <div className="space-y-8">
+            <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-8 sm:p-12 text-white shadow-xl relative overflow-hidden">
+              <div className="relative z-10 max-w-2xl space-y-4">
+                <span className="bg-amber-500/20 text-amber-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-amber-500/30">
+                  Independencia Energética
+                </span>
+                <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">Energía solar híbrida para tu hogar y negocio</h2>
+                <p className="text-slate-300 text-base sm:text-lg">Diseñamos, importamos y configuramos sistemas solares con respaldo de baterías de última generación.</p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold tracking-tight">Kits y Componentes Disponibles</h3>
+              <span className="text-sm font-medium text-slate-500">{publicProducts.length} productos en línea</span>
+            </div>
+
+            {loadingProducts ? (
+              <div className="flex flex-col items-center justify-center py-20 space-y-3">
+                <Loader2 size={36} className="animate-spin text-amber-500" />
+                <p className="text-sm font-medium text-slate-500">Cargando catálogo en tiempo real...</p>
+              </div>
+            ) : productsError ? (
+              <div className="bg-rose-50 border border-rose-200 text-rose-700 p-6 rounded-2xl text-center space-y-2">
+                <AlertCircle size={28} className="mx-auto" />
+                <p className="font-bold">{productsError}</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {publicProducts.map(product => (
+                  <div key={product.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden">
+                    <div className="bg-slate-100 h-48 flex items-center justify-center relative border-b border-slate-100 overflow-hidden">
+                      <ProductImage product={product} />
+                      <span className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-slate-800 text-xs font-bold px-2.5 py-1 rounded-lg uppercase shadow-sm">
+                        {product.category}
+                      </span>
+                    </div>
+                    <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                      <div className="space-y-2">
+                        <h4 className="font-bold text-lg text-slate-900 leading-snug">{product.name}</h4>
+                        <p className="text-slate-600 text-sm overflow-hidden" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                          {product.description}
+                        </p>
+                      </div>
+                      <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                        <div>
+                          <span className="text-xs font-medium text-slate-400 block">Precio contado</span>
+                          <span className="text-xl font-black text-slate-950">${product.price.toLocaleString('es-CL')}</span>
+                        </div>
+                        <button 
+                          onClick={() => sendToWhatsApp(product.name, product.price)}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-xl shadow-md transition-all flex items-center space-x-2 text-sm font-bold"
+                        >
+                          <Send size={16} />
+                          <span>WhatsApp</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* VISTA 2: CALCULADORA SOLAR */}
+        {activeTab === 'calculator' && (
+          <div className="max-w-4xl mx-auto space-y-8">
+            <div className="text-center space-y-2">
+              <h2 className="text-3xl font-extrabold tracking-tight">Calculadora de Dimensionamiento Solar</h2>
+              <p className="text-slate-600">Basado en especificaciones técnicas reales de nuestros kits.</p>
+            </div>
+
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">Consumo Diario Estimado (kWh/día)</label>
+                  <input 
+                    type="range" min="5" max="60" 
+                    value={calcKWh} onChange={e => setCalcKWh(e.target.value)}
+                    className="w-full accent-amber-500"
+                  />
+                  <div className="flex justify-between text-xs font-semibold text-slate-500 mt-1">
+                    <span>5 kWh</span>
+                    <span className="text-amber-600 font-bold text-base">{calcKWh} kWh/día</span>
+                    <span>60 kWh</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">Autonomía (Respaldo en Baterías)</label>
+                  <select 
+                    value={calcAutonomy} onChange={e => setCalcAutonomy(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium text-slate-800 focus:ring-2 focus:ring-amber-500"
+                  >
+                    <option value="1">1 Día (Uso estándar)</option>
+                    <option value="2">2 Días (Mayor seguridad)</option>
+                    <option value="3">3 Días (Aislado total)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-md">
+                <div className="space-y-4">
+                  <span className="text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">
+                    Resultado Estimado
+                  </span>
+                  <h3 className="text-xl font-bold">Sistema Recomendado</h3>
+                  
+                  <div className="space-y-3 pt-2">
+                    <div className="flex justify-between border-b border-slate-800 pb-2">
+                      <span className="text-slate-400 text-sm">Capacidad Solar:</span>
+                      <span className="font-bold text-amber-400">{calculatedSystem.recommendedKW} kWp</span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-800 pb-2">
+                      <span className="text-slate-400 text-sm">Banco Baterías:</span>
+                      <span className="font-bold text-amber-400">{calculatedSystem.estimatedBatteryKWh} kWh</span>
+                    </div>
+                    
+                    {calculatedSystem.matchedKit ? (
+                      <div className="flex justify-between pb-2">
+                        <span className="text-slate-400 text-sm">Kit Sugerido:</span>
+                        <span className="font-bold text-white text-right max-w-[50%] truncate" title={calculatedSystem.matchedKit.name}>
+                          {calculatedSystem.matchedKit.name}
+                        </span>
+                      </div>
+                    ) : (
+                       <div className="text-xs text-rose-400 italic">No hay kits registrados con atributos técnicos para estimar precio.</div>
+                    )}
+                    
+                  </div>
+                </div>
+
+                <button 
+                  disabled={!calculatedSystem.matchedKit}
+                  onClick={() => sendToWhatsApp(`Cotización: ${calculatedSystem.matchedKit.name} para ${calcKWh}kWh`, calculatedSystem.estimatedCost)}
+                  className={`w-full font-bold py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 ${calculatedSystem.matchedKit ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}`}
+                >
+                  <Send size={18} />
+                  <span>Consultar por WhatsApp</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* VISTA 3: ADMIN */}
+        {activeTab === 'admin' && (
+          <div className="space-y-6">
+            {!adminAuthenticated ? (
+              <div className="max-w-md mx-auto bg-white rounded-3xl border border-slate-200 shadow-sm p-8 space-y-6 mt-12">
+                <div className="text-center space-y-2">
+                  <div className="bg-slate-100 w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-slate-700">
+                    <Settings size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold">Acceso Administrativo</h3>
+                </div>
+                <form onSubmit={handleAdminLogin} className="space-y-4">
+                  <input 
+                    type="password" 
+                    placeholder="Token de Acceso (ADMIN_TOKEN)" 
+                    value={adminTokenInput}
+                    onChange={e => setAdminTokenInput(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium focus:ring-2 focus:ring-amber-500"
+                    required
+                  />
+                  <button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl shadow-md transition-all">
+                    Validar Acceso
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                  <div>
+                    <h3 className="text-xl font-bold">Catálogo e Inventario</h3>
+                    <p className="text-xs text-slate-500">Conectado a API Express con verificación ETag</p>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <button onClick={openCreateModal} className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-5 py-2.5 rounded-xl shadow-md transition-all flex items-center space-x-2 text-sm">
+                      <Plus size={18} />
+                      <span>Nuevo Producto</span>
+                    </button>
+                    <button onClick={() => logoutAdmin()} className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-xl text-sm transition-all">
+                      Salir
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                          <th className="p-4 sm:px-6">Producto</th>
+                          <th className="p-4 sm:px-6">Categoría</th>
+                          <th className="p-4 sm:px-6">Precio</th>
+                          <th className="p-4 sm:px-6">Estado</th>
+                          <th className="p-4 sm:px-6 text-right">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 text-sm">
+                        {products.map(prod => (
+                          <tr key={prod.id} className="hover:bg-slate-50/50 transition-all">
+                            <td className="p-4 sm:px-6 font-semibold text-slate-900">
+                              {prod.name}
+                              {prod.nominalKW > 0 && <span className="block text-xs font-normal text-slate-400 mt-0.5">Potencia: {prod.nominalKW} kW</span>}
+                            </td>
+                            <td className="p-
 ```
