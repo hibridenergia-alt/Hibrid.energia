@@ -1,0 +1,189 @@
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { 
+  Sun, Settings, CheckCircle, AlertCircle, 
+  Eye, EyeOff, Trash2, Plus, Edit3, X, Calculator, Send, Loader2
+} from 'lucide-react';
+
+// Extracción segura de variables de entorno (Runtime vs Build time)
+const getRuntimeConfig = () => {
+  if (typeof window !== 'undefined' && window.env) return window.env;
+  return {};
+};
+
+// Utilidad para resolver rutas de imágenes respetando contratos y el BASE_URL
+function resolveImageSrc(rawImage) {
+  if (!rawImage) return null;
+  if (/^https?:\/\//i.test(rawImage)) return rawImage;
+  // Si la ruta ya es absoluta desde la raíz, se respeta; sino, se anexa BASE_URL
+  return rawImage.startsWith('/')
+    ? rawImage
+    : `${import.meta.env.BASE_URL || '/'}${rawImage}`;
+}
+
+// Componente seguro para manejo de imágenes con fallback
+function ProductImage({ product }) {
+  const [failed, setFailed] = useState(false);
+  const src = resolveImageSrc(product.image_url || product.image);
+
+  if (!src || failed) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-slate-100">
+        <Sun size={48} className="text-amber-500/40" />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={product.name}
+      className="w-full h-full object-cover"
+      loading="lazy"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
+const emptyForm = {
+  name: '',
+  price: '',
+  description: '',
+  category: 'principales',
+  image: '',
+  visible: true,
+  nominalKW: 0
+};
+
+export default function App() {
+  // Estado de Navegación
+  const [activeTab, setActiveTab] = useState('catalog'); 
+  
+  // Estado de Autenticación Desacoplado
+  const [adminTokenInput, setAdminTokenInput] = useState('');
+  const [sessionToken, setSessionToken] = useState(null);
+  const adminAuthenticated = !!sessionToken;
+  
+  // Estado de Productos
+  const [products, setProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [productsError, setProductsError] = useState('');
+
+  // Estado del Inventario Dinámico de Activos
+  const [repositoryAssets, setRepositoryAssets] = useState([]);
+  const [loadingAssets, setLoadingAssets] = useState(false);
+
+  // Estado del Calculador Solar
+  const [calcKWh, setCalcKWh] = useState(15);
+  const [calcAutonomy, setCalcAutonomy] = useState(1);
+
+  // Estado del Modal de Edición/Creación Admin
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [formData, setFormData] = useState(emptyForm);
+
+  // Estado de Mensajería / Feedback
+  const [notification, setNotification] = useState(null);
+  const notificationTimerRef = useRef(null);
+
+  const showNotify = useCallback((msg, type = 'success') => {
+    setNotification({ msg, type });
+    if (notificationTimerRef.current) {
+      clearTimeout(notificationTimerRef.current);
+    }
+    notificationTimerRef.current = setTimeout(() => {
+      setNotification(null);
+      notificationTimerRef.current = null;
+    }, 4000);
+  }, []);
+
+  const resetForm = useCallback(() => {
+    setFormData(emptyForm);
+  }, []);
+
+  // Función memoizada para cargar/refrescar productos (soporta silent refresh)
+  const fetchProducts = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) setLoadingProducts(true);
+    setProductsError('');
+    try {
+      const headers = adminAuthenticated 
+        ? { Authorization: `Bearer ${sessionToken}` } 
+        : {};
+
+      const res = await fetch('/api/products', { headers });
+      if (!res.ok) throw new Error();
+
+      const data = await res.json();
+      setProducts(data);
+    } catch {
+      setProductsError('No fue posible conectar con el servidor para cargar el catálogo.');
+    } finally {
+      if (!silent) setLoadingProducts(false);
+    }
+  }, [adminAuthenticated, sessionToken]);
+
+  // Carga inicial del catálogo
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  // Carga dinámica de assets con normalización estricta de contrato
+  useEffect(() => {
+    if (activeTab !== 'admin' || !adminAuthenticated) return;
+
+    let cancelled = false;
+    async function loadRepositoryAssets() {
+      setLoadingAssets(true);
+      try {
+        const res = await fetch('/api/assets', {
+          headers: { Authorization: `Bearer ${sessionToken}` }
+        });
+        if (!res.ok) throw new Error();
+        
+        const data = await res.json();
+        
+        if (!cancelled) {
+          const normalizeAsset = (asset) => {
+            const value = asset?.value || asset?.url || '';
+            const label = asset?.label || asset?.name || value;
+            return value ? { value, label } : null;
+          };
+
+          setRepositoryAssets(
+            Array.isArray(data) ? data.map(normalizeAsset).filter(Boolean) : []
+          );
+        }
+      } catch {
+        if (!cancelled) showNotify("Error al cargar repositorio dinámico de imágenes.", "error");
+      } finally {
+        if (!cancelled) setLoadingAssets(false);
+      }
+    }
+
+    loadRepositoryAssets();
+    return () => { cancelled = true; };
+  }, [activeTab, adminAuthenticated, sessionToken, showNotify]);
+
+  useEffect(() => {
+    return () => {
+      if (notificationTimerRef.current) clearTimeout(notificationTimerRef.current);
+    };
+  }, []);
+
+  const logoutAdmin = (message = "Sesión administrativa finalizada.") => {
+    setSessionToken(null);
+    setAdminTokenInput('');
+    setModalOpen(false);
+    setEditingProduct(null);
+    resetForm();
+    showNotify(message, "error");
+  };
+
+  const publicProducts = useMemo(() => {
+    return products.filter(p => p.visible);
+  }, [products]);
+
+  // Calculadora basada en especificaciones técnicas
+  const calculatedSystem = useMemo(() => {
+    const dailyKWh = Number(calcKWh) || 0;
+    const recommendedKW = Number((dailyKWh / 4.5).toFixed(1)); 
+    const estimatedBattery
