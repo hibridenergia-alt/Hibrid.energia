@@ -61,18 +61,28 @@ let whatsappMessageId = 0;
 let storageAvailable = true;
 let refreshQueued = false;
 
+// ---------- Inicialización del DOM ----------
 function cacheEls(){
-  [
-    "categoryGrid","catalogGrid","catalogTitle","catalogMeta","clearFiltersBtn",
-    "cartList","summaryBox","stickyCartCount","stickyCartTotal","whatsappBtn","clearCartBtn",
-    "calcKwh","calcKwhOut","calcAutonomia","calcAutonomiaOut","calcTipo","calculateBtn","calcResult",
-    "advancedToggle","advancedPanel",
-    "adminPass","adminLoginBtn","loginError","adminLogoutBtn","adminFilter","adminInventoryList","btnOpenNewProduct",
-    "productModal","btnCloseModal","modalForm","modalTitle","modalProductId","modalProductEtag","modalProductName",
-    "modalProductCategory","modalProductPrice","modalProductDesc","modalProductImage","modalProductImageUrl",
-    "modalGalleryGrid","modalPreviewBox","modalSubmitBtn","customImgToggle","customImgPanel",
-    "statTotal","statVisible","statHidden","noticeStack","themeToggle","themeIcon"
-  ].forEach(id => { els[id] = document.getElementById(id); });
+  Object.assign(els, {
+    categoryGrid: $("#categoryGrid"), catalogGrid: $("#catalogGrid"), catalogTitle: $("#catalogTitle"),
+    catalogMeta: $("#catalogMeta"), clearFiltersBtn: $("#clearFiltersBtn"), cartList: $("#cartList"),
+    summaryBox: $("#summaryBox"), stickyCartCount: $("#stickyCartCount"), stickyCartTotal: $("#stickyCartTotal"),
+    whatsappBtn: $("#whatsappBtn"), clearCartBtn: $("#clearCartBtn"), calcKwh: $("#calcKwh"),
+    calcKwhOut: $("#calcKwhOut"), calcAutonomia: $("#calcAutonomia"), calcAutonomiaOut: $("#calcAutonomiaOut"),
+    calcTipo: $("#calcTipo"), calculateBtn: $("#calculateBtn"), calcResult: $("#calcResult"),
+    advancedToggle: $("#advancedToggle"), advancedPanel: $("#advancedPanel"), adminPass: $("#adminPass"),
+    adminLoginBtn: $("#adminLoginBtn"), loginError: $("#loginError"), adminLogoutBtn: $("#adminLogoutBtn"),
+    adminFilter: $("#adminFilter"), adminInventoryList: $("#adminInventoryList"), btnOpenNewProduct: $("#btnOpenNewProduct"),
+    productModal: $("#productModal"), btnCloseModal: $("#btnCloseModal"), modalForm: $("#modalForm"),
+    modalTitle: $("#modalTitle"), modalProductId: $("#modalProductId"), modalProductEtag: $("#modalProductEtag"),
+    modalProductName: $("#modalProductName"), modalProductCategory: $("#modalProductCategory"),
+    modalProductPrice: $("#modalProductPrice"), modalProductDesc: $("#modalProductDesc"),
+    modalProductImage: $("#modalProductImage"), modalProductImageUrl: $("#modalProductImageUrl"),
+    modalGalleryGrid: $("#modalGalleryGrid"), modalPreviewBox: $("#modalPreviewBox"),
+    modalSubmitBtn: $("#modalSubmitBtn"), customImgToggle: $("#customImgToggle"), customImgPanel: $("#customImgPanel"),
+    statTotal: $("#statTotal"), statVisible: $("#statVisible"), statHidden: $("#statHidden"),
+    noticeStack: $("#noticeStack"), themeToggle: $("#themeToggle"), themeIcon: $("#themeIcon")
+  });
 }
 
 // ---------- Utilidades de Sanitización y UI ----------
@@ -169,8 +179,8 @@ function initTheme(){
 }
 function applyTheme(theme){
   document.documentElement.setAttribute("data-theme", theme);
-  localStorage.setItem(THEME_KEY, theme);
-  if(els.themeIcon) els.themeIcon.className = "fa-solid " + (theme === "dark" ? "fa-moon" : "fa-sun");
+  try { localStorage.setItem(THEME_KEY, theme); } catch {}
+  if(els.themeIcon) els.themeIcon.className = theme === "dark" ? "fa-solid fa-moon" : "fa-solid fa-sun";
 }
 
 // ---------- Red y Autenticación ----------
@@ -205,35 +215,30 @@ function logoutAdmin(showMsg = false) {
 async function loginAdmin() {
   if (!els.adminPass) return;
   const token = els.adminPass.value.trim();
-  if (!token) return;
+  if (!token) { showNotice("Ingresa tu token de administrador.", "error"); return; }
   els.loginError.style.display = "none";
   els.adminLoginBtn.disabled = true;
 
   try {
-    const res = await fetch(`${API_URL}/api/admin/session`, {
-      method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ token })
+    const res = await apiFetch("/api/admin/session", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token })
     });
-    if (!res.ok) { els.loginError.style.display = "block"; return; }
+    if (res.unauthorized || !res.ok) { els.loginError.style.display = "block"; return; }
     state.adminUnlocked = true;
     els.adminPass.value = "";
     routeTo("admin");
+    renderAdmin();
     showNotice("Acceso concedido.", "success");
     await fetchProducts({ automaticRetry: false });
-  } catch {
-    els.loginError.textContent = "No se pudo conectar con el servidor. Intenta de nuevo.";
-    els.loginError.style.display = "block";
   } finally {
-    els.adminLoginBtn.disabled = false;
+    if(els.adminLoginBtn) els.adminLoginBtn.disabled = false;
   }
 }
 
 async function doLogout(){
   let result;
-  try {
-    result = await apiFetch("/api/admin/session", { method: "DELETE" });
-  } catch {
-    result = { ok: false, networkError: true };
-  }
+  try { result = await apiFetch("/api/admin/session", { method: "DELETE" }); } 
+  catch { result = { ok: false, networkError: true }; }
   logoutAdmin(false);
   routeTo("home");
   if (result.ok) showNotice("Sesión cerrada.", "info");
@@ -337,8 +342,7 @@ function routeTo(route) {
     const target = btn.dataset.route === "admin-entry" ? (state.adminUnlocked ? "admin" : "admin-login") : btn.dataset.route;
     btn.classList.toggle("active", target === route);
   });
-  if (route === "cart") renderCart();
-  if (route === "admin") renderAdmin();
+  renderAll();
   scrollToTop();
 }
 
@@ -348,15 +352,15 @@ function filteredProducts(){ return visibleProducts().filter(item => state.filte
 
 function renderCategoryButtons(){
   if(!els.categoryGrid) return;
-  let html = "";
-  categories.forEach(cat => {
+  els.categoryGrid.innerHTML = categories.map(cat => {
     const count = cat.key === "all" ? state.products.filter(p => p.visible === true).length : state.products.filter(p => normCat(p.category) === cat.key && p.visible === true).length;
     const activeClass = state.filterCategory === cat.key ? "active" : "";
-    html += `<button class='category-card ${escapeHtml(activeClass)}' type='button' data-select-category='${escapeHtml(cat.key)}'>`;
-    html += `<img src='${escapeHtml(safeImageUrl(cat.image))}' class='cat-img' alt='${escapeHtml(cat.label)}' loading='lazy' data-fallback='${escapeHtml(LOCAL_IMAGE_FALLBACK)}'>`;
-    html += `<div class='cat-body'><strong>${escapeHtml(cat.label)}</strong><small>${escapeHtml(cat.blurb)}</small><span>${count} producto${count===1?"":"s"}</span></div></button>`;
-  });
-  els.categoryGrid.innerHTML = html;
+    return `
+      <button class='category-card ${escapeHtml(activeClass)}' type='button' data-select-category='${escapeHtml(cat.key)}'>
+        <img src='${escapeHtml(safeImageUrl(cat.image))}' class='cat-img' alt='${escapeHtml(cat.label)}' loading='lazy' data-fallback='${escapeHtml(LOCAL_IMAGE_FALLBACK)}'>
+        <div class='cat-body'><strong>${escapeHtml(cat.label)}</strong><small>${escapeHtml(cat.blurb)}</small><span>${count} producto${count===1?"":"s"}</span></div>
+      </button>`;
+  }).join("");
 
   if(els.adminFilter){
     let opts = "<option value='all'>Todas las categorías</option>";
@@ -385,22 +389,26 @@ function renderCatalog(){
     return;
   }
 
-  let html = "";
-  list.forEach(item => {
+  els.catalogGrid.innerHTML = list.map(item => {
     const alt = escapeHtml(item.name || "Producto HiBRID");
-    html += `<article class='product-card'><div class='product-media'><img src='${escapeHtml(productImage(item))}' alt='${alt}' loading='lazy' data-fallback='${escapeHtml(LOCAL_IMAGE_FALLBACK)}'></div>`;
-    html += `<div class='product-body'><div class='product-top'><div><span class='badge${item.visible ? "" : " muted"}'>${escapeHtml(getCategoryLabel(item.category))}${item.visible ? "" : " · Oculto"}</span>`;
-    html += `<h4 class='product-title' style='margin-top:.7rem'>${escapeHtml(item.name)}</h4></div><div class='price'>${formatPrice(item.price)}</div></div>`;
-    html += `<p class='small muted'>${escapeHtml(item.description)}</p><button class='btn primary full' type='button' data-add='${escapeHtml(item.id)}'>Agregar al carrito</button></div></article>`;
-  });
-  els.catalogGrid.innerHTML = html;
+    return `
+      <article class='product-card'>
+        <div class='product-media'><img src='${escapeHtml(productImage(item))}' alt='${alt}' loading='lazy' data-fallback='${escapeHtml(LOCAL_IMAGE_FALLBACK)}'></div>
+        <div class='product-body'>
+          <div class='product-top'><div><span class='badge${item.visible ? "" : " muted"}'>${escapeHtml(getCategoryLabel(item.category))}${item.visible ? "" : " · Oculto"}</span>
+          <h4 class='product-title' style='margin-top:.7rem'>${escapeHtml(item.name)}</h4></div><div class='price'>${formatPrice(item.price)}</div></div>
+          <p class='small muted'>${escapeHtml(item.description)}</p>
+          <button class='btn primary full' type='button' data-add='${escapeHtml(item.id)}'>Agregar al carrito</button>
+        </div>
+      </article>`;
+  }).join("");
 }
 
 // ---------- Carrito ----------
 function normalizeQuantity(value) {
   const q = Number(value);
-  if (!Number.isFinite(q)) return 0;
-  return Math.min(999, Math.max(1, Math.floor(q)));
+  if (!Number.isSafeInteger(q)) return 0;
+  return Math.min(999, Math.max(1, q));
 }
 
 function normalizeCart(value) {
@@ -437,9 +445,8 @@ function saveCartData() {
 
 function loadCartData() {
   try {
-    const raw = localStorage.getItem(CART_KEY);
-    const parsed = JSON.parse(raw || "[]");
-    state.cart = normalizeCart(parsed);
+    const raw = localStorage.getItem(CART_KEY) || "[]";
+    state.cart = normalizeCart(JSON.parse(raw));
   } catch (error) {
     state.cart = []; storageAvailable = false; console.warn("No se pudo leer el carrito:", error);
   }
@@ -467,9 +474,7 @@ function addToCart(id) {
   if (item) item.quantity = normalizeQuantity(item.quantity + 1);
   else state.cart.push({ id: String(id), quantity: 1 });
   
-  saveCartData();
-  updateCartStats();
-  showNotice("Producto agregado al carrito.", "success");
+  saveCartData(); updateCartStats(); showNotice("Producto agregado al carrito.", "success");
 }
 
 function changeQty(id, delta){
@@ -556,8 +561,8 @@ function calculateSystem(){
   const enfoqueEl = document.querySelector('input[name="enfoque"]:checked');
   const enfoque = enfoqueEl ? enfoqueEl.value : "auto";
 
-  if(!dailyKwh || dailyKwh <= 0){
-    els.calcResult.innerHTML = "<p class='small' style='color:#e0524f;margin-top:1rem'>Ajusta el control de consumo diario para calcular.</p>";
+  if(!Number.isFinite(dailyKwh) || dailyKwh <= 0){
+    els.calcResult.innerHTML = "<p class='small' style='color:#e0524f;margin-top:1rem'>Ajusta el consumo diario para calcular.</p>";
     return;
   }
 
@@ -569,17 +574,14 @@ function calculateSystem(){
   const totalInstalledKw = panels * panelPowerKw;
   const area = panels * areaPerPanel;
 
-  const BATTERY_USABLE_FRACTION = 0.80;
-  const DESIGN_MARGIN = 1.15;
-  const BATTERY_UNIT_KWH = 5.12;
-  const usableStorageKwh = dailyKwh * autonomyDays * DESIGN_MARGIN;
-  const nominalBatteryKwh = usableStorageKwh / BATTERY_USABLE_FRACTION;
-  const numBatteries = Math.max(1, Math.ceil(nominalBatteryKwh / BATTERY_UNIT_KWH));
+  const usableStorageKwh = dailyKwh * autonomyDays * 1.15;
+  const nominalBatteryKwh = usableStorageKwh / 0.80;
+  const numBatteries = Math.max(1, Math.ceil(nominalBatteryKwh / 5.12));
   const batteryKwh = nominalBatteryKwh.toFixed(1);
 
   let inverterNote = "La potencia del inversor no puede definirse solo con el consumo diario.";
-  if (totalInstalledKw <= 5) inverterNote = "Rango fotovoltaico preliminar: revisar inversor de 3–5 kW según demanda máxima.";
-  else if (totalInstalledKw <= 10) inverterNote = "Rango fotovoltaico preliminar: revisar inversor de 6–8 kW según demanda máxima.";
+  if (totalInstalledKw <= 5) inverterNote = "Revisar inversor de 3 a 5 kW según demanda máxima.";
+  else if (totalInstalledKw <= 10) inverterNote = "Revisar inversor de 6 a 8 kW según demanda máxima.";
   else inverterNote = "Evaluar configuración trifásica o inversores en paralelo con un técnico.";
 
   const wTextBase = `Hola HiBRID, usé su calculadora web.\nConsumo diario: ${dailyKwh} kWh\nAutonomía: ${autonomyDays} día(s)\nTipo de proyecto: ${profile.label}\n`;
@@ -625,16 +627,23 @@ function renderAdmin(){
     return;
   }
 
-  let html = "";
-  list.forEach(item => {
+  els.adminInventoryList.innerHTML = list.map(item => {
     const alt = escapeHtml(item.name || "Producto HiBRID");
-    html += `<div class='inv-item'><img src='${escapeHtml(productImage(item))}' alt='${alt}' data-fallback='${escapeHtml(LOCAL_IMAGE_FALLBACK)}'><div class='inv-info'><h4>${escapeHtml(item.name)}</h4>`;
-    html += `<div class='tiny muted'>Cat: ${escapeHtml(getCategoryLabel(item.category))} | Precio: ${formatPrice(item.price)}</div></div><div class='inv-actions'>`;
-    html += `<label class='switch' title='Activar/Ocultar'><input type='checkbox' data-toggle-id='${escapeHtml(item.id)}' ${item.visible ? "checked" : ""}><span class='slider'></span></label>`;
-    html += `<button class='btn secondary small' type='button' data-edit-id='${escapeHtml(item.id)}'>Editar</button><button class='btn secondary small' type='button' data-duplicate-id='${escapeHtml(item.id)}'>Duplicar</button>`;
-    html += `<button class='btn danger small' type='button' data-delete-id='${escapeHtml(item.id)}'><i class='fa-solid fa-trash'></i></button></div></div>`;
-  });
-  els.adminInventoryList.innerHTML = html;
+    return `
+      <div class='inv-item'>
+        <img src='${escapeHtml(productImage(item))}' alt='${alt}' data-fallback='${escapeHtml(LOCAL_IMAGE_FALLBACK)}'>
+        <div class='inv-info'>
+          <h4>${escapeHtml(item.name)}</h4>
+          <div class='tiny muted'>Cat: ${escapeHtml(getCategoryLabel(item.category))} | Precio: ${formatPrice(item.price)}</div>
+        </div>
+        <div class='inv-actions'>
+          <label class='switch' title='Activar/Ocultar'><input type='checkbox' data-toggle-id='${escapeHtml(item.id)}' ${item.visible ? "checked" : ""}><span class='slider'></span></label>
+          <button class='btn secondary small' type='button' data-edit-id='${escapeHtml(item.id)}'>Editar</button>
+          <button class='btn secondary small' type='button' data-duplicate-id='${escapeHtml(item.id)}'>Duplicar</button>
+          <button class='btn danger small' type='button' data-delete-id='${escapeHtml(item.id)}'><i class='fa-solid fa-trash'></i></button>
+        </div>
+      </div>`;
+  }).join("");
 }
 
 async function toggleVisibility(id){
@@ -829,14 +838,13 @@ function renderModalGallery(){
   const category = els.modalProductCategory.value || "principales";
   const images = imageLibrary[category] || [];
   const current = els.modalProductImage.value;
-  let html = "";
-  images.forEach(img => {
+  els.modalGalleryGrid.innerHTML = images.length ? images.map(img => {
     const activeClass = current === img && !els.modalProductImageUrl.value ? "active" : "";
     const imgSrc = img.startsWith('http') ? img : './' + img;
-    html += `<button class='gallery-item ${escapeHtml(activeClass)}' type='button' data-modal-img='${escapeHtml(img)}'>`;
-    html += `<img src='${escapeHtml(imgSrc)}' loading='lazy' data-fallback='${escapeHtml(LOCAL_IMAGE_FALLBACK)}'></button>`;
-  });
-  els.modalGalleryGrid.innerHTML = images.length ? html : "<div class='small muted'>No hay imágenes para esta categoría.</div>";
+    return `<button class='gallery-item ${escapeHtml(activeClass)}' type='button' data-modal-img='${escapeHtml(img)}'>
+              <img src='${escapeHtml(imgSrc)}' loading='lazy' data-fallback='${escapeHtml(LOCAL_IMAGE_FALLBACK)}'>
+            </button>`;
+  }).join("") : "<div class='small muted'>No hay imágenes para esta categoría.</div>";
 }
 
 function updateModalPreview(){
@@ -894,32 +902,25 @@ function bindEvents(){
     const catBtn = event.target.closest("[data-select-category]");
     if(catBtn){
       state.filterCategory = catBtn.dataset.selectCategory;
-      renderCategoryButtons(); renderCatalog();
+      renderAll();
       if(state.route !== "home") routeTo("home");
       setTimeout(() => scrollToElement(document.getElementById("catalogMetaJump")), 50);
       return;
     }
 
-    if(event.target.closest("#clearFiltersBtn")){ state.filterCategory = "all"; renderCategoryButtons(); renderCatalog(); return; }
-    
+    if(event.target.closest("#clearFiltersBtn")){ state.filterCategory = "all"; renderAll(); return; }
     const addBtn = event.target.closest("[data-add]");
     if(addBtn) { addToCart(addBtn.dataset.add); return; }
-    
     const qtyBtn = event.target.closest("[data-qty]");
     if(qtyBtn) { changeQty(qtyBtn.dataset.id, qtyBtn.dataset.qty === "plus" ? 1 : -1); return; }
-    
     const removeBtn = event.target.closest("[data-remove]");
     if(removeBtn) { removeFromCart(removeBtn.dataset.remove); return; }
-    
     const editBtn = event.target.closest("[data-edit-id]");
     if(editBtn) { openModal(editBtn.dataset.editId); return; }
-    
     const dupBtn = event.target.closest("[data-duplicate-id]");
     if(dupBtn) { duplicateProduct(dupBtn.dataset.duplicateId); return; }
-    
     const delBtn = event.target.closest("[data-delete-id]");
     if(delBtn) { deleteProductAction(delBtn.dataset.deleteId); return; }
-    
     const modalImgBtn = event.target.closest("[data-modal-img]");
     if(modalImgBtn){
       els.modalProductImage.value = modalImgBtn.dataset.modalImg;
@@ -988,7 +989,6 @@ function init() {
   bindEvents();
   initCalcInputs();
   loadCartData();
-  renderCategoryButtons();
   fetchProducts({ automaticRetry: false });
   routeTo("home");
 }
