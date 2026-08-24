@@ -1,1 +1,24 @@
-
+{
+  "name": "hibrid-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "API de productos de Hibrid Soluciones Energéticas",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.0.1",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "rate-limit-redis": "^4.2.0",
+    "redis": "^4.7.0",
+    "zod": "^3.23.8"
+  }
+}
