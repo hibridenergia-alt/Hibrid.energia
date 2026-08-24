@@ -593,7 +593,7 @@
   <div id="noticeStack" class="notice-stack" aria-live="polite" aria-atomic="true"></div>
 
   <script>
-    // --- INTEGRACIÓN RENDER & WHATSAPP CORREGIDA ---
+    // --- INTEGRACIÓN RENDER & WHATSAPP CORREGIDA FINAL ---
     const API_URL = "https://hibrid-energia.onrender.com";
     const WHATSAPP_NUMBER = "56956139055";
 
@@ -624,7 +624,7 @@
       products: [],
       cart: [],
       filterCategory: "all",
-      adminUnlocked: !!localStorage.getItem("hibrid_token"),
+      adminUnlocked: false,
       adminToken: localStorage.getItem("hibrid_token") || ""
     };
 
@@ -632,62 +632,52 @@
     const $$ = (selector, parent = document) => Array.from(parent.querySelectorAll(selector));
 
     const els = {
-      categoryGrid: $("#categoryGrid"),
-      catalogGrid: $("#catalogGrid"),
-      catalogTitle: $("#catalogTitle"),
-      catalogMeta: $("#catalogMeta"),
-      clearFiltersBtn: $("#clearFiltersBtn"),
-      cartList: $("#cartList"),
-      summaryBox: $("#summaryBox"),
-      stickyCartCount: $("#stickyCartCount"),
-      stickyCartTotal: $("#stickyCartTotal"),
-      whatsappBtn: $("#whatsappBtn"),
-      clearCartBtn: $("#clearCartBtn"),
-      powerInput: $("#powerInput"),
-      batteryPercent: $("#batteryPercent"),
-      projectUse: $("#projectUse"),
-      calculateBtn: $("#calculateBtn"),
-      calcResult: $("#calcResult"),
-      adminPass: $("#adminPass"),
-      adminLoginBtn: $("#adminLoginBtn"),
-      adminFilter: $("#adminFilter"),
-      adminInventoryList: $("#adminInventoryList"),
-      btnOpenNewProduct: $("#btnOpenNewProduct"),
-      productModal: $("#productModal"),
-      btnCloseModal: $("#btnCloseModal"),
-      modalForm: $("#modalForm"),
-      modalTitle: $("#modalTitle"),
-      modalProductId: $("#modalProductId"),
-      modalProductName: $("#modalProductName"),
-      modalProductCategory: $("#modalProductCategory"),
-      modalProductPrice: $("#modalProductPrice"),
-      modalProductDesc: $("#modalProductDesc"),
-      modalProductImage: $("#modalProductImage"),
-      modalProductImageUrl: $("#modalProductImageUrl"),
-      modalGalleryGrid: $("#modalGalleryGrid"),
-      statTotal: $("#statTotal"),
-      statVisible: $("#statVisible"),
-      statHidden: $("#statHidden"),
+      categoryGrid: $("#categoryGrid"), catalogGrid: $("#catalogGrid"),
+      catalogTitle: $("#catalogTitle"), catalogMeta: $("#catalogMeta"),
+      clearFiltersBtn: $("#clearFiltersBtn"), cartList: $("#cartList"),
+      summaryBox: $("#summaryBox"), stickyCartCount: $("#stickyCartCount"),
+      stickyCartTotal: $("#stickyCartTotal"), whatsappBtn: $("#whatsappBtn"),
+      clearCartBtn: $("#clearCartBtn"), powerInput: $("#powerInput"),
+      batteryPercent: $("#batteryPercent"), projectUse: $("#projectUse"),
+      calculateBtn: $("#calculateBtn"), calcResult: $("#calcResult"),
+      adminPass: $("#adminPass"), adminLoginBtn: $("#adminLoginBtn"),
+      adminFilter: $("#adminFilter"), adminInventoryList: $("#adminInventoryList"),
+      btnOpenNewProduct: $("#btnOpenNewProduct"), productModal: $("#productModal"),
+      btnCloseModal: $("#btnCloseModal"), modalForm: $("#modalForm"),
+      modalTitle: $("#modalTitle"), modalProductId: $("#modalProductId"),
+      modalProductName: $("#modalProductName"), modalProductCategory: $("#modalProductCategory"),
+      modalProductPrice: $("#modalProductPrice"), modalProductDesc: $("#modalProductDesc"),
+      modalProductImage: $("#modalProductImage"), modalProductImageUrl: $("#modalProductImageUrl"),
+      modalGalleryGrid: $("#modalGalleryGrid"), statTotal: $("#statTotal"),
+      statVisible: $("#statVisible"), statHidden: $("#statHidden"),
       noticeStack: $("#noticeStack")
     };
 
     function escapeHtml(value){
-      return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+      return String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
     function showNotice(message, type="info"){
       const node = document.createElement("div");
       node.className = "notice " + type;
-      const title = type === "success" ? "Listo" : type === "error" ? "Revisa" : "Info";
+      const title = type === "success" ? "Listo" : type === "error" ? "Error" : "Info";
       node.innerHTML = "<div><strong>" + title + "</strong><div class='small muted' style='margin-top:.15rem'>" + escapeHtml(message) + "</div></div>";
       if(els.noticeStack) els.noticeStack.appendChild(node);
       setTimeout(() => { node.style.opacity = "0"; node.style.transform = "translateY(-4px)"; }, 2800);
       setTimeout(() => { if(node.parentNode) node.remove(); }, 3400);
+    }
+
+    // --- MANEJO DE ERRORES CENTRALIZADO ---
+    function handleApiError(res) {
+      if (res.status === 401 || res.status === 403) {
+        state.adminUnlocked = false;
+        state.adminToken = "";
+        localStorage.removeItem("hibrid_token");
+        routeTo("home");
+        throw new Error("Sesión expirada. Por favor, vuelve a ingresar al panel.");
+      }
+      if (res.status === 412) throw new Error("Conflicto de edición. Refrescando datos...");
+      throw new Error("El servidor rechazó la operación.");
     }
 
     function loadCartData(){
@@ -704,17 +694,23 @@
 
     // --- CONEXIÓN A RENDER ---
     async function fetchProducts() {
+      if(state.products.length === 0 && els.catalogGrid) {
+         els.catalogGrid.innerHTML = "<div class='empty'><i class='fa-solid fa-spinner fa-spin' style='color:var(--color-primary); margin-bottom:10px; font-size:1.5rem;'></i><br>Conectando con el servidor...</div>";
+      }
+      
       try {
         let res;
-        if (state.adminUnlocked && state.adminToken) {
+        if (state.adminToken) {
           res = await fetch(`${API_URL}/api/products`, {
             headers: { "Authorization": `Bearer ${state.adminToken}` }
           });
-          if (res.status === 401) {
+          if (res.status === 401 || res.status === 403) {
             state.adminUnlocked = false;
             state.adminToken = "";
             localStorage.removeItem("hibrid_token");
             res = await fetch(`${API_URL}/api/products`);
+          } else {
+            state.adminUnlocked = true;
           }
         } else {
           res = await fetch(`${API_URL}/api/products`);
@@ -725,7 +721,8 @@
           renderAll();
         }
       } catch (error) {
-        showNotice("Error conectando al servidor de Render.", "error");
+        if(els.catalogGrid) els.catalogGrid.innerHTML = "<div class='empty'>Error conectando al servidor de Render.</div>";
+        console.error(error);
       }
     }
 
@@ -739,8 +736,9 @@
 
     function productImage(product){
       if(!product) return "./paneles.jpg";
-      const img = product.image_url || product.image || product.imagen || "paneles.jpg";
-      return img.startsWith('http') ? img : './' + img;
+      const img = product.image_url || product.image || "paneles.jpg";
+      if(img.startsWith('http') || img.startsWith('/')) return img;
+      return './' + img;
     }
 
     function getCategoryLabel(key){
@@ -780,7 +778,7 @@
       let html = "";
       categories.forEach(cat => {
         const count = state.products.filter(item => item.category === cat.key && item.visible === true).length;
-        const imgSrc = cat.image.startsWith('http') ? cat.image : './' + cat.image;
+        const imgSrc = cat.image.startsWith('http') || cat.image.startsWith('/') ? cat.image : './' + cat.image;
         const activeClass = state.filterCategory === cat.key ? "active" : "";
         html += "<button class='category-card " + activeClass + "' type='button' data-select-category='" + cat.key + "'>";
         html += "<img src='" + imgSrc + "' class='cat-img' alt='" + cat.label + "' loading='lazy' onerror=\"this.onerror=null;this.src='https://via.placeholder.com/400x300?text=HiBRID';\">";
@@ -821,7 +819,6 @@
         html += "<h4 class='product-title' style='margin-top:.7rem'>" + escapeHtml(item.name) + "</h4></div>";
         html += "<div class='price'>" + formatPrice(item.price) + "</div></div>";
         html += "<p class='small muted'>" + escapeHtml(item.description) + "</p>";
-        html += "<div class='tiny muted'>ID: " + escapeHtml(item.id) + "</div>";
         html += "<button class='btn primary full' type='button' data-add='" + escapeHtml(item.id) + "'>Agregar al carrito</button>";
         html += "</div></article>";
       });
@@ -1028,8 +1025,8 @@
       if(!state.adminUnlocked || !els.adminInventoryList) return;
 
       if(els.statTotal) els.statTotal.textContent = state.products.length;
-      if(els.statVisible) els.statVisible.textContent = state.products.filter(p => p.visible).length;
-      if(els.statHidden) els.statHidden.textContent = state.products.filter(p => !p.visible).length;
+      if(els.statVisible) els.statVisible.textContent = state.products.filter(p => p.visible === true).length;
+      if(els.statHidden) els.statHidden.textContent = state.products.filter(p => p.visible === false).length;
 
       const list = adminFilteredProducts();
       
@@ -1069,11 +1066,14 @@
            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${state.adminToken}`, "If-Match": item.etag },
            body: JSON.stringify({ visible: !item.visible })
          });
-         if (!res.ok) throw new Error();
+         if (!res.ok) handleApiError(res);
          
          showNotice(!item.visible ? "Producto Publicado" : "Producto Oculto", "info");
          await fetchProducts();
-       } catch(e) { showNotice("Error cambiando visibilidad", "error"); }
+       } catch(e) { 
+         showNotice(e.message, "error"); 
+         if (e.message.includes("Conflicto")) await fetchProducts();
+       }
     }
 
     async function duplicateProduct(id) {
@@ -1085,8 +1085,8 @@
           price: original.price,
           description: original.description,
           category: original.category,
-          image: original.image || original.image_url,
-          visible: false
+          image_url: original.image_url || original.image,
+          visible: false // SIEMPRE BORRADOR POR DEFECTO
        };
 
        try {
@@ -1095,10 +1095,11 @@
            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${state.adminToken}` },
            body: JSON.stringify(payload)
          });
-         if(!res.ok) throw new Error();
+         if(!res.ok) handleApiError(res);
+
          showNotice("Producto duplicado como borrador.", "success");
          await fetchProducts();
-       } catch(e) { showNotice("Error al duplicar", "error"); }
+       } catch(e) { showNotice(e.message, "error"); }
     }
 
     async function deleteProduct(id) {
@@ -1111,13 +1112,13 @@
           method: "DELETE",
           headers: { "Authorization": `Bearer ${state.adminToken}`, "If-Match": item.etag }
         });
-        if (!res.ok && res.status !== 204) throw new Error("El servidor rechazó la operación");
+        if (!res.ok && res.status !== 204) handleApiError(res);
 
         state.cart = state.cart.filter(row => row.id !== id);
         saveCartData();
         showNotice("Producto eliminado correctamente.", "success");
         await fetchProducts();
-      } catch(e) { showNotice(e.message || "Error al eliminar", "error"); }
+      } catch(e) { showNotice(e.message, "error"); }
     }
 
     async function saveModalProduct(e) {
@@ -1140,7 +1141,17 @@
       if (!image) { showNotice("Selecciona una imagen.", "error"); return; }
 
       const existing = isNew ? null : state.products.find(p => p.id === idVal);
-      const payload = { name, description, price, category, image, visible: isNew ? true : existing.visible };
+      if (!isNew && !existing) { showNotice("El producto ya no existe.", "error"); return; }
+
+      // UNIFICADO A image_url - SI ES NUEVO NACE COMO BORRADOR
+      const payload = { 
+        name, 
+        description, 
+        price, 
+        category, 
+        image_url: image, 
+        visible: isNew ? false : existing.visible 
+      };
 
       const url = `${API_URL}/api/products${isNew ? '' : `/${existing.id}`}`;
       const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${state.adminToken}` };
@@ -1148,17 +1159,12 @@
 
       try {
         const res = await fetch(url, { method: isNew ? "POST" : "PATCH", headers, body: JSON.stringify(payload) });
+        if (!res.ok) handleApiError(res);
 
-        if (!res.ok) {
-          if (res.status === 401) throw new Error("Token inválido");
-          if (res.status === 412) throw new Error("El producto cambió. Recarga la página");
-          throw new Error("El servidor rechazó la operación");
-        }
-
-        showNotice(isNew ? "Producto creado exitosamente" : "Producto actualizado", "success");
+        showNotice(isNew ? "Producto creado como borrador" : "Producto actualizado", "success");
         closeModal();
         await fetchProducts();
-      } catch (error) { showNotice(error.message || "Error al guardar", "error"); }
+      } catch (error) { showNotice(error.message, "error"); }
     }
 
     async function loginAdmin() {
@@ -1194,12 +1200,14 @@
           if(els.modalProductCategory) els.modalProductCategory.value = item.category;
           if(els.modalProductPrice) els.modalProductPrice.value = item.price;
           if(els.modalProductDesc) els.modalProductDesc.value = item.description;
-          if(els.modalProductImage) els.modalProductImage.value = productImage(item).replace('./', '');
+          
+          const rawImg = item.image_url || item.image || "";
+          if(els.modalProductImage) els.modalProductImage.value = rawImg.replace('./', '');
           
           if(els.modalProductImageUrl){
              const library = imageLibrary.catalog[item.category] || [];
-             if(item.image_url && !library.includes(item.image_url)){
-                els.modalProductImageUrl.value = item.image_url || "";
+             if(rawImg && !library.includes(rawImg)){
+                els.modalProductImageUrl.value = rawImg || "";
              } else { els.modalProductImageUrl.value = ""; }
           }
        } else {
@@ -1229,7 +1237,7 @@
        let html = "";
        images.forEach(img => {
           const activeClass = current === img ? "active" : "";
-          const imgSrc = img.startsWith('http') ? img : './' + img;
+          const imgSrc = img.startsWith('http') || img.startsWith('/') ? img : './' + img;
           html += "<button class='gallery-item " + activeClass + "' type='button' data-modal-img='" + escapeHtml(img) + "'>";
           html += "<img src='" + escapeHtml(imgSrc) + "' loading='lazy' onerror=\"this.onerror=null;this.src='https://via.placeholder.com/400x300?text=HiBRID';\"></button>";
        });
