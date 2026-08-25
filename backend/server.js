@@ -12,6 +12,8 @@ const PORT = process.env.PORT || 10000;
 
 // Configuración Estricta de Redis
 const redisClient = createClient({ url: process.env.REDIS_URL });
+// Cliente dedicado para transacciones (Hallazgo 4)
+const txClient = redisClient.duplicate();
 
 redisClient.on('error', (err) => {
   console.error('❌ Error crítico en Redis principal:', err);
@@ -20,9 +22,14 @@ redisClient.on('error', (err) => {
   }
 });
 
+txClient.on('error', (err) => {
+  console.error('❌ Error crítico en txClient:', err);
+});
+
 try {
   await redisClient.connect();
-  console.log('✅ Redis conectado exitosamente.');
+  await txClient.connect(); // Inicializar cliente de transacciones
+  console.log('✅ Redis (Principal y Transaccional) conectados exitosamente.');
 } catch (err) {
   console.error('❌ Falla fatal al inicializar Redis:', err);
   if (process.env.NODE_ENV === 'production') process.exit(1);
@@ -30,6 +37,10 @@ try {
 
 app.use(helmet());
 app.use(express.json());
+
+// Hallazgo 1: Configurar 'trust proxy' para Render/Heroku (Crítico)
+app.set('trust proxy', 1);
+
 app.use(cors({
   origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : '*',
   methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -37,24 +48,43 @@ app.use(cors({
   exposedHeaders: ['ETag']
 }));
 
-const limiter = rateLimit({
+// Configuración de Rate Limits separados (Hallazgo 9)
+const store = redisClient.isOpen ? new RedisStore({
+  sendCommand: (...args) => redisClient.sendCommand(args),
+}) : undefined;
+
+const publicLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 100,
+  limit: 300, // Límite generoso para lecturas
   standardHeaders: true,
   legacyHeaders: false,
-  store: redisClient.isOpen ? new RedisStore({
-    sendCommand: (...args) => redisClient.sendCommand(args),
-  }) : undefined,
+  store,
 });
-app.use('/api/', limiter);
 
+const adminLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 50, // Límite estricto para operaciones de escritura/admin
+  standardHeaders: true,
+  legacyHeaders: false,
+  store,
+});
+
+// Aplicar Rate Limiter condicionalmente
+app.use('/api/', (req, res, next) => {
+  if (req.method === 'GET' && req.path === '/products') {
+    return publicLimiter(req, res, next);
+  }
+  return adminLimiter(req, res, next);
+});
+
+// Hallazgo 11: IDs determinísticos y Hallazgo 7: Imagen bateriacatalogo1.jpg
 const DEFAULT_PRODUCTS = [
-  { id: crypto.randomUUID(), name: 'Panel Solar Monocristalino 550W', category: 'paneles', price: 150000, description: 'Alta eficiencia, tecnología PERC.', image: 'panelescatalogo.jpg', visible: true, etag: '"1"' },
-  { id: crypto.randomUUID(), name: 'Inversor Híbrido 5kW', category: 'inversores', price: 850000, description: 'Onda senoidal pura, compatible con litio.', image: 'inversorcatalogo.png', visible: true, etag: '"1"' },
-  { id: crypto.randomUUID(), name: 'Batería de Litio 4.8kWh', category: 'baterias', price: 1250000, description: 'Ciclo profundo, 6000 ciclos DoD 80%.', image: 'bateriacatalogo.jpg', visible: true, etag: '"1"' },
-  { id: crypto.randomUUID(), name: 'Aerogenerador 1kW', category: 'aerogeneradores', price: 650000, description: 'Ideal para zonas costeras.', image: 'eolica.jpg', visible: true, etag: '"1"' },
-  { id: crypto.randomUUID(), name: 'Kit Solar Off-Grid Básico', category: 'kits', price: 2100000, description: 'Todo incluido para cabañas aisladas.', image: 'kitsolar.jpg', visible: true, etag: '"1"' },
-  { id: crypto.randomUUID(), name: 'Conectores MC4 (Par)', category: 'otros', price: 4500, description: 'Conectores solares con certificación IP67.', image: '', visible: true, etag: '"1"' }
+  { id: 'seed-panel-550w', name: 'Panel Solar Monocristalino 550W', category: 'paneles', price: 150000, description: 'Alta eficiencia, tecnología PERC.', image: 'panelescatalogo.jpg', visible: true, etag: '"1"' },
+  { id: 'seed-inversor-5kw', name: 'Inversor Híbrido 5kW', category: 'inversores', price: 850000, description: 'Onda senoidal pura, compatible con litio.', image: 'inversorcatalogo.png', visible: true, etag: '"1"' },
+  { id: 'seed-bateria-4-8kwh', name: 'Batería de Litio 4.8kWh', category: 'baterias', price: 1250000, description: 'Ciclo profundo, 6000 ciclos DoD 80%.', image: 'bateriacatalogo1.jpg', visible: true, etag: '"1"' },
+  { id: 'seed-aerogenerador-1kw', name: 'Aerogenerador 1kW', category: 'aerogeneradores', price: 650000, description: 'Ideal para zonas costeras.', image: 'eolica.jpg', visible: true, etag: '"1"' },
+  { id: 'seed-kit-solar-basico', name: 'Kit Solar Off-Grid Básico', category: 'kits', price: 2100000, description: 'Todo incluido para cabañas aisladas.', image: 'kitsolar.jpg', visible: true, etag: '"1"' },
+  { id: 'seed-conectores-mc4', name: 'Conectores MC4 (Par)', category: 'otros', price: 4500, description: 'Conectores solares con certificación IP67.', image: '', visible: true, etag: '"1"' }
 ];
 
 async function getProductsSnapshot() {
@@ -67,39 +97,48 @@ async function getProductsSnapshot() {
   }
 }
 
+// Hallazgo 4: Reutilizar cliente de base de datos para transacciones en vez de crear/destruir
 async function updateProductsAtomically(updaterFn, maxRetries = 3) {
-  const isolatedClient = redisClient.duplicate();
-  await isolatedClient.connect();
-
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      await isolatedClient.watch('products');
-      const data = await isolatedClient.get('products');
+      await txClient.watch('products');
+      const data = await txClient.get('products');
       let products = data ? JSON.parse(data) : structuredClone(DEFAULT_PRODUCTS);
       
       const updatedProducts = updaterFn(products);
       
-      const multi = isolatedClient.multi();
+      const multi = txClient.multi();
       multi.set('products', JSON.stringify(updatedProducts));
       const result = await multi.exec();
       
       if (result) {
-        await isolatedClient.quit();
         return updatedProducts;
       }
     } catch (err) {
-      await isolatedClient.unwatch();
-      await isolatedClient.quit();
-      throw err;
+      await txClient.unwatch();
+      if (attempt === maxRetries) throw err;
     }
   }
-  await isolatedClient.quit();
   throw new Error('Conflicto persistente en base de datos.');
 }
 
+// Hallazgo 5: Comparación segura de tokens en tiempo constante
+function safeCompare(a, b) {
+  try {
+    const bufA = Buffer.from(String(a));
+    const bufB = Buffer.from(String(b));
+    if (bufA.length !== bufB.length) return false;
+    return crypto.timingSafeEqual(bufA, bufB);
+  } catch (e) {
+    return false;
+  }
+}
+
 const requireAdmin = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || authHeader !== `Bearer ${process.env.ADMIN_TOKEN}`) {
+  const authHeader = req.headers.authorization || '';
+  const expected = `Bearer ${process.env.ADMIN_TOKEN}`;
+  
+  if (!safeCompare(authHeader, expected)) {
     res.setHeader('WWW-Authenticate', 'Bearer realm="HiBRID Admin Area"');
     return res.status(401).json({ error: 'Acceso denegado. Token inválido.' });
   }
@@ -110,8 +149,10 @@ app.get('/health', (req, res) => res.status(200).json({ ok: true, service: 'hibr
 
 app.get('/api/products', async (req, res) => {
   const products = await getProductsSnapshot();
-  const authHeader = req.headers.authorization;
-  const isAdmin = authHeader === `Bearer ${process.env.ADMIN_TOKEN}`;
+  const authHeader = req.headers.authorization || '';
+  const expected = `Bearer ${process.env.ADMIN_TOKEN}`;
+  
+  const isAdmin = safeCompare(authHeader, expected);
   const publicProducts = isAdmin ? products : products.filter(p => p.visible);
   res.json(publicProducts);
 });
@@ -123,7 +164,7 @@ app.get('/api/assets', requireAdmin, (req, res) => {
     { value: 'paneles.jpg', label: 'Paneles' },
     { value: 'panelescatalogo.jpg', label: 'Paneles Catálogo' },
     { value: 'bateria.jpg', label: 'Batería' },
-    { value: 'bateriacatalogo.jpg', label: 'Batería Catálogo' },
+    { value: 'bateriacatalogo1.jpg', label: 'Batería Catálogo' },
     { value: 'inversor.jpg', label: 'Inversor' },
     { value: 'inversorcatalogo.png', label: 'Inversor Catálogo' },
     { value: 'eolica.jpg', label: 'Eólica' },
@@ -132,13 +173,13 @@ app.get('/api/assets', requireAdmin, (req, res) => {
   ]);
 });
 
+// Hallazgo 10: Limpiar propiedades sin uso como image_url
 const productSchema = z.object({
   name: z.string().min(1),
   price: z.number().nonnegative(),
   description: z.string().optional(),
   category: z.enum(['paneles', 'inversores', 'baterias', 'aerogeneradores', 'kits', 'otros']),
   image: z.string().optional(),
-  image_url: z.string().optional(),
   visible: z.boolean().optional(),
   nominalKW: z.number().nonnegative().optional()
 });
