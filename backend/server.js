@@ -41,7 +41,6 @@ app.use(cors({
   exposedHeaders: ['ETag']
 }));
 
-// HALLAZGO 14: Separación estricta de Stores en Redis mediante prefix
 const publicStore = redisClient.isOpen ? new RedisStore({
   prefix: 'rl:public:',
   sendCommand: (...args) => redisClient.sendCommand(args),
@@ -65,7 +64,7 @@ const DEFAULT_PRODUCTS = [
   { id: 'seed-inversor-5kw', name: 'Inversor Híbrido 5kW', category: 'inversores', price: 850000, description: 'Onda senoidal pura, compatible con litio.', image: 'productos/inversor1.png', visible: true, etag: '"1"' },
   { id: 'seed-bateria-4-8kwh', name: 'Batería de Litio 4.8kWh', category: 'baterias', price: 1250000, description: 'Ciclo profundo, 6000 ciclos DoD 80%.', image: 'productos/bateria1.png', visible: true, etag: '"1"' },
   { id: 'seed-aerogenerador-1kw', name: 'Aerogenerador 1kW', category: 'aerogeneradores', price: 650000, description: 'Ideal para zonas costeras.', image: 'productos/aero1.png', visible: true, etag: '"1"' },
-  { id: 'seed-kit-solar-basico', name: 'Kit Solar Off-Grid Básico', category: 'kits', price: 2100000, description: 'Todo incluido para cabañas aisladas.', image: 'productos/Paneles4.png', visible: true, etag: '"1"' },
+  { id: 'seed-kit-solar-basico', name: 'Kit Solar Off-Grid Básico', category: 'kits', price: 2100000, description: 'Todo incluido para cabañas aisladas.', image: 'productos/kit1.png', visible: true, etag: '"1"' },
   { id: 'seed-conectores-mc4', name: 'Conectores MC4 (Par)', category: 'otros', price: 4500, description: 'Conectores solares con certificación IP67.', image: 'productos/otros1.png', visible: true, etag: '"1"' }
 ];
 
@@ -129,7 +128,7 @@ app.get('/api/products', async (req, res) => {
 
 app.get('/api/admin/session', requireAdmin, (req, res) => res.json({ status: 'ok' }));
 
-// HALLAZGO 16: Listado de assets con "Label" estético pero "Value" idéntico al typo del repo.
+// AÑADIDO: Listado de assets ahora incluye los Kits reportados en tu captura
 app.get('/api/assets', requireAdmin, (req, res) => {
   res.json([
     { group: 'Paneles', options: [
@@ -152,16 +151,25 @@ app.get('/api/assets', requireAdmin, (req, res) => {
     { group: 'Inversores', options: [
       { value: 'productos/inversor1.png', label: 'Inversor 1' },
       { value: 'productos/inversor2.png', label: 'Inversor 2' },
-      { value: 'productos/imversor3.png', label: 'Inversor 3 (typo corregido UI)' },
+      { value: 'productos/imversor3.png', label: 'Inversor 3' },
       { value: 'productos/inversor4.png', label: 'Inversor 4' },
-      { value: 'productos/imversor5.png', label: 'Inversor 5 (typo corregido UI)' }
+      { value: 'productos/imversor5.png', label: 'Inversor 5' }
+    ]},
+    { group: 'Kits Solares', options: [
+      { value: 'productos/kit1.png', label: 'Kit 1' },
+      { value: 'productos/kit2.png', label: 'Kit 2' },
+      { value: 'productos/kit4.png', label: 'Kit 4' },
+      { value: 'productos/kit5.png', label: 'Kit 5' },
+      { value: 'productos/kit6.png', label: 'Kit 6' },
+      { value: 'productos/kit7.png', label: 'Kit 7' },
+      { value: 'productos/kit8.png', label: 'Kit 8' }
     ]},
     { group: 'Aerogeneradores', options: [
       { value: 'productos/aero1.png', label: 'Aero 1' },
       { value: 'productos/aero2.png', label: 'Aero 2' },
       { value: 'productos/aero3.png', label: 'Aero 3' },
       { value: 'productos/aero4.png', label: 'Aero 4' },
-      { value: 'productos/aerp5.png', label: 'Aero 5 (typo corregido UI)' }
+      { value: 'productos/aerp5.png', label: 'Aero 5' }
     ]},
     { group: 'Otros', options: [
       { value: 'productos/otros1.png', label: 'Otros 1' },
@@ -179,7 +187,6 @@ app.get('/api/assets', requireAdmin, (req, res) => {
   ]);
 });
 
-// HALLAZGO 18: Eliminado el campo en desuso nominalKW del validador.
 const productSchema = z.object({
   name: z.string().min(1),
   price: z.number().nonnegative(),
