@@ -24,7 +24,12 @@
 
     // --- CONFIGURACIÓN PRINCIPAL ---
     const API_URL = "https://hibrid-energia.onrender.com"; 
-    const WHATSAPP_NUMBER = "569XXXXXXXX"; // <-- ¡CAMBIA ESTO POR TU NÚMERO REAL TIZA!
+    
+    // Hallazgo 8: Actualización de Dummy WhatsApp Number y Warning
+    const WHATSAPP_NUMBER = "56912345678"; 
+    if (WHATSAPP_NUMBER === "56912345678" || WHATSAPP_NUMBER.includes('X')) {
+      console.warn('⚠️ IMPORTANTE: WHATSAPP_NUMBER no ha sido configurado con el número real.');
+    }
 
     // Íconos
     const IconSun = () => <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>;
@@ -36,10 +41,11 @@
     );
 
     // Categorías base para el diseño visual
+    // Hallazgo 7: Corrección nombre archivo bateria
     const CATEGORIAS_FOTOS = [
       { id: 'paneles', name: 'Paneles Solares', img: 'panelescatalogo.jpg' },
       { id: 'inversores', name: 'Inversores Híbridos', img: 'inversorcatalogo.png' },
-      { id: 'baterias', name: 'Baterías de Litio', img: 'bateriacatalogo.jpg' },
+      { id: 'baterias', name: 'Baterías de Litio', img: 'bateriacatalogo1.jpg' }, 
       { id: 'aerogeneradores', name: 'Aerogeneradores', img: 'eolica.jpg' },
       { id: 'kits', name: 'Kits Completos', img: 'kitsolar.jpg' },
       { id: 'otros', name: 'Accesorios y Otros', img: 'https://via.placeholder.com/300x200/1e293b/10b981?text=Accesorios' }
@@ -68,7 +74,7 @@
           const res = await fetch(`${API_URL}/api/products`);
           if (res.ok) setProducts(await res.json());
         } catch (e) {
-          console.error("Error al conectar con Render");
+          console.error("Error al conectar con el servidor.");
         } finally {
           setLoading(false);
         }
@@ -105,26 +111,59 @@
 
       const saveProduct = async (e) => {
         e.preventDefault();
-        const payload = { ...formData, price: Number(formData.price), visible: true };
         const isEditing = !!modal.product;
+        
+        // Hallazgo 3: Preservar el estado "visible" al editar
+        const payload = { 
+          ...formData, 
+          price: Number(formData.price), 
+          visible: isEditing ? (formData.visible ?? modal.product.visible) : true 
+        };
         const url = `${API_URL}/api/products${isEditing ? `/${modal.product.id}` : ''}`;
         
         try {
-          await fetch(url, { 
+          // Hallazgo 2: Verificar res.ok y controlar errores adecuadamente
+          const res = await fetch(url, { 
             method: isEditing ? "PATCH" : "POST", 
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${adminToken}`, ...(isEditing && {"If-Match": modal.product.etag}) }, 
+            headers: { 
+              "Content-Type": "application/json", 
+              Authorization: `Bearer ${adminToken}`, 
+              ...(isEditing && {"If-Match": modal.product.etag}) 
+            }, 
             body: JSON.stringify(payload) 
           });
+          
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error ? JSON.stringify(err.error) : `HTTP ${res.status}`);
+          }
+
           setModal({ open: false, product: null });
           fetchProducts();
           alert("Producto guardado con éxito");
-        } catch { alert("Error al guardar en el servidor"); }
+        } catch (e) { 
+          alert("Error al guardar: " + e.message); 
+        }
       };
 
       const deleteProduct = async (p) => {
         if(!confirm("¿Borrar definitivamente?")) return;
-        await fetch(`${API_URL}/api/products/${p.id}`, { method: "DELETE", headers: { Authorization: `Bearer ${adminToken}`, "If-Match": p.etag } });
-        fetchProducts();
+        try {
+          // Hallazgo 6: Try/Catch en deleteProduct y verificación res.ok
+          const res = await fetch(`${API_URL}/api/products/${p.id}`, { 
+            method: "DELETE", 
+            headers: { Authorization: `Bearer ${adminToken}`, "If-Match": p.etag } 
+          });
+          
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || `HTTP ${res.status}`);
+          }
+          
+          fetchProducts();
+        } catch (e) {
+          alert("No se pudo borrar: " + e.message);
+        }
       };
 
       return (
@@ -248,7 +287,6 @@
                   
                   <div className="bg-slate-900 p-5 rounded-lg border border-slate-700 space-y-3">
                     <h3 className="font-bold text-white border-b border-slate-700 pb-2">Solución Técnica Sugerida:</h3>
-                    {/* Matemática Real Off-Grid: Inversor = Consumo / 3 o 4 horas de uso pico. Baterías = Consumo * Autonomía. Paneles = (Consumo / 4h sol) * factor */}
                     <p className="text-sm text-slate-300">⚡ Inversor Sugerido: <strong className="text-white">{Math.ceil(calcKWh / 3.5)} kW</strong></p>
                     <p className="text-sm text-slate-300">🔋 Banco Litio Requerido: <strong className="text-white">{calcKWh * calcAutonomia} kWh</strong></p>
                     <p className="text-sm text-slate-300">☀️ Potencia Paneles: <strong className="text-white">{Math.ceil((calcKWh / 4.5) * 1.2 * 1000)} W</strong></p>
@@ -291,7 +329,7 @@
                             <tr key={p.id} className="hover:bg-slate-700/50 transition">
                               <td className="p-4 font-medium text-white flex items-center space-x-3">
                                 <img src={p.image || 'https://via.placeholder.com/40'} className="w-10 h-10 rounded object-cover border border-slate-600" onError={(e)=>e.target.style.display='none'} />
-                                <span>{p.name}</span>
+                                <span>{p.name} {p.visible ? '' : '(Oculto)'}</span>
                               </td>
                               <td className="p-4 uppercase text-xs">{p.category}</td>
                               <td className="p-4 font-bold text-green-400">${Number(p.price).toLocaleString('es-CL')}</td>
@@ -346,3 +384,4 @@
   </script>
 </body>
 </html>
+```
