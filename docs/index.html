@@ -1,669 +1,348 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="dark">
+<html lang="es">
 <head>
-  <script>
-    /* Prevención del destello de tema (FOUC) al cargar la página */
-    (() => {
-      const saved = localStorage.getItem("hibrid_theme");
-      document.documentElement.dataset.theme = (saved === "light" || saved === "dark") ? saved : "dark";
-    })();
-  </script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HiBRID | Tienda y Cotizador Energético</title>
-  <meta name="description" content="Tienda y cotizador de energía solar y eólica con catálogo, carrito, calculadora y administrador.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HiBRID Soluciones Energéticas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
-    :root,[data-theme="light"]{
-      --text-xs:clamp(.75rem,.7rem + .25vw,.875rem);
-      --text-sm:clamp(.875rem,.8rem + .35vw,1rem);
-      --text-base:clamp(1rem,.95rem + .25vw,1.08rem);
-      --text-lg:clamp(1.125rem,1rem + .75vw,1.45rem);
-      --text-xl:clamp(1.5rem,1.25rem + 1.15vw,2rem);
-
-      --space-1:.25rem; --space-2:.5rem; --space-3:.75rem; --space-4:1rem; --space-5:1.25rem; --space-6:1.5rem; --space-8:2rem; --space-10:2.5rem; --space-12:3rem; --space-16:4rem;
-
-      --radius-sm:.5rem; --radius-md:.85rem; --radius-lg:1.1rem; --radius-xl:1.45rem; --radius-full:999px;
-      --font-body:'Satoshi',system-ui,sans-serif;
-      --max:1260px;
-      --transition:180ms cubic-bezier(.16,1,.3,1);
-
-      --color-bg-1:#f4f7f5;
-      --color-bg-2:#e9f0eb;
-      --color-surface-1:rgba(255,255,255,.98);
-      --color-surface-2:rgba(247,250,248,.98);
-      --color-surface:#ffffff;
-      --color-well:#eef3f0;
-      --color-topbar:rgba(255,255,255,.9);
-      --color-border:rgba(17,24,20,.12);
-      --color-divider:rgba(17,24,20,.08);
-      --color-text:#0f1713;
-      --color-text-muted:#54645d;
-      --color-text-faint:#889690;
-      --color-text-inverse:#ffffff;
-      --color-primary:#1c9a54;
-      --color-primary-hover:#16803f;
-      --color-primary-highlight:rgba(28,154,84,.12);
-      --color-overlay-1:rgba(17,24,20,.03);
-      --color-overlay-2:rgba(17,24,20,.045);
-      --color-overlay-3:rgba(17,24,20,.06);
-      --color-overlay-6:rgba(17,24,20,.08);
-      --color-backdrop:rgba(15,23,20,.45);
-      --shadow-sm:0 2px 10px rgba(16,30,24,.06);
-      --shadow-md:0 14px 36px rgba(16,30,24,.08);
-      --shadow-lg:0 24px 58px rgba(16,30,24,.12);
-    }
-
-    [data-theme="dark"]{
-      --color-bg-1:#071016;
-      --color-bg-2:#0d161e;
-      --color-surface-1:rgba(15,25,33,.98);
-      --color-surface-2:rgba(20,33,42,.98);
-      --color-surface:#0f1921;
-      --color-well:#091118;
-      --color-topbar:rgba(10,17,24,.88);
-      --color-border:rgba(231,242,237,.12);
-      --color-divider:rgba(231,242,237,.08);
-      --color-text:#eef7f2;
-      --color-text-muted:#a4b7b2;
-      --color-text-faint:#7d918b;
-      --color-text-inverse:#06100b;
-      --color-primary:#28d26d;
-      --color-primary-hover:#1fbe61;
-      --color-primary-highlight:rgba(40,210,109,.12);
-      --color-overlay-1:rgba(255,255,255,.02);
-      --color-overlay-2:rgba(255,255,255,.03);
-      --color-overlay-3:rgba(255,255,255,.04);
-      --color-overlay-6:rgba(255,255,255,.06);
-      --color-backdrop:rgba(0,0,0,.8);
-      --shadow-sm:0 2px 10px rgba(0,0,0,.22);
-      --shadow-md:0 18px 40px rgba(0,0,0,.28);
-      --shadow-lg:0 28px 62px rgba(0,0,0,.36);
-    }
-
-    *,:before,:after{box-sizing:border-box;margin:0;padding:0}
-    
-    html {
-      -webkit-text-size-adjust: 100%;
-      text-size-adjust: 100%;
-      scroll-behavior: smooth;
-    }
-    
-    .visually-hidden {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    body{
-      min-height:100dvh;
-      font-family:var(--font-body);
-      font-size:var(--text-base);
-      line-height:1.6;
-      color:var(--color-text);
-      background: linear-gradient(180deg,var(--color-bg-1) 0%, var(--color-bg-2) 100%);
-      display: flex;
-      flex-direction: column;
-      transition: background var(--transition), color var(--transition);
-    }
-
-    img,svg{display:block;max-width:100%;height:auto}
-    button,input,textarea,select{font:inherit;color:inherit}
-    button{cursor:pointer;background:none;border:0;text-align:left;}
-    a{color:inherit}
-    :focus-visible{outline:2px solid var(--color-primary);outline-offset:3px;border-radius:var(--radius-sm)}
-    @media (prefers-reduced-motion: reduce){ *{animation-duration:.01ms !important; transition-duration:.01ms !important;} }
-
-    .topbar{
-      position:sticky;top:0;z-index:90;
-      background:var(--color-topbar);
-      border-bottom:1px solid var(--color-border);
-      backdrop-filter:blur(14px);
-    }
-
-    .topbar-inner{
-      width:min(calc(100% - 24px), var(--max));
-      margin:auto;
-      padding:var(--space-3) 0;
-      display:flex;
-      flex-wrap:wrap;
-      gap:var(--space-4);
-      align-items:center;
-      justify-content:space-between;
-    }
-
-    .logo-shell{ display:flex; align-items:center; }
-    .logo-img{ width:100%; max-width:220px; height:auto; max-height:60px; object-fit:contain; }
-    .logo-fallback{ display:none; align-items:center; gap:.5rem; font-weight:900; font-size:var(--text-lg); letter-spacing:-.02em; }
-    .logo-fallback i{ color:var(--color-primary); }
-
-    .nav{display:flex;gap:var(--space-2);flex-wrap:wrap;align-items:center;}
-
-    .btn{
-      min-height:46px;padding:.85rem 1rem;border-radius:var(--radius-md);
-      display:inline-flex;align-items:center;justify-content:center;gap:.55rem;
-      border:1px solid transparent;font-size:var(--text-sm);font-weight:800;
-      transition:all var(--transition);
-      text-align:center;
-    }
-    .btn:hover{transform:translateY(-1px)}
-    .btn.primary{background:var(--color-primary);border-color:var(--color-primary);color:var(--color-text-inverse)}
-    .btn.primary:hover{background:var(--color-primary-hover);border-color:var(--color-primary-hover)}
-    .btn.secondary{background:var(--color-overlay-2);border-color:var(--color-border)}
-    .btn.secondary:hover{background:var(--color-overlay-6)}
-    .btn.ghost{background:transparent;border-color:var(--color-border)}
-    .btn.danger{background:rgba(255,113,113,.12);border-color:rgba(255,113,113,.28);color:#e0524f}
-    [data-theme="dark"] .btn.danger{color:#ffd1d1}
-    .btn.small{min-height:38px;padding:.6rem .85rem;border-radius:.8rem;font-size:var(--text-xs);}
-    .btn.full{width:100%}
-    .btn.active{background:var(--color-primary);border-color:var(--color-primary);color:var(--color-text-inverse)}
-
-    .icon-btn{
-      width:44px;height:44px;border-radius:var(--radius-full);border:1px solid var(--color-border);
-      display:inline-flex;align-items:center;justify-content:center;background:var(--color-overlay-2);
-      transition:all var(--transition); flex-shrink:0;
-    }
-    .icon-btn:hover{ background:var(--color-overlay-6); transform:translateY(-1px); }
-
-    .social-links{
-      display:flex; align-items:center; gap:.45rem; margin-left:.35rem; padding-left:.7rem;
-      border-left:1px solid var(--color-border);
-    }
-    .social-link{
-      width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;
-      border-radius:var(--radius-full);border:1px solid var(--color-border);
-      background:var(--color-overlay-2);color:var(--color-text-muted);font-size:1rem;
-      transition: transform var(--transition), color var(--transition), background var(--transition), border-color var(--transition);
-    }
-    .social-link:hover{ transform:translateY(-2px); color:#ffffff; }
-    .social-link.facebook:hover{background:#1877f2; border-color:#1877f2;}
-    .social-link.instagram:hover{background:linear-gradient(135deg,#feda75,#d62976,#4f5bd5); border-color:#d62976;}
-    .social-link.whatsapp:hover{background:#25d366; border-color:#25d366;}
-    .social-link.tiktok:hover{background:#111111; border-color:#ffffff;}
-
-    .page{flex: 1; width:min(calc(100% - 24px), var(--max));margin:auto;padding:var(--space-8) 0 var(--space-16)}
-    .view{display:none}
-    .view.active{display:block}
-
-    .panel,.product-card,.cart-card,.summary-card,.admin-card,.notice,.login-card{
-      background:linear-gradient(180deg,var(--color-surface-1),var(--color-surface-2));
-      border:1px solid var(--color-border);
-      border-radius:var(--radius-xl);
-      box-shadow:var(--shadow-md);
-    }
-
-    .section-head{
-      display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);
-      margin:0 0 var(--space-4);
-      scroll-margin-top: 120px;
-    }
-    .section-head h3{font-size:var(--text-lg);font-weight:900;letter-spacing:-.02em}
-    .section-head p{font-size:var(--text-sm);color:var(--color-text-muted);margin-top:.2rem;}
-
-    .category-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-10);}
-    .category-card{
-      padding:0;display:flex;flex-direction:column;min-height:180px;
-      border: 1px solid var(--color-border); border-radius: var(--radius-lg);
-      background: linear-gradient(180deg,var(--color-surface-2),var(--color-surface-1));
-      transition:all var(--transition); overflow:hidden;
-    }
-    .category-card:hover{ transform:translateY(-4px); border-color:var(--color-primary); box-shadow: var(--shadow-lg); }
-    .category-card.active{ border-color:var(--color-primary); box-shadow: 0 0 0 1px var(--color-primary); }
-    .cat-img { width: 100%; height: 120px; object-fit: cover; background: var(--color-well); border-bottom: 1px solid var(--color-border); }
-    .cat-body { padding: var(--space-3); display: flex; flex-direction: column; flex: 1; }
-    .category-card strong {font-size:var(--text-base);font-weight:900; color:var(--color-text); text-transform:uppercase; letter-spacing:.05em;}
-    .category-card small {font-size:var(--text-sm);font-weight:400;color:var(--color-text-muted); margin-top:.2rem;}
-    .category-card span {margin-top:auto;font-size:var(--text-xs);color:var(--color-text-faint); padding-top: .6rem;}
-
-    .field,.select,.textarea{
-      width:100%;padding:.95rem 1rem;border-radius:var(--radius-md);border:1px solid var(--color-border);
-      background:var(--color-overlay-2);color:var(--color-text);outline:none
-    }
-    .textarea{min-height:110px;resize:vertical}
-    .field:focus,.select:focus,.textarea:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px var(--color-primary-highlight)}
-
-    .catalog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4)}
-    .product-card{
-      overflow:hidden;display:grid;grid-template-rows:auto 1fr;
-      transition:transform var(--transition),border-color var(--transition),box-shadow var(--transition)
-    }
-    .product-card:hover{transform:translateY(-3px);border-color:var(--color-primary);box-shadow:var(--shadow-lg)}
-    .product-media{aspect-ratio:4/3;background:#ffffff;overflow:hidden; display:flex; align-items:center; justify-content:center;}
-    .product-media img{width:100%;height:100%;object-fit:cover}
-    .product-body{padding:var(--space-4);display:grid;gap:var(--space-3)}
-    .product-top{display:flex;gap:var(--space-3);justify-content:space-between;align-items:start}
-    .product-title{font-size:var(--text-base);font-weight:900;line-height:1.15}
-    .price{font-size:var(--text-lg);font-weight:900;color:var(--color-primary);white-space:nowrap;font-variant-numeric:tabular-nums}
-
-    .badge{
-      display:inline-flex;align-items:center;gap:.4rem;padding:.34rem .72rem;border-radius:var(--radius-full);
-      background:var(--color-primary-highlight);color:var(--color-primary);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.07em
-    }
-    .badge.muted{background:var(--color-overlay-3);color:var(--color-text-muted)}
-
-    .empty{
-      grid-column:1/-1;padding:var(--space-8);text-align:center;color:var(--color-text-muted);
-      border:1px dashed var(--color-border);border-radius:var(--radius-lg);background:var(--color-overlay-1)
-    }
-    .empty strong{display:block;color:var(--color-text);font-size:var(--text-base);margin-bottom:.35rem;}
-    .empty .btn{margin-top:var(--space-4);}
-
-    .calc-layout,.cart-layout{display:grid;gap:var(--space-5)}
-    .calc-layout{grid-template-columns:.92fr 1.08fr}
-    .cart-layout{grid-template-columns:1.18fr .82fr}
-
-    .panel,.cart-card,.summary-card,.admin-card,.login-card{padding:var(--space-5)}
-    .calc-result{
-      margin-top:var(--space-4);padding:var(--space-5);border-radius:var(--radius-lg);
-      background:var(--color-primary-highlight);border:1px solid var(--color-primary)
-    }
-    .calc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
-    .calc-slider-row{ margin-bottom:var(--space-4); }
-    .calc-slider-row label{ display:flex; justify-content:space-between; gap:var(--space-2); margin-bottom:.5rem; font-weight:800; }
-    .calc-slider-row output{ color:var(--color-primary); font-variant-numeric:tabular-nums; }
-    input[type="range"]{ width:100%; accent-color:var(--color-primary); }
-
-    .advanced-toggle{
-      display:flex;align-items:center;gap:.5rem;margin:var(--space-4) 0;cursor:pointer;
-      color:var(--color-text-muted);font-size:var(--text-sm);font-weight:800;user-select:none;
-    }
-    .advanced-toggle i{transition:transform var(--transition);}
-    .advanced-toggle.open i{transform:rotate(90deg);}
-    .advanced-panel{ display:none; padding-top:var(--space-2); border-top:1px solid var(--color-divider); margin-top:var(--space-2); }
-    .advanced-panel.open{ display:block; }
-    .radio-row{ display:flex; flex-direction:column; gap:var(--space-2); margin-top:var(--space-2); }
-    .radio-option{
-      display:flex; align-items:flex-start; gap:.6rem; padding:var(--space-3); border-radius:var(--radius-md);
-      border:1px solid var(--color-border); cursor:pointer; transition:all var(--transition);
-    }
-    .radio-option:hover{ border-color:var(--color-primary); }
-    .radio-option input{ margin-top:.2rem; accent-color:var(--color-primary); }
-    .radio-option strong{ display:block; font-size:var(--text-sm); }
-    .radio-option span{ display:block; font-size:var(--text-xs); color:var(--color-text-muted); margin-top:.15rem; }
-
-    .cart-list{display:grid;gap:var(--space-4)}
-    .cart-item{
-      display:grid;grid-template-columns:96px 1fr auto;gap:var(--space-4);padding:var(--space-4);
-      border-radius:var(--radius-lg);background:var(--color-overlay-1);border:1px solid var(--color-border)
-    }
-    .cart-item img{width:96px;height:96px;border-radius:var(--radius-md);object-fit:cover;background:#ffffff;}
-    .qty-row{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-3)}
-    .summary-line{display:flex;justify-content:space-between;gap:var(--space-3);padding:var(--space-3) 0;border-bottom:1px solid var(--color-divider)}
-    .summary-line:last-child{border-bottom:0;padding-top:var(--space-4);font-size:var(--text-lg);font-weight:900}
-
-    .small,.tiny,.muted{color:var(--color-text-muted)}
-    .small{font-size:var(--text-sm)}
-    .tiny{font-size:var(--text-xs)}
-
-    .admin-inventory{display:grid;gap:var(--space-4);}
-    .admin-stats-row{display:grid;grid-template-columns:repeat(3, 1fr);gap:var(--space-3);margin-bottom:var(--space-4);}
-    .stat-card{background:var(--color-overlay-1);border:1px solid var(--color-border);padding:var(--space-4);border-radius:var(--radius-lg);text-align:center;}
-    .stat-card h4{font-size:var(--text-xl);color:var(--color-primary);margin-bottom:.2rem;}
-    .admin-controls{display:flex;gap:var(--space-3);justify-content:space-between;align-items:center;margin-bottom:var(--space-4);flex-wrap:wrap;}
-
-    .inventory-list{display:grid;grid-template-columns:1fr;gap:var(--space-3);}
-    .inv-item{
-      display:grid;grid-template-columns:80px 1fr auto;gap:var(--space-4);align-items:center;
-      padding:var(--space-3);border-radius:var(--radius-lg);background:var(--color-overlay-1);border:1px solid var(--color-border);
-    }
-    .inv-item img{width:80px;height:80px;object-fit:cover;border-radius:var(--radius-md);background:#fff;}
-    .inv-info h4{font-size:var(--text-base);font-weight:800;margin-bottom:.2rem;}
-    .inv-actions{display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;}
-
-    .switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;}
-    .switch input{opacity:0;width:0;height:0;}
-    .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:var(--color-overlay-6);transition:.3s;border-radius:34px;border:1px solid var(--color-border);}
-    .slider:before{position:absolute;content:"";height:16px;width:16px;left:3px;bottom:3px;background-color:var(--color-text-muted);transition:.3s;border-radius:50%;}
-    input:checked + .slider{background-color:var(--color-primary-highlight);border-color:var(--color-primary);}
-    input:checked + .slider:before{transform:translateX(20px);background-color:var(--color-primary);}
-
-    .modal-overlay{
-      position:fixed;top:0;left:0;width:100%;height:100%;background:var(--color-backdrop);backdrop-filter:blur(5px);
-      z-index:1000;display:flex;align-items:center;justify-content:center;
-      opacity:0;visibility:hidden;transition:all var(--transition);
-    }
-    .modal-overlay.active{opacity:1;visibility:visible;}
-    .modal-content{
-      background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);
-      width:100%;max-width:700px;max-height:90vh;overflow-y:auto;padding:var(--space-6);
-      position:relative;transform:translateY(20px);transition:all var(--transition);
-    }
-    .modal-overlay.active .modal-content{transform:translateY(0);}
-    .btn-close-modal{
-      position:absolute;top:var(--space-4);right:var(--space-4);background:transparent;border:0;
-      color:var(--color-text-muted);font-size:1.5rem;cursor:pointer;line-height:1;
-    }
-    .btn-close-modal:hover{color:var(--color-text);}
-
-    .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
-    .preview-box{
-      border:1px solid var(--color-border);border-radius:var(--radius-lg);overflow:hidden;
-      background:var(--color-well);height:160px;display:flex;align-items:center;justify-content:center;
-      margin-top:var(--space-4);
-    }
-    .preview-box img{width:100%;height:100%;object-fit:cover;}
-    .preview-box .preview-empty{color:var(--color-text-faint);font-size:var(--text-sm);text-align:center;padding:var(--space-4);}
-    .gallery-panel{border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);background:var(--color-overlay-1);margin-top:var(--space-4);}
-    .gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);max-height:200px;overflow:auto;}
-    .gallery-item{
-      border:2px solid transparent;background:var(--color-overlay-1);border-radius:var(--radius-md);
-      overflow:hidden;cursor:pointer;transition:all var(--transition);position:relative;
-    }
-    .gallery-item:hover{border-color:var(--color-primary);opacity:.85;}
-    .gallery-item.active{border-color:var(--color-primary);box-shadow:0 0 0 2px var(--color-primary-highlight);}
-    .gallery-item.active:after{
-      content:"✓"; position:absolute; top:4px; right:4px; width:20px; height:20px; border-radius:50%;
-      background:var(--color-primary); color:#fff; font-size:12px; display:flex; align-items:center; justify-content:center; font-weight:900;
-    }
-    .gallery-item img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#ffffff;}
-
-    .notice-stack{
-      position:fixed;top:100px;right:var(--space-4);z-index:1200;display:grid;gap:var(--space-3);
-      width:min(360px,calc(100vw - 2rem))
-    }
-    .notice{padding:var(--space-4);display:flex;gap:var(--space-3);align-items:flex-start;border-radius:var(--radius-lg);background:var(--color-surface);border:1px solid var(--color-border);box-shadow:var(--shadow-lg)}
-    .notice i{margin-top:.15rem;}
-    .notice.success i{color:var(--color-primary);}
-    .notice.error i{color:#e0524f;}
-    .notice.info i{color:var(--color-text-muted);}
-
-    .sticky-cart{
-      position:fixed;right:var(--space-4);bottom:var(--space-4);z-index:70;display:flex;align-items:center;gap:var(--space-3);
-      padding:.75rem .82rem .75rem 1rem;border-radius:var(--radius-full);border:1px solid var(--color-border);
-      background:var(--color-surface);backdrop-filter:blur(12px);box-shadow:var(--shadow-lg)
-    }
-    .sticky-cart strong{display:block;font-size:var(--text-sm)}
-    .sticky-cart span{display:block;font-size:var(--text-xs);color:var(--color-text-muted)}
-
-    .site-footer { text-align: center; padding: var(--space-8); margin-top: var(--space-12); border-top: 1px solid var(--color-border); padding-bottom: 120px; color:var(--color-text-faint); font-size:var(--text-xs); }
-
-    .spinner{
-      width:22px;height:22px;border-radius:50%;border:3px solid var(--color-overlay-6);
-      border-top-color:var(--color-primary);animation:spin .8s linear infinite;margin:0 auto var(--space-3);
-    }
-    @keyframes spin{to{transform:rotate(360deg)}}
-
-    @media (max-width:1160px){
-      .calc-layout,.cart-layout{grid-template-columns:1fr}
-      .catalog-grid{grid-template-columns:repeat(2,1fr)}
-    }
-    @media (max-width:760px){
-      .topbar-inner{flex-direction:column; padding: var(--space-3); gap: var(--space-3);}
-      .logo-shell { justify-content:center; }
-      .nav{justify-content:center; width:100%;}
-      .social-links{width:100%; justify-content:center; margin-left:0; padding-left:0; padding-top:.65rem; border-left:0; border-top:1px solid var(--color-border);}
-      .category-grid{grid-template-columns:repeat(2,1fr); gap:var(--space-3);}
-      .catalog-grid,.form-grid,.calc-grid{grid-template-columns:1fr}
-      .cart-item,.inv-item{grid-template-columns:1fr; text-align:center;}
-      .inv-actions{justify-content:center;}
-      .cart-item img,.inv-item img{width:100%;height:auto;aspect-ratio:4/3;margin:auto;}
-      .sticky-cart{left:var(--space-3);right:var(--space-3);bottom:var(--space-3);justify-content:space-between;border-radius:var(--radius-xl)}
-      .notice-stack{left:var(--space-3);right:var(--space-3);width:auto}
-      .admin-stats-row{grid-template-columns:1fr;}
-      .admin-controls{flex-direction:column;align-items:stretch;}
-    }
+    body { font-family: system-ui, -apple-system, sans-serif; background-color: #0f172a; color: #f8fafc; }
+    /* Scrollbar personalizada para tema oscuro */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #1e293b; }
+    ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 4px; }
   </style>
 </head>
 <body>
+  <div id="root"></div>
 
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="logo-shell">
-        <img id="siteLogo" src="./logotipohibrid.png" alt="Logo HiBRID" class="logo-img" loading="eager">
-        <div class="logo-fallback" id="logoFallback" aria-hidden="true"><i class="fa-solid fa-sun" aria-hidden="true"></i> HiBRID</div>
+  <script type="text/babel">
+    const { useState, useEffect, useCallback } = React;
+
+    // --- CONFIGURACIÓN PRINCIPAL ---
+    const API_URL = "https://hibrid-energia.onrender.com"; 
+    const WHATSAPP_NUMBER = "569XXXXXXXX"; // <-- ¡CAMBIA ESTO POR TU NÚMERO REAL TIZA!
+
+    // Íconos
+    const IconSun = () => <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>;
+    const IconCart = ({count}) => (
+      <div className="relative">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        {count > 0 && <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{count}</span>}
       </div>
-      <nav class="nav" aria-label="Navegación principal">
-        <button class="btn secondary nav-btn" type="button" data-route="home">Catálogo</button>
-        <button class="btn secondary nav-btn" type="button" data-route="calculator">Calculadora</button>
-        <button class="btn secondary nav-btn" type="button" data-route="admin-entry">Admin</button>
-        <button class="icon-btn" id="themeToggle" type="button" aria-label="Cambiar tema" title="Cambiar tema claro/oscuro">
-          <i class="fa-solid fa-moon" id="themeIcon"></i>
-        </button>
+    );
 
-        <div class="social-links" aria-label="Redes sociales">
-          <a class="social-link facebook" href="https://www.facebook.com/hibridenergia" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-          <a class="social-link instagram" href="https://www.instagram.com/hibridenergia/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-          <a id="headerWhatsappLink" class="social-link whatsapp" href="#" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>
-          <a class="social-link tiktok" href="https://www.tiktok.com/@hibrid976" target="_blank" rel="noopener noreferrer" aria-label="TikTok" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-        </div>
-      </nav>
-    </div>
-  </header>
+    // Categorías base para el diseño visual
+    const CATEGORIAS_FOTOS = [
+      { id: 'paneles', name: 'Paneles Solares', img: 'panelescatalogo.jpg' },
+      { id: 'inversores', name: 'Inversores Híbridos', img: 'inversorcatalogo.png' },
+      { id: 'baterias', name: 'Baterías de Litio', img: 'bateriacatalogo.jpg' },
+      { id: 'aerogeneradores', name: 'Aerogeneradores', img: 'eolica.jpg' },
+      { id: 'kits', name: 'Kits Completos', img: 'kitsolar.jpg' },
+      { id: 'otros', name: 'Accesorios y Otros', img: 'https://via.placeholder.com/300x200/1e293b/10b981?text=Accesorios' }
+    ];
 
-  <main id="mainContent" class="page">
-    <section id="home" class="view active">
-      <div class="section-head">
-        <div>
-          <h3>Categorías</h3>
-          <p>Encuentra rápidamente la familia de producto que buscas.</p>
-        </div>
-      </div>
-      <div id="categoryGrid" class="category-grid"></div>
+    function App() {
+      const [view, setView] = useState('home'); 
+      const [products, setProducts] = useState([]);
+      const [cart, setCart] = useState([]);
+      const [filter, setFilter] = useState('ver todos');
+      const [loading, setLoading] = useState(true);
 
-      <div class="section-head" id="catalogMetaJump" style="margin-top: var(--space-6);">
-        <div>
-          <h3 id="catalogTitle">Todos los productos</h3>
-          <p id="catalogMeta">Catálogo completo.</p>
-        </div>
-        <button id="clearFiltersBtn" class="btn secondary small" type="button" style="display:none;">Ver todos</button>
-      </div>
-      <div id="catalogGrid" class="catalog-grid"></div>
-    </section>
+      // Estados Calculadora
+      const [calcKWh, setCalcKWh] = useState(15);
+      const [calcAutonomia, setCalcAutonomia] = useState(2);
 
-    <section id="calculator" class="view">
-      <div class="section-head" style="margin-top:0">
-        <div>
-          <h3>Calculadora Solar Inteligente</h3>
-          <p>Calcula tu kit ideal basado en lo que consumes por día.</p>
-        </div>
-        <button class="btn ghost" type="button" data-route="home">Volver</button>
-      </div>
+      // Estados Admin
+      const [adminToken, setAdminToken] = useState(localStorage.getItem('hibrid_token') || '');
+      const [isAuthenticated, setIsAuthenticated] = useState(false);
+      const [modal, setModal] = useState({ open: false, product: null });
+      const [formData, setFormData] = useState({});
 
-      <div class="calc-layout">
-        <article class="panel">
-          <h3 style="margin-bottom:.6rem">Referencia visual</h3>
-          <p class="small muted" style="margin-bottom:1rem">Revisa el apartado de "Consumo" en tu boleta de luz y divídelo por 30 para estimar tu consumo diario.</p>
-          <div class="preview-box" style="height:auto;aspect-ratio:3/4;">
-            <img src="./boleta.jpg" alt="Referencia de boleta de luz" loading="lazy" data-static-fallback>
-          </div>
-        </article>
+      const fetchProducts = useCallback(async () => {
+        setLoading(true);
+        try {
+          const res = await fetch(`${API_URL}/api/products`);
+          if (res.ok) setProducts(await res.json());
+        } catch (e) {
+          console.error("Error al conectar con Render");
+        } finally {
+          setLoading(false);
+        }
+      }, []);
 
-        <article class="panel">
-          <h3 style="margin-bottom:.6rem">Ingresa tus datos</h3>
-          <p class="small muted" style="margin-bottom:1rem">Simulamos con paneles de 550W de alta eficiencia.</p>
+      useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
-          <div class="calc-slider-row">
-            <label for="calcKwh">Consumo diario estimado <output id="calcKwhOut">10</output> kWh/día</label>
-            <input id="calcKwh" type="range" min="2" max="80" step="1" value="10">
-          </div>
-          <div class="calc-slider-row">
-            <label for="calcAutonomia">Días de autonomía (respaldo sin sol) <output id="calcAutonomiaOut">1</output></label>
-            <input id="calcAutonomia" type="range" min="1" max="5" step="1" value="1">
-          </div>
-          <div class="calc-slider-row">
-            <label for="calcTipo" style="margin-bottom:.5rem;">Tipo de proyecto</label>
-            <select id="calcTipo" class="select">
-              <option value="hogar">Residencial / Hogar</option>
-              <option value="comercial">Comercial / Negocio</option>
-              <option value="parcela">Parcela / Off-Grid (Aislado)</option>
-            </select>
-          </div>
+      // Funciones del Carrito
+      const addToCart = (p) => {
+        setCart([...cart, p]);
+        alert(`¡${p.name} agregado al carrito!`);
+      };
+      
+      const cartTotal = cart.reduce((sum, p) => sum + Number(p.price), 0);
 
-          <button type="button" class="advanced-toggle" id="advancedToggle" aria-expanded="false">
-            <i class="fa-solid fa-chevron-right"></i> Opciones avanzadas (enfoque de cotización)
-          </button>
-          <div class="advanced-panel" id="advancedPanel">
-            <div class="radio-row">
-              <label class="radio-option">
-                <input type="radio" name="enfoque" value="auto" checked>
-                <span><strong>Selección automática de inversor</strong><span>Muestra el desglose técnico completo: paneles, inversor, baterías y área de techo.</span></span>
-              </label>
-              <label class="radio-option">
-                <input type="radio" name="enfoque" value="rapida">
-                <span><strong>Cotización rápida</strong><span>Solo el resumen esencial, ideal para pedir precio de inmediato.</span></span>
-              </label>
+      const sendCartToWA = () => {
+        let text = `Hola HiBRID, quiero cotizar los siguientes equipos:\n\n`;
+        cart.forEach(p => text += `- ${p.name} ($${Number(p.price).toLocaleString('es-CL')})\n`);
+        text += `\n*TOTAL ESTIMADO: $${cartTotal.toLocaleString('es-CL')}*`;
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, '_blank');
+      };
+
+      // Funciones Admin
+      const loginAdmin = async (e) => {
+        e.preventDefault();
+        try {
+          const res = await fetch(`${API_URL}/api/admin/session`, { headers: { Authorization: `Bearer ${adminToken}` } });
+          if (!res.ok) throw new Error();
+          setIsAuthenticated(true);
+          localStorage.setItem('hibrid_token', adminToken);
+          alert("¡Acceso concedido al panel de Tiza!");
+        } catch { alert("Contraseña incorrecta. Verifica mayúsculas y espacios."); }
+      };
+
+      const saveProduct = async (e) => {
+        e.preventDefault();
+        const payload = { ...formData, price: Number(formData.price), visible: true };
+        const isEditing = !!modal.product;
+        const url = `${API_URL}/api/products${isEditing ? `/${modal.product.id}` : ''}`;
+        
+        try {
+          await fetch(url, { 
+            method: isEditing ? "PATCH" : "POST", 
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${adminToken}`, ...(isEditing && {"If-Match": modal.product.etag}) }, 
+            body: JSON.stringify(payload) 
+          });
+          setModal({ open: false, product: null });
+          fetchProducts();
+          alert("Producto guardado con éxito");
+        } catch { alert("Error al guardar en el servidor"); }
+      };
+
+      const deleteProduct = async (p) => {
+        if(!confirm("¿Borrar definitivamente?")) return;
+        await fetch(`${API_URL}/api/products/${p.id}`, { method: "DELETE", headers: { Authorization: `Bearer ${adminToken}`, "If-Match": p.etag } });
+        fetchProducts();
+      };
+
+      return (
+        <div className="pb-20">
+          {/* HEADER OSCURO */}
+          <header className="bg-slate-900 border-b border-slate-700 p-4 sticky top-0 z-40 flex justify-between items-center shadow-lg">
+            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setView('home')}>
+              <IconSun /> 
+              <div>
+                <h1 className="font-black text-xl tracking-wider text-white leading-tight">HiBRID</h1>
+                <p className="text-[10px] text-green-500 font-bold tracking-widest uppercase">Soluciones Energéticas</p>
+              </div>
             </div>
-          </div>
+            <nav className="flex space-x-4 items-center">
+              <button onClick={() => setView('calculator')} className="text-sm font-medium hover:text-green-400">Calculadora</button>
+              <button onClick={() => setView('admin')} className="text-sm font-medium text-slate-400 hover:text-white">Admin</button>
+              <button onClick={() => setView('cart')} className="text-green-500 hover:text-green-400">
+                <IconCart count={cart.length} />
+              </button>
+            </nav>
+          </header>
 
-          <div style="margin-top:1.25rem">
-            <button id="calculateBtn" class="btn primary full" type="button">Calcular una estimación preliminar</button>
-          </div>
-          <div id="calcResult"></div>
-        </article>
-      </div>
-    </section>
+          <main className="max-w-5xl mx-auto p-4 py-8">
+            
+            {/* VISTA 1: INICIO (Categorías con fotos como en tu diseño) */}
+            {view === 'home' && (
+              <div className="space-y-6">
+                <div className="text-center mb-10">
+                  <h2 className="text-3xl font-bold text-white mb-2">Encuentra tu equipo ideal</h2>
+                  <p className="text-slate-400">Selecciona una categoría para ver nuestro catálogo.</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {CATEGORIAS_FOTOS.map(cat => (
+                    <div key={cat.id} onClick={() => { setFilter(cat.id); setView('catalog'); }} 
+                         className="bg-slate-800 rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-green-500 transition shadow-lg group relative">
+                      <img src={cat.img} alt={cat.name} className="w-full h-32 object-cover opacity-70 group-hover:opacity-100 transition" onError={(e)=>e.target.src='https://via.placeholder.com/300x200/1e293b/10b981?text=HiBRID'} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent flex items-end p-3">
+                        <h3 className="font-bold text-white shadow-black drop-shadow-md">{cat.name}</h3>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => { setFilter('ver todos'); setView('catalog'); }} className="w-full mt-6 bg-slate-800 border border-slate-700 py-4 rounded-xl font-bold text-green-400 hover:bg-slate-700 transition">
+                  Ver catálogo completo
+                </button>
+              </div>
+            )}
 
-    <section id="cart" class="view">
-      <div class="section-head" style="margin-top:0">
-        <div>
-          <h3>Carrito y cotización</h3>
-          <p>Revisa productos, cantidades, imagen, unitario, subtotal y total final.</p>
+            {/* VISTA 2: CATÁLOGO DE PRODUCTOS (Fondo oscuro, botones verdes) */}
+            {view === 'catalog' && (
+              <div>
+                <div className="flex items-center space-x-4 mb-6">
+                  <button onClick={()=>setView('home')} className="text-slate-400 hover:text-white">← Volver</button>
+                  <h2 className="text-2xl font-bold uppercase text-green-500">{filter === 'ver todos' ? 'Todos los productos' : filter}</h2>
+                </div>
+
+                {loading ? <p className="text-center text-slate-400 py-10">Conectando con el servidor...</p> : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    {products.filter(p => filter === 'ver todos' || p.category === filter).map(p => (
+                      <div key={p.id} className="bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-slate-700 flex flex-col">
+                        <img src={p.image || 'https://via.placeholder.com/300x200/1e293b/10b981?text=HiBRID'} alt={p.name} className="w-full h-48 object-cover" onError={(e)=>e.target.src='https://via.placeholder.com/300x200/1e293b/10b981?text=HiBRID'} />
+                        <div className="p-5 flex flex-col flex-grow">
+                          <span className="text-xs text-green-500 font-bold uppercase mb-1">{p.category}</span>
+                          <h3 className="font-bold text-lg mb-2 text-white">{p.name}</h3>
+                          <p className="text-slate-400 text-sm mb-4 line-clamp-2">{p.description}</p>
+                          <div className="mt-auto flex justify-between items-center">
+                            <span className="font-black text-xl text-white">${Number(p.price).toLocaleString('es-CL')}</span>
+                            <button onClick={() => addToCart(p)} className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg font-bold text-sm transition">
+                              + Carrito
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* VISTA 3: CARRITO */}
+            {view === 'cart' && (
+              <div className="max-w-xl mx-auto bg-slate-800 p-6 rounded-xl border border-slate-700">
+                <h2 className="text-2xl font-bold mb-6 flex items-center space-x-2"><IconCart count={0} /> <span>Tu Cotización</span></h2>
+                {cart.length === 0 ? <p className="text-slate-400 text-center py-8">Tu carrito está vacío.</p> : (
+                  <div className="space-y-4">
+                    {cart.map((p, i) => (
+                      <div key={i} className="flex justify-between items-center border-b border-slate-700 pb-2">
+                        <div>
+                          <p className="font-bold text-white">{p.name}</p>
+                          <p className="text-sm text-green-400">${Number(p.price).toLocaleString('es-CL')}</p>
+                        </div>
+                        <button onClick={() => setCart(cart.filter((_, idx) => idx !== i))} className="text-red-400 text-sm hover:text-red-300">Quitar</button>
+                      </div>
+                    ))}
+                    <div className="pt-4 flex justify-between items-center">
+                      <span className="text-lg text-slate-300">Total Estimado:</span>
+                      <span className="text-2xl font-black text-white">${cartTotal.toLocaleString('es-CL')}</span>
+                    </div>
+                    <button onClick={sendCartToWA} className="w-full mt-6 bg-green-600 hover:bg-green-500 text-white font-bold p-4 rounded-xl transition">
+                      Enviar Cotización por WhatsApp
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* VISTA 4: CALCULADORA SOLAR (Matemática real y texto legal) */}
+            {view === 'calculator' && (
+              <div className="max-w-xl mx-auto bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700 space-y-6">
+                <h2 className="text-2xl font-bold text-white border-b border-slate-700 pb-4">Calculadora Off-Grid / Híbrida</h2>
+                
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-bold text-green-400 mb-2">Consumo Diario (kWh/día): {calcKWh}</label>
+                    <input type="range" min="2" max="50" value={calcKWh} onChange={e=>setCalcKWh(Number(e.target.value))} className="w-full accent-green-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-green-400 mb-2">Días de Autonomía en Baterías: {calcAutonomia}</label>
+                    <input type="range" min="1" max="4" value={calcAutonomia} onChange={e=>setCalcAutonomia(Number(e.target.value))} className="w-full accent-green-500" />
+                  </div>
+                  
+                  <div className="bg-slate-900 p-5 rounded-lg border border-slate-700 space-y-3">
+                    <h3 className="font-bold text-white border-b border-slate-700 pb-2">Solución Técnica Sugerida:</h3>
+                    {/* Matemática Real Off-Grid: Inversor = Consumo / 3 o 4 horas de uso pico. Baterías = Consumo * Autonomía. Paneles = (Consumo / 4h sol) * factor */}
+                    <p className="text-sm text-slate-300">⚡ Inversor Sugerido: <strong className="text-white">{Math.ceil(calcKWh / 3.5)} kW</strong></p>
+                    <p className="text-sm text-slate-300">🔋 Banco Litio Requerido: <strong className="text-white">{calcKWh * calcAutonomia} kWh</strong></p>
+                    <p className="text-sm text-slate-300">☀️ Potencia Paneles: <strong className="text-white">{Math.ceil((calcKWh / 4.5) * 1.2 * 1000)} W</strong></p>
+                    <p className="text-xs text-slate-500 mt-4 italic">* Los precios y cálculos son de referencia orientativa y están sujetos a evaluación técnica del terreno.</p>
+                  </div>
+
+                  <button onClick={() => {
+                    const text = encodeURIComponent(`Hola HiBRID, usé su calculadora web.\nNecesito cotizar un sistema con:\n- Consumo: ${calcKWh} kWh/día\n- Autonomía: ${calcAutonomia} días\n\n*Nota: Entiendo que esto es de referencia y requiere evaluación.*`);
+                    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank');
+                  }} className="w-full bg-green-600 text-white font-bold p-4 rounded-xl hover:bg-green-500 transition">
+                    Cotizar este Sistema por WhatsApp
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* VISTA 5: ADMIN RÁPIDO */}
+            {view === 'admin' && (
+              <div className="max-w-4xl mx-auto">
+                {!isAuthenticated ? (
+                  <form onSubmit={loginAdmin} className="bg-slate-800 p-6 rounded-xl shadow border border-slate-700 max-w-sm mx-auto">
+                    <h2 className="font-bold text-xl text-white mb-4">Acceso Admin</h2>
+                    <input type="password" required value={adminToken} onChange={e=>setAdminToken(e.target.value)} placeholder="Tu contraseña exacta de Render" className="w-full bg-slate-900 border border-slate-700 text-white p-3 rounded mb-4 focus:outline-none focus:border-green-500" />
+                    <button className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded transition">Ingresar al Panel</button>
+                  </form>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                      <h2 className="text-2xl font-bold text-white">Inventario Activo ({products.length})</h2>
+                      <button onClick={() => { setFormData({category:'paneles'}); setModal({open: true, product: null}); }} className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold">+ Nuevo Producto</button>
+                    </div>
+                    
+                    <div className="bg-slate-800 rounded-xl overflow-hidden border border-slate-700">
+                      <table className="w-full text-left text-sm text-slate-300">
+                        <thead className="bg-slate-900 border-b border-slate-700 text-green-500">
+                          <tr><th className="p-4">Producto</th><th className="p-4">Cat</th><th className="p-4">Precio</th><th className="p-4 text-right">Acciones</th></tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-700">
+                          {products.map(p => (
+                            <tr key={p.id} className="hover:bg-slate-700/50 transition">
+                              <td className="p-4 font-medium text-white flex items-center space-x-3">
+                                <img src={p.image || 'https://via.placeholder.com/40'} className="w-10 h-10 rounded object-cover border border-slate-600" onError={(e)=>e.target.style.display='none'} />
+                                <span>{p.name}</span>
+                              </td>
+                              <td className="p-4 uppercase text-xs">{p.category}</td>
+                              <td className="p-4 font-bold text-green-400">${Number(p.price).toLocaleString('es-CL')}</td>
+                              <td className="p-4 text-right space-x-3">
+                                <button onClick={()=>{setFormData({...p}); setModal({open:true, product:p});}} className="text-blue-400 hover:text-blue-300">Editar</button>
+                                <button onClick={()=>deleteProduct(p)} className="text-red-400 hover:text-red-300">Borrar</button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </main>
+
+          {/* MODAL EDICIÓN RÁPIDA (Solo sale si haces clic en Editar o Nuevo) */}
+          {modal.open && (
+            <div className="fixed inset-0 bg-slate-900/90 flex items-center justify-center p-4 z-50">
+              <form onSubmit={saveProduct} className="bg-slate-800 p-6 rounded-xl border border-slate-600 max-w-md w-full space-y-4">
+                <h3 className="font-bold text-xl text-green-400 mb-2">{modal.product ? 'Editar Rápido' : 'Crear Producto'}</h3>
+                
+                <input required placeholder="Nombre (Ej: Inversor Deye 5kW)" value={formData.name || ''} onChange={e=>setFormData({...formData, name: e.target.value})} className="w-full bg-slate-900 border border-slate-600 text-white p-3 rounded focus:border-green-500 outline-none" />
+                
+                <input required type="number" placeholder="Precio en pesos (sin puntos)" value={formData.price || ''} onChange={e=>setFormData({...formData, price: e.target.value})} className="w-full bg-slate-900 border border-slate-600 text-white p-3 rounded focus:border-green-500 outline-none" />
+                
+                <select value={formData.category || 'paneles'} onChange={e=>setFormData({...formData, category: e.target.value})} className="w-full bg-slate-900 border border-slate-600 text-white p-3 rounded focus:border-green-500 outline-none">
+                  <option value="paneles">Paneles</option><option value="inversores">Inversores</option><option value="baterias">Baterías</option><option value="aerogeneradores">Aerogeneradores</option><option value="kits">Kits</option><option value="otros">Otros</option>
+                </select>
+                
+                {/* CAMPO DE IMAGEN RÁPIDO */}
+                <input placeholder="Nombre de la foto (Ej: panel.jpg)" value={formData.image || ''} onChange={e=>setFormData({...formData, image: e.target.value})} className="w-full bg-slate-900 border border-slate-600 text-white p-3 rounded focus:border-green-500 outline-none" />
+                <p className="text-xs text-slate-400 -mt-2">Pon el nombre exacto del archivo que subiste a GitHub, ej: <span className="text-green-400">eolica.jpg</span></p>
+
+                <textarea placeholder="Descripción técnica breve" value={formData.description || ''} onChange={e=>setFormData({...formData, description: e.target.value})} className="w-full bg-slate-900 border border-slate-600 text-white p-3 rounded focus:border-green-500 outline-none" rows="2"></textarea>
+                
+                <div className="flex justify-end space-x-3 pt-4 border-t border-slate-700">
+                  <button type="button" onClick={()=>setModal({open:false})} className="px-5 py-2 rounded text-slate-300 hover:bg-slate-700">Cancelar</button>
+                  <button type="submit" className="px-5 py-2 bg-green-600 hover:bg-green-500 text-white font-bold rounded">Guardar</button>
+                </div>
+              </form>
+            </div>
+          )}
         </div>
-        <button class="btn ghost" type="button" data-route="home">Seguir comprando</button>
-      </div>
+      );
+    }
 
-      <div class="cart-layout">
-        <article class="cart-card">
-          <div id="cartList" class="cart-list"></div>
-        </article>
-        <aside class="summary-card">
-          <h3 style="margin-bottom:.8rem">Resumen final</h3>
-          <div id="summaryBox"></div>
-          <div style="display:grid;gap:var(--space-3);margin-top:var(--space-5)">
-            <button id="whatsappBtn" class="btn primary full" type="button">Enviar a WhatsApp</button>
-            <button id="clearCartBtn" class="btn danger full" type="button">Vaciar carrito</button>
-            <p class="tiny muted">El mensaje incluirá productos, cantidades, subtotales y total estimado.</p>
-          </div>
-        </aside>
-      </div>
-    </section>
-
-    <section id="admin-login" class="view">
-      <div class="section-head" style="margin-top:0">
-        <div>
-          <h3>Administrador</h3>
-          <p>Acceso restringido para gestión de catálogo.</p>
-        </div>
-        <button class="btn ghost" type="button" data-route="home">Volver al inicio</button>
-      </div>
-      <div class="login-card" style="max-width:520px; margin: auto;">
-        <label for="adminPass" style="display:block;margin-bottom:.45rem;font-weight:800">Token de acceso</label>
-        <input id="adminPass" class="field" type="password" placeholder="Ingresa tu token de administrador" autocomplete="off">
-        <p id="loginError" class="tiny" style="color:#e0524f;margin-top:.5rem;display:none;">Token inválido. Verifica e intenta de nuevo.</p>
-        <div style="display:grid;gap:var(--space-3);margin-top:1rem">
-          <button id="adminLoginBtn" class="btn primary full" type="button">Entrar al panel</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="admin" class="view">
-      <div class="section-head" style="margin-top:0">
-        <div>
-          <h3>Inventario HiBRID</h3>
-          <p>Gestiona todo tu catálogo de forma simple y rápida.</p>
-        </div>
-        <button class="btn ghost" type="button" id="adminLogoutBtn">Cerrar sesión</button>
-      </div>
-
-      <div class="admin-inventory">
-        <div class="admin-stats-row">
-          <div class="stat-card"><h4 id="statTotal">0</h4><span class="small muted">Total Productos</span></div>
-          <div class="stat-card"><h4 id="statVisible" style="color:var(--color-primary)">0</h4><span class="small muted">Publicados</span></div>
-          <div class="stat-card"><h4 id="statHidden" style="color:#e0524f">0</h4><span class="small muted">Ocultos</span></div>
-        </div>
-
-        <div class="admin-controls">
-          <select id="adminFilter" class="select" style="max-width:250px;" aria-label="Filtrar por categoría"></select>
-          <div style="display:flex; gap:var(--space-2);">
-            <button id="btnOpenNewProduct" class="btn primary" type="button">Nuevo producto</button>
-          </div>
-        </div>
-
-        <div id="adminInventoryList" class="inventory-list"></div>
-      </div>
-    </section>
-  </main>
-
-  <div id="productModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
-    <div class="modal-content">
-      <button id="btnCloseModal" class="btn-close-modal" aria-label="Cerrar">&times;</button>
-      <h3 id="modalTitle" style="margin-bottom:var(--space-4);">Nuevo Producto</h3>
-
-      <form id="modalForm">
-        <input type="hidden" id="modalProductId">
-        <input type="hidden" id="modalProductEtag">
-        <input type="hidden" id="modalProductImage">
-
-        <div class="form-grid">
-          <div>
-            <label for="modalProductName" style="display:block;margin-bottom:.45rem;font-weight:800">Nombre del producto *</label>
-            <input id="modalProductName" class="field" type="text" placeholder="Ej: Batería Litio 5kWh" required>
-          </div>
-          <div>
-            <label for="modalProductCategory" style="display:block;margin-bottom:.45rem;font-weight:800">Categoría *</label>
-            <select id="modalProductCategory" class="select" required></select>
-          </div>
-        </div>
-
-        <div class="form-grid" style="margin-top:var(--space-4);">
-          <div>
-            <label for="modalProductPrice" style="display:block;margin-bottom:.45rem;font-weight:800">Precio de referencia *</label>
-            <input id="modalProductPrice" class="field" type="number" min="0" step="1000" placeholder="0" required>
-          </div>
-          <div>
-            <label for="modalProductDesc" style="display:block;margin-bottom:.45rem;font-weight:800">Descripción *</label>
-            <textarea id="modalProductDesc" class="textarea" placeholder="Descripción breve" maxlength="1000" required></textarea>
-          </div>
-        </div>
-
-        <label style="display:block;margin:var(--space-4) 0 .3rem;font-weight:800">Vista previa de imagen</label>
-        <div class="preview-box" id="modalPreviewBox"><div class="preview-empty">Selecciona una imagen abajo</div></div>
-
-        <div class="gallery-panel">
-          <strong style="display:block;margin-bottom:var(--space-2)">Selecciona una imagen del catálogo (recomendado):</strong>
-          <div id="modalGalleryGrid" class="gallery-grid"></div>
-
-          <button type="button" class="advanced-toggle" id="customImgToggle" aria-expanded="false" style="margin-top:var(--space-4);">
-            <i class="fa-solid fa-chevron-right"></i> Usar una URL personalizada en su lugar
-          </button>
-          <div class="advanced-panel" id="customImgPanel">
-            <label for="modalProductImageUrl" class="visually-hidden">URL personalizada de imagen</label>
-            <input id="modalProductImageUrl" class="field" type="url" placeholder="https://ejemplo.com/imagen.jpg">
-            <p class="tiny muted" style="margin-top:.4rem">Si la completas, reemplaza la selección de la galería. Verifica la vista previa antes de guardar.</p>
-          </div>
-        </div>
-
-        <div style="margin-top:var(--space-5); display:flex; gap:var(--space-3);">
-          <button type="submit" class="btn primary full" id="modalSubmitBtn">Guardar Producto</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <footer class="site-footer">
-    <p>HiBRID Soluciones Energéticas — cotizaciones y precios de referencia, sujetos a evaluación técnica.</p>
-  </footer>
-
-  <div class="sticky-cart">
-    <div>
-      <strong id="stickyCartCount">0 productos</strong>
-      <span id="stickyCartTotal">$0</span>
-    </div>
-    <button class="btn primary" type="button" data-route="cart">Ver carrito</button>
-  </div>
-
-  <div id="noticeStack" class="notice-stack" aria-live="polite" aria-atomic="true"></div>
-
-  <script src="./hibrid.js"></script>
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 </body>
 </html>
