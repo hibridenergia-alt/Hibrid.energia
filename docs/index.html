@@ -10,45 +10,45 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     body { font-family: system-ui, -apple-system, sans-serif; background-color: #0f172a; color: #f8fafc; }
-    /* Scrollbar personalizada para tema oscuro */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: #1e293b; }
     ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 4px; }
+    
+    @keyframes slideInUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .toast-anim { animation: slideInUp 0.3s ease-out forwards; }
   </style>
 </head>
 <body>
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect, useCallback } = React;
+    const { useState, useEffect, useCallback, useRef } = React;
 
-    // --- CONFIGURACIÓN PRINCIPAL ---
     const API_URL = "https://hibrid-energia.onrender.com"; 
-    
-    // Hallazgo 8: Actualización de Dummy WhatsApp Number y Warning
-    const WHATSAPP_NUMBER = "56912345678"; 
-    if (WHATSAPP_NUMBER === "56912345678" || WHATSAPP_NUMBER.includes('X')) {
-      console.warn('⚠️ IMPORTANTE: WHATSAPP_NUMBER no ha sido configurado con el número real.');
-    }
+    // WhatsApp final validado
+    const WHATSAPP_NUMBER = "56956139055"; 
 
-    // Íconos
-    const IconSun = () => <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>;
+    // Íconos SVG
     const IconCart = ({count}) => (
       <div className="relative">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
         {count > 0 && <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{count}</span>}
       </div>
     );
+    const IconFB = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>;
+    const IconIG = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>;
+    const IconTikTok = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5v3a8 8 0 0 1-5-1.5z"/></svg>;
 
-    // Categorías base para el diseño visual
-    // Hallazgo 7: Corrección nombre archivo bateria
     const CATEGORIAS_FOTOS = [
-      { id: 'paneles', name: 'Paneles Solares', img: 'panelescatalogo.jpg' },
-      { id: 'inversores', name: 'Inversores Híbridos', img: 'inversorcatalogo.png' },
-      { id: 'baterias', name: 'Baterías de Litio', img: 'bateriacatalogo1.jpg' }, 
-      { id: 'aerogeneradores', name: 'Aerogeneradores', img: 'eolica.jpg' },
-      { id: 'kits', name: 'Kits Completos', img: 'kitsolar.jpg' },
-      { id: 'otros', name: 'Accesorios y Otros', img: 'https://via.placeholder.com/300x200/1e293b/10b981?text=Accesorios' }
+      { id: 'paneles', name: 'Paneles Solares', img: 'categoria/panelessolarescategoria.png' },
+      { id: 'inversores', name: 'Inversores Híbridos', img: 'categoria/inversorescategoria.png' },
+      { id: 'baterias', name: 'Baterías de Litio', img: 'categoria/bateriascategoria.png' }, 
+      { id: 'aerogeneradores', name: 'Aerogeneradores', img: 'categoria/eolicacategoria.png' },
+      { id: 'kits', name: 'Kits Completos', img: 'categoria/kitsolarescategoria.png' },
+      { id: 'otros', name: 'Accesorios y Otros', img: 'categoria/otroscategoria.png' }
     ];
 
     function App() {
@@ -57,35 +57,49 @@
       const [cart, setCart] = useState([]);
       const [filter, setFilter] = useState('ver todos');
       const [loading, setLoading] = useState(true);
+      const [toastMsg, setToastMsg] = useState(null); 
 
-      // Estados Calculadora
+      // HALLAZGO 15: Manejador de estado seguro para Toasts
+      const toastTimer = useRef(null);
+      const showToast = useCallback((msg) => {
+        if (toastTimer.current) clearTimeout(toastTimer.current);
+        setToastMsg(msg);
+        toastTimer.current = setTimeout(() => setToastMsg(null), 3000);
+      }, []);
+
+      // Calculadora
       const [calcKWh, setCalcKWh] = useState(15);
       const [calcAutonomia, setCalcAutonomia] = useState(2);
 
-      // Estados Admin
+      // Admin
       const [adminToken, setAdminToken] = useState(localStorage.getItem('hibrid_token') || '');
       const [isAuthenticated, setIsAuthenticated] = useState(false);
       const [modal, setModal] = useState({ open: false, product: null });
       const [formData, setFormData] = useState({});
+      const [imageOptions, setImageOptions] = useState([]);
 
       const fetchProducts = useCallback(async () => {
         setLoading(true);
         try {
           const res = await fetch(`${API_URL}/api/products`);
           if (res.ok) setProducts(await res.json());
-        } catch (e) {
-          console.error("Error al conectar con el servidor.");
-        } finally {
-          setLoading(false);
-        }
+        } catch (e) { console.error("Error al conectar con el servidor."); } 
+        finally { setLoading(false); }
       }, []);
 
-      useEffect(() => { fetchProducts(); }, [fetchProducts]);
+      const fetchAssets = async () => {
+        try {
+          const res = await fetch(`${API_URL}/api/assets`, { headers: { Authorization: `Bearer ${adminToken}` } });
+          if (res.ok) setImageOptions(await res.json());
+        } catch (e) { console.error("Error cargando lista de imágenes"); }
+      };
 
-      // Funciones del Carrito
+      useEffect(() => { fetchProducts(); }, [fetchProducts]);
+      useEffect(() => { if(isAuthenticated) fetchAssets(); }, [isAuthenticated]);
+
       const addToCart = (p) => {
         setCart([...cart, p]);
-        alert(`¡${p.name} agregado al carrito!`);
+        showToast(`✅ ${p.name} agregado`);
       };
       
       const cartTotal = cart.reduce((sum, p) => sum + Number(p.price), 0);
@@ -97,7 +111,6 @@
         window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, '_blank');
       };
 
-      // Funciones Admin
       const loginAdmin = async (e) => {
         e.preventDefault();
         try {
@@ -105,73 +118,56 @@
           if (!res.ok) throw new Error();
           setIsAuthenticated(true);
           localStorage.setItem('hibrid_token', adminToken);
-          alert("¡Acceso concedido al panel de Tiza!");
-        } catch { alert("Contraseña incorrecta. Verifica mayúsculas y espacios."); }
+          showToast("✅ Acceso Admin Concedido");
+        } catch { alert("Contraseña incorrecta."); }
       };
 
       const saveProduct = async (e) => {
         e.preventDefault();
         const isEditing = !!modal.product;
-        
-        // Hallazgo 3: Preservar el estado "visible" al editar
-        const payload = { 
-          ...formData, 
-          price: Number(formData.price), 
-          visible: isEditing ? (formData.visible ?? modal.product.visible) : true 
-        };
+        const payload = { ...formData, price: Number(formData.price), visible: isEditing ? (formData.visible ?? modal.product.visible) : true };
         const url = `${API_URL}/api/products${isEditing ? `/${modal.product.id}` : ''}`;
         
         try {
-          // Hallazgo 2: Verificar res.ok y controlar errores adecuadamente
           const res = await fetch(url, { 
             method: isEditing ? "PATCH" : "POST", 
-            headers: { 
-              "Content-Type": "application/json", 
-              Authorization: `Bearer ${adminToken}`, 
-              ...(isEditing && {"If-Match": modal.product.etag}) 
-            }, 
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${adminToken}`, ...(isEditing && {"If-Match": modal.product.etag}) }, 
             body: JSON.stringify(payload) 
           });
           
-          if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            throw new Error(err.error ? JSON.stringify(err.error) : `HTTP ${res.status}`);
-          }
-
+          if (!res.ok) throw new Error("Conflicto al guardar. ¿Alguien más lo editó?");
           setModal({ open: false, product: null });
           fetchProducts();
-          alert("Producto guardado con éxito");
-        } catch (e) { 
-          alert("Error al guardar: " + e.message); 
-        }
+          showToast("✅ Producto guardado");
+        } catch (e) { alert("Error al guardar: " + e.message); }
       };
 
       const deleteProduct = async (p) => {
-        if(!confirm("¿Borrar definitivamente?")) return;
+        if(!confirm(`¿Borrar definitivamente ${p.name}?`)) return;
         try {
-          // Hallazgo 6: Try/Catch en deleteProduct y verificación res.ok
-          const res = await fetch(`${API_URL}/api/products/${p.id}`, { 
-            method: "DELETE", 
-            headers: { Authorization: `Bearer ${adminToken}`, "If-Match": p.etag } 
-          });
-          
-          if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            throw new Error(err.error || `HTTP ${res.status}`);
-          }
-          
+          const res = await fetch(`${API_URL}/api/products/${p.id}`, { method: "DELETE", headers: { Authorization: `Bearer ${adminToken}`, "If-Match": p.etag } });
+          if (!res.ok) throw new Error("No se pudo borrar");
           fetchProducts();
-        } catch (e) {
-          alert("No se pudo borrar: " + e.message);
-        }
+          showToast("🗑️ Producto borrado");
+        } catch (e) { alert(e.message); }
       };
 
+      // Cálculos Matemáticos Reales
+      const kwInversor = Math.ceil(calcKWh / 3.5);
+      const kwhBateria = calcKWh * calcAutonomia;
+      const wPaneles = Math.ceil((calcKWh / 4.5) * 1.2 * 1000);
+      
+      const cantPaneles = Math.ceil(wPaneles / 550);
+      const cantBaterias = Math.ceil(kwhBateria / 4.8);
+      const cantInversores = Math.ceil(kwInversor / 5);
+
       return (
-        <div className="pb-20">
-          {/* HEADER OSCURO */}
+        <div className="min-h-screen flex flex-col pb-24">
+          {/* HEADER */}
           <header className="bg-slate-900 border-b border-slate-700 p-4 sticky top-0 z-40 flex justify-between items-center shadow-lg">
             <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setView('home')}>
-              <IconSun /> 
+              <img src="categoria/logotipohibrid.png" alt="Logo HiBRID" className="h-10 w-10 object-contain rounded-full bg-slate-800" onError={(e)=> { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} />
+              <div style={{display: 'none'}} className="h-10 w-10 bg-green-500 rounded-full flex items-center justify-center font-bold">H</div>
               <div>
                 <h1 className="font-black text-xl tracking-wider text-white leading-tight">HiBRID</h1>
                 <p className="text-[10px] text-green-500 font-bold tracking-widest uppercase">Soluciones Energéticas</p>
@@ -186,11 +182,11 @@
             </nav>
           </header>
 
-          <main className="max-w-5xl mx-auto p-4 py-8">
+          <main className="max-w-5xl mx-auto p-4 py-8 flex-grow w-full">
             
-            {/* VISTA 1: INICIO (Categorías con fotos como en tu diseño) */}
+            {/* VISTA 1: INICIO */}
             {view === 'home' && (
-              <div className="space-y-6">
+              <div className="space-y-6 fade-in">
                 <div className="text-center mb-10">
                   <h2 className="text-3xl font-bold text-white mb-2">Encuentra tu equipo ideal</h2>
                   <p className="text-slate-400">Selecciona una categoría para ver nuestro catálogo.</p>
@@ -212,7 +208,7 @@
               </div>
             )}
 
-            {/* VISTA 2: CATÁLOGO DE PRODUCTOS (Fondo oscuro, botones verdes) */}
+            {/* VISTA 2: CATÁLOGO */}
             {view === 'catalog' && (
               <div>
                 <div className="flex items-center space-x-4 mb-6">
@@ -220,24 +216,27 @@
                   <h2 className="text-2xl font-bold uppercase text-green-500">{filter === 'ver todos' ? 'Todos los productos' : filter}</h2>
                 </div>
 
-                {loading ? <p className="text-center text-slate-400 py-10">Conectando con el servidor...</p> : (
+                {loading ? <p className="text-center text-slate-400 py-10">Cargando inventario...</p> : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     {products.filter(p => filter === 'ver todos' || p.category === filter).map(p => (
                       <div key={p.id} className="bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-slate-700 flex flex-col">
-                        <img src={p.image || 'https://via.placeholder.com/300x200/1e293b/10b981?text=HiBRID'} alt={p.name} className="w-full h-48 object-cover" onError={(e)=>e.target.src='https://via.placeholder.com/300x200/1e293b/10b981?text=HiBRID'} />
+                        <img src={p.image || 'https://via.placeholder.com/300x200/1e293b/10b981?text=HiBRID'} alt={p.name} className="w-full h-48 object-cover bg-slate-900" onError={(e)=>e.target.src='https://via.placeholder.com/300x200/1e293b/10b981?text=Sin+Foto'} />
                         <div className="p-5 flex flex-col flex-grow">
                           <span className="text-xs text-green-500 font-bold uppercase mb-1">{p.category}</span>
                           <h3 className="font-bold text-lg mb-2 text-white">{p.name}</h3>
                           <p className="text-slate-400 text-sm mb-4 line-clamp-2">{p.description}</p>
                           <div className="mt-auto flex justify-between items-center">
                             <span className="font-black text-xl text-white">${Number(p.price).toLocaleString('es-CL')}</span>
-                            <button onClick={() => addToCart(p)} className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg font-bold text-sm transition">
+                            <button onClick={() => addToCart(p)} className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg font-bold text-sm transition transform hover:scale-105 active:scale-95">
                               + Carrito
                             </button>
                           </div>
                         </div>
                       </div>
                     ))}
+                    {products.filter(p => filter === 'ver todos' || p.category === filter).length === 0 && (
+                      <p className="text-slate-500 col-span-full text-center py-8">No hay productos visibles en esta categoría.</p>
+                    )}
                   </div>
                 )}
               </div>
@@ -270,46 +269,58 @@
               </div>
             )}
 
-            {/* VISTA 4: CALCULADORA SOLAR (Matemática real y texto legal) */}
+            {/* VISTA 4: CALCULADORA */}
             {view === 'calculator' && (
               <div className="max-w-xl mx-auto bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700 space-y-6">
-                <h2 className="text-2xl font-bold text-white border-b border-slate-700 pb-4">Calculadora Off-Grid / Híbrida</h2>
+                <h2 className="text-2xl font-bold text-white border-b border-slate-700 pb-4">Calculadora Off-Grid</h2>
                 
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-bold text-green-400 mb-2">Consumo Diario (kWh/día): {calcKWh}</label>
+                    <label className="block text-sm font-bold text-green-400 mb-2">Consumo Diario: {calcKWh} kWh/día</label>
                     <input type="range" min="2" max="50" value={calcKWh} onChange={e=>setCalcKWh(Number(e.target.value))} className="w-full accent-green-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-green-400 mb-2">Días de Autonomía en Baterías: {calcAutonomia}</label>
+                    <label className="block text-sm font-bold text-green-400 mb-2">Días de Autonomía Requerida: {calcAutonomia}</label>
                     <input type="range" min="1" max="4" value={calcAutonomia} onChange={e=>setCalcAutonomia(Number(e.target.value))} className="w-full accent-green-500" />
                   </div>
                   
-                  <div className="bg-slate-900 p-5 rounded-lg border border-slate-700 space-y-3">
-                    <h3 className="font-bold text-white border-b border-slate-700 pb-2">Solución Técnica Sugerida:</h3>
-                    <p className="text-sm text-slate-300">⚡ Inversor Sugerido: <strong className="text-white">{Math.ceil(calcKWh / 3.5)} kW</strong></p>
-                    <p className="text-sm text-slate-300">🔋 Banco Litio Requerido: <strong className="text-white">{calcKWh * calcAutonomia} kWh</strong></p>
-                    <p className="text-sm text-slate-300">☀️ Potencia Paneles: <strong className="text-white">{Math.ceil((calcKWh / 4.5) * 1.2 * 1000)} W</strong></p>
-                    <p className="text-xs text-slate-500 mt-4 italic">* Los precios y cálculos son de referencia orientativa y están sujetos a evaluación técnica del terreno.</p>
+                  <div className="bg-slate-900 p-5 rounded-lg border border-slate-700 space-y-4">
+                    <h3 className="font-bold text-green-500 border-b border-slate-700 pb-2">📦 Recomendación de Kit Estimado:</h3>
+                    
+                    <ul className="space-y-3 text-sm text-slate-300">
+                      <li className="flex justify-between items-center">
+                        <span>⚡ <strong>{cantInversores}x</strong> Inversor(es) (aprox. 5kW c/u)</span>
+                        <span className="text-white bg-slate-800 px-2 rounded">{kwInversor} kW req.</span>
+                      </li>
+                      <li className="flex justify-between items-center">
+                        <span>🔋 <strong>{cantBaterias}x</strong> Batería(s) Litio (aprox. 4.8kWh c/u)</span>
+                        <span className="text-white bg-slate-800 px-2 rounded">{kwhBateria} kWh req.</span>
+                      </li>
+                      <li className="flex justify-between items-center">
+                        <span>☀️ <strong>{cantPaneles}x</strong> Panel(es) Solares (aprox. 550W c/u)</span>
+                        <span className="text-white bg-slate-800 px-2 rounded">{wPaneles} W req.</span>
+                      </li>
+                    </ul>
+                    <p className="text-xs text-slate-500 mt-4 italic border-t border-slate-800 pt-2">* Cálculos teóricos. Varían según irradiación solar de la zona geográfica y picos de arranque.</p>
                   </div>
 
                   <button onClick={() => {
-                    const text = encodeURIComponent(`Hola HiBRID, usé su calculadora web.\nNecesito cotizar un sistema con:\n- Consumo: ${calcKWh} kWh/día\n- Autonomía: ${calcAutonomia} días\n\n*Nota: Entiendo que esto es de referencia y requiere evaluación.*`);
+                    const text = encodeURIComponent(`Hola HiBRID, usé su calculadora web.\nNecesito un sistema aproximado para:\n- Consumo: ${calcKWh} kWh/día\n- Autonomía: ${calcAutonomia} días\n\nEl sistema me sugirió un kit con ${cantPaneles} paneles, ${cantBaterias} baterías y ${cantInversores} inversor(es). Quisiera una evaluación formal.`);
                     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank');
                   }} className="w-full bg-green-600 text-white font-bold p-4 rounded-xl hover:bg-green-500 transition">
-                    Cotizar este Sistema por WhatsApp
+                    Solicitar este Kit por WhatsApp
                   </button>
                 </div>
               </div>
             )}
 
-            {/* VISTA 5: ADMIN RÁPIDO */}
+            {/* VISTA 5: ADMIN */}
             {view === 'admin' && (
               <div className="max-w-4xl mx-auto">
                 {!isAuthenticated ? (
                   <form onSubmit={loginAdmin} className="bg-slate-800 p-6 rounded-xl shadow border border-slate-700 max-w-sm mx-auto">
                     <h2 className="font-bold text-xl text-white mb-4">Acceso Admin</h2>
-                    <input type="password" required value={adminToken} onChange={e=>setAdminToken(e.target.value)} placeholder="Tu contraseña exacta de Render" className="w-full bg-slate-900 border border-slate-700 text-white p-3 rounded mb-4 focus:outline-none focus:border-green-500" />
+                    <input type="password" required value={adminToken} onChange={e=>setAdminToken(e.target.value)} placeholder="Tu contraseña exacta" className="w-full bg-slate-900 border border-slate-700 text-white p-3 rounded mb-4 focus:outline-none focus:border-green-500" />
                     <button className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded transition">Ingresar al Panel</button>
                   </form>
                 ) : (
@@ -319,17 +330,17 @@
                       <button onClick={() => { setFormData({category:'paneles'}); setModal({open: true, product: null}); }} className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold">+ Nuevo Producto</button>
                     </div>
                     
-                    <div className="bg-slate-800 rounded-xl overflow-hidden border border-slate-700">
-                      <table className="w-full text-left text-sm text-slate-300">
+                    <div className="bg-slate-800 rounded-xl overflow-hidden border border-slate-700 overflow-x-auto">
+                      <table className="w-full text-left text-sm text-slate-300 min-w-[600px]">
                         <thead className="bg-slate-900 border-b border-slate-700 text-green-500">
                           <tr><th className="p-4">Producto</th><th className="p-4">Cat</th><th className="p-4">Precio</th><th className="p-4 text-right">Acciones</th></tr>
                         </thead>
                         <tbody className="divide-y divide-slate-700">
                           {products.map(p => (
-                            <tr key={p.id} className="hover:bg-slate-700/50 transition">
+                            <tr key={p.id} className={`hover:bg-slate-700/50 transition ${!p.visible ? 'opacity-50' : ''}`}>
                               <td className="p-4 font-medium text-white flex items-center space-x-3">
-                                <img src={p.image || 'https://via.placeholder.com/40'} className="w-10 h-10 rounded object-cover border border-slate-600" onError={(e)=>e.target.style.display='none'} />
-                                <span>{p.name} {p.visible ? '' : '(Oculto)'}</span>
+                                <img src={p.image} className="w-10 h-10 rounded object-cover border border-slate-600 bg-slate-900" onError={(e)=>e.target.src='https://via.placeholder.com/40?text=NoImg'} />
+                                <span>{p.name} {!p.visible && <span className="text-xs text-red-400 ml-2">(Oculto)</span>}</span>
                               </td>
                               <td className="p-4 uppercase text-xs">{p.category}</td>
                               <td className="p-4 font-bold text-green-400">${Number(p.price).toLocaleString('es-CL')}</td>
@@ -348,11 +359,30 @@
             )}
           </main>
 
-          {/* MODAL EDICIÓN RÁPIDA (Solo sale si haces clic en Editar o Nuevo) */}
+          {/* HALLAZGO 17: FOOTER - Enlaces reales de Redes Sociales */}
+          <footer className="mt-auto bg-slate-900 border-t border-slate-800 p-6">
+            <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center text-slate-400 text-sm">
+              <p>© 2026 HiBRID Soluciones Energéticas. Todos los derechos reservados.</p>
+              <div className="flex space-x-6 mt-4 md:mt-0">
+                <a href="https://www.facebook.com/profile.php?id=61593714868741" target="_blank" rel="noopener noreferrer" className="hover:text-green-500 transition"><IconFB /></a>
+                <a href="https://www.instagram.com/hibridenergia/" target="_blank" rel="noopener noreferrer" className="hover:text-green-500 transition"><IconIG /></a>
+                <a href="https://www.tiktok.com/@hibrid976" target="_blank" rel="noopener noreferrer" className="hover:text-green-500 transition"><IconTikTok /></a>
+              </div>
+            </div>
+          </footer>
+
+          {/* NOTIFICACIÓN FLOTANTE */}
+          {toastMsg && (
+            <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-full shadow-2xl font-bold z-50 flex items-center space-x-2 toast-anim">
+              <span>{toastMsg}</span>
+            </div>
+          )}
+
+          {/* MODAL EDICIÓN RÁPIDA CON SELECTOR DE IMÁGENES HALLAZGO 16 */}
           {modal.open && (
             <div className="fixed inset-0 bg-slate-900/90 flex items-center justify-center p-4 z-50">
               <form onSubmit={saveProduct} className="bg-slate-800 p-6 rounded-xl border border-slate-600 max-w-md w-full space-y-4">
-                <h3 className="font-bold text-xl text-green-400 mb-2">{modal.product ? 'Editar Rápido' : 'Crear Producto'}</h3>
+                <h3 className="font-bold text-xl text-green-400 mb-2">{modal.product ? 'Editar Producto' : 'Crear Producto'}</h3>
                 
                 <input required placeholder="Nombre (Ej: Inversor Deye 5kW)" value={formData.name || ''} onChange={e=>setFormData({...formData, name: e.target.value})} className="w-full bg-slate-900 border border-slate-600 text-white p-3 rounded focus:border-green-500 outline-none" />
                 
@@ -362,9 +392,22 @@
                   <option value="paneles">Paneles</option><option value="inversores">Inversores</option><option value="baterias">Baterías</option><option value="aerogeneradores">Aerogeneradores</option><option value="kits">Kits</option><option value="otros">Otros</option>
                 </select>
                 
-                {/* CAMPO DE IMAGEN RÁPIDO */}
-                <input placeholder="Nombre de la foto (Ej: panel.jpg)" value={formData.image || ''} onChange={e=>setFormData({...formData, image: e.target.value})} className="w-full bg-slate-900 border border-slate-600 text-white p-3 rounded focus:border-green-500 outline-none" />
-                <p className="text-xs text-slate-400 -mt-2">Pon el nombre exacto del archivo que subiste a GitHub, ej: <span className="text-green-400">eolica.jpg</span></p>
+                <div className="relative">
+                  <label className="text-xs font-bold text-slate-400 mb-1 block">Selecciona la Foto (Carpeta Productos):</label>
+                  <select value={formData.image || ''} onChange={e=>setFormData({...formData, image: e.target.value})} className="w-full bg-slate-900 border border-slate-600 text-white p-3 rounded focus:border-green-500 outline-none">
+                    <option value="">-- Sin Imagen --</option>
+                    {imageOptions.map((group, idx) => (
+                      <optgroup key={idx} label={group.group}>
+                        {group.options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                      </optgroup>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex items-center space-x-2 mt-2">
+                  <input type="checkbox" id="visibleCheck" checked={formData.visible ?? true} onChange={e=>setFormData({...formData, visible: e.target.checked})} className="w-4 h-4 accent-green-500" />
+                  <label htmlFor="visibleCheck" className="text-sm text-slate-300">Mostrar en catálogo público</label>
+                </div>
 
                 <textarea placeholder="Descripción técnica breve" value={formData.description || ''} onChange={e=>setFormData({...formData, description: e.target.value})} className="w-full bg-slate-900 border border-slate-600 text-white p-3 rounded focus:border-green-500 outline-none" rows="2"></textarea>
                 
@@ -384,4 +427,3 @@
   </script>
 </body>
 </html>
-```
