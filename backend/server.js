@@ -10,7 +10,9 @@ import crypto from 'crypto';
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Configuración Estricta de Redis
+// ============================================================
+// Configuración de Redis (cliente principal + cliente de transacciones)
+// ============================================================
 const redisClient = createClient({ url: process.env.REDIS_URL });
 const txClient = redisClient.duplicate();
 
@@ -18,7 +20,6 @@ redisClient.on('error', (err) => {
   console.error('❌ Error crítico en Redis principal:', err);
   if (process.env.NODE_ENV === 'production') process.exit(1);
 });
-
 txClient.on('error', (err) => console.error('❌ Error crítico en txClient:', err));
 
 try {
@@ -32,7 +33,7 @@ try {
 
 app.use(helmet());
 app.use(express.json());
-app.set('trust proxy', 1);
+app.set('trust proxy', 1); // Necesario en Render (proxy inverso)
 
 app.use(cors({
   origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : '*',
@@ -41,6 +42,9 @@ app.use(cors({
   exposedHeaders: ['ETag']
 }));
 
+// ============================================================
+// Rate limiting (público vs admin, con stores separados)
+// ============================================================
 const publicStore = redisClient.isOpen ? new RedisStore({
   prefix: 'rl:public:',
   sendCommand: (...args) => redisClient.sendCommand(args),
@@ -55,48 +59,13 @@ const publicLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standard
 const adminLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 50, standardHeaders: true, legacyHeaders: false, store: adminStore });
 
 app.use('/api/', (req, res, next) => {
-  if (req.method === 'GET' && req.path === '/products') return publicLimiter(req, res, next);
-  return adminLimiter(req, res, next);
+  const isPublicGet = req.method === 'GET' && (req.path === '/products' || req.path === '/config');
+  return isPublicGet ? publicLimiter(req, res, next) : adminLimiter(req, res, next);
 });
 
-const DEFAULT_PRODUCTS = [
-  { id: 'seed-panel-550w', name: 'Panel Solar Monocristalino 550W', category: 'paneles', price: 150000, description: 'Alta eficiencia, tecnología PERC.', image: 'productos/paneles1.png', visible: true, etag: '"1"' },
-  { id: 'seed-inversor-5kw', name: 'Inversor Híbrido 5kW', category: 'inversores', price: 850000, description: 'Onda senoidal pura, compatible con litio.', image: 'productos/inversor1.png', visible: true, etag: '"1"' },
-  { id: 'seed-bateria-4-8kwh', name: 'Batería de Litio 4.8kWh', category: 'baterias', price: 1250000, description: 'Ciclo profundo, 6000 ciclos DoD 80%.', image: 'productos/bateria1.png', visible: true, etag: '"1"' },
-  { id: 'seed-aerogenerador-1kw', name: 'Aerogenerador 1kW', category: 'aerogeneradores', price: 650000, description: 'Ideal para zonas costeras.', image: 'productos/aero1.png', visible: true, etag: '"1"' },
-  { id: 'seed-kit-solar-basico', name: 'Kit Solar Off-Grid Básico', category: 'kits', price: 2100000, description: 'Todo incluido para cabañas aisladas.', image: 'productos/kit1.png', visible: true, etag: '"1"' },
-  { id: 'seed-conectores-mc4', name: 'Conectores MC4 (Par)', category: 'otros', price: 4500, description: 'Conectores solares con certificación IP67.', image: 'productos/otros1.png', visible: true, etag: '"1"' }
-];
-
-async function getProductsSnapshot() {
-  const data = await redisClient.get('products');
-  if (!data) return structuredClone(DEFAULT_PRODUCTS);
-  try {
-    return JSON.parse(data);
-  } catch (e) {
-    return structuredClone(DEFAULT_PRODUCTS);
-  }
-}
-
-async function updateProductsAtomically(updaterFn, maxRetries = 3) {
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      await txClient.watch('products');
-      const data = await txClient.get('products');
-      let products = data ? JSON.parse(data) : structuredClone(DEFAULT_PRODUCTS);
-      const updatedProducts = updaterFn(products);
-      const multi = txClient.multi();
-      multi.set('products', JSON.stringify(updatedProducts));
-      const result = await multi.exec();
-      if (result) return updatedProducts;
-    } catch (err) {
-      await txClient.unwatch();
-      if (attempt === maxRetries) throw err;
-    }
-  }
-  throw new Error('Conflicto persistente en base de datos.');
-}
-
+// ============================================================
+// Utilidades de seguridad
+// ============================================================
 function safeCompare(a, b) {
   try {
     const bufA = Buffer.from(String(a));
@@ -116,6 +85,57 @@ const requireAdmin = (req, res, next) => {
   next();
 };
 
+// ============================================================
+// Persistencia atómica genérica (WATCH/MULTI sobre una clave Redis)
+// ============================================================
+async function atomicUpdate(redisKey, defaultValue, updaterFn, maxRetries = 3) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      await txClient.watch(redisKey);
+      const data = await txClient.get(redisKey);
+      const current = data ? JSON.parse(data) : structuredClone(defaultValue);
+      const updated = updaterFn(current);
+      const multi = txClient.multi();
+      multi.set(redisKey, JSON.stringify(updated));
+      const result = await multi.exec();
+      if (result) return updated;
+    } catch (err) {
+      await txClient.unwatch();
+      if (err.message === 'NOT_FOUND' || err.message === 'PRECONDITION_FAILED' || attempt === maxRetries) throw err;
+    }
+  }
+  throw new Error('Conflicto persistente en base de datos.');
+}
+
+// ============================================================
+// PRODUCTOS
+// ============================================================
+const DEFAULT_PRODUCTS = [
+  { id: 'seed-panel-550w', name: 'Panel Solar Monocristalino 550W', category: 'paneles', price: 150000, description: 'Alta eficiencia, tecnología PERC.', image: 'productos/paneles1.png', visible: true, etag: '"1"' },
+  { id: 'seed-inversor-5kw', name: 'Inversor Híbrido 5kW', category: 'inversores', price: 850000, description: 'Onda senoidal pura, compatible con litio.', image: 'productos/inversor1.png', visible: true, etag: '"1"' },
+  { id: 'seed-bateria-4-8kwh', name: 'Batería de Litio 4.8kWh', category: 'baterias', price: 1250000, description: 'Ciclo profundo, 6000 ciclos DoD 80%.', image: 'productos/bateria1.png', visible: true, etag: '"1"' },
+  { id: 'seed-aerogenerador-1kw', name: 'Aerogenerador 1kW', category: 'aerogeneradores', price: 650000, description: 'Ideal para zonas costeras.', image: 'productos/aero1.png', visible: true, etag: '"1"' },
+  { id: 'seed-kit-solar-basico', name: 'Kit Solar Off-Grid Básico', category: 'kits', price: 2100000, description: 'Todo incluido para cabañas aisladas.', image: 'productos/kit1.png', visible: true, etag: '"1"' },
+  { id: 'seed-conectores-mc4', name: 'Conectores MC4 (Par)', category: 'otros', price: 4500, description: 'Conectores solares con certificación IP67.', image: 'productos/otros1.png', visible: true, etag: '"1"' }
+];
+
+async function getProductsSnapshot() {
+  const data = await redisClient.get('products');
+  if (!data) return structuredClone(DEFAULT_PRODUCTS);
+  try { return JSON.parse(data); } catch (e) { return structuredClone(DEFAULT_PRODUCTS); }
+}
+
+const updateProductsAtomically = (updaterFn) => atomicUpdate('products', DEFAULT_PRODUCTS, updaterFn);
+
+const productSchema = z.object({
+  name: z.string().min(1),
+  price: z.number().nonnegative(),
+  description: z.string().optional(),
+  category: z.enum(['paneles', 'inversores', 'baterias', 'aerogeneradores', 'kits', 'otros']),
+  image: z.string().optional(),
+  visible: z.boolean().optional()
+});
+
 app.get('/health', (req, res) => res.status(200).json({ ok: true, service: 'hibrid-api' }));
 
 app.get('/api/products', async (req, res) => {
@@ -127,74 +147,6 @@ app.get('/api/products', async (req, res) => {
 });
 
 app.get('/api/admin/session', requireAdmin, (req, res) => res.json({ status: 'ok' }));
-
-// AÑADIDO: Listado de assets ahora incluye los Kits reportados en tu captura
-app.get('/api/assets', requireAdmin, (req, res) => {
-  res.json([
-    { group: 'Paneles', options: [
-      { value: 'productos/Paneles4.png', label: 'Paneles 4' },
-      { value: 'productos/paneles1.png', label: 'Paneles 1' },
-      { value: 'productos/paneles2.png', label: 'Paneles 2' },
-      { value: 'productos/paneles3.png', label: 'Paneles 3' },
-      { value: 'productos/paneles5.png', label: 'Paneles 5' }
-    ]},
-    { group: 'Baterías', options: [
-      { value: 'productos/bateria1.png', label: 'Batería 1' },
-      { value: 'productos/bateria1a.png', label: 'Batería 1a' },
-      { value: 'productos/bateria2.png', label: 'Batería 2' },
-      { value: 'productos/bateria2a.png', label: 'Batería 2a' },
-      { value: 'productos/bateria3.png', label: 'Batería 3' },
-      { value: 'productos/bateria3a.png', label: 'Batería 3a' },
-      { value: 'productos/bateria4.png', label: 'Batería 4' },
-      { value: 'productos/bateria5.png', label: 'Batería 5' }
-    ]},
-    { group: 'Inversores', options: [
-      { value: 'productos/inversor1.png', label: 'Inversor 1' },
-      { value: 'productos/inversor2.png', label: 'Inversor 2' },
-      { value: 'productos/imversor3.png', label: 'Inversor 3' },
-      { value: 'productos/inversor4.png', label: 'Inversor 4' },
-      { value: 'productos/imversor5.png', label: 'Inversor 5' }
-    ]},
-    { group: 'Kits Solares', options: [
-      { value: 'productos/kit1.png', label: 'Kit 1' },
-      { value: 'productos/kit2.png', label: 'Kit 2' },
-      { value: 'productos/kit4.png', label: 'Kit 4' },
-      { value: 'productos/kit5.png', label: 'Kit 5' },
-      { value: 'productos/kit6.png', label: 'Kit 6' },
-      { value: 'productos/kit7.png', label: 'Kit 7' },
-      { value: 'productos/kit8.png', label: 'Kit 8' }
-    ]},
-    { group: 'Aerogeneradores', options: [
-      { value: 'productos/aero1.png', label: 'Aero 1' },
-      { value: 'productos/aero2.png', label: 'Aero 2' },
-      { value: 'productos/aero3.png', label: 'Aero 3' },
-      { value: 'productos/aero4.png', label: 'Aero 4' },
-      { value: 'productos/aerp5.png', label: 'Aero 5' }
-    ]},
-    { group: 'Otros', options: [
-      { value: 'productos/otros1.png', label: 'Otros 1' },
-      { value: 'productos/otros2.png', label: 'Otros 2' },
-      { value: 'productos/otros3.png', label: 'Otros 3' },
-      { value: 'productos/otros4.png', label: 'Otros 4' },
-      { value: 'productos/otros5.png', label: 'Otros 5' },
-      { value: 'productos/otros6.png', label: 'Otros 6' },
-      { value: 'productos/otros7.png', label: 'Otros 7' },
-      { value: 'productos/otros8.png', label: 'Otros 8' },
-      { value: 'productos/otros9.png', label: 'Otros 9' },
-      { value: 'productos/otros10.png', label: 'Otros 10' },
-      { value: 'productos/otros11.png', label: 'Otros 11' }
-    ]}
-  ]);
-});
-
-const productSchema = z.object({
-  name: z.string().min(1),
-  price: z.number().nonnegative(),
-  description: z.string().optional(),
-  category: z.enum(['paneles', 'inversores', 'baterias', 'aerogeneradores', 'kits', 'otros']),
-  image: z.string().optional(),
-  visible: z.boolean().optional()
-});
 
 app.post('/api/products', requireAdmin, async (req, res) => {
   try {
@@ -247,6 +199,145 @@ app.delete('/api/products/:id', requireAdmin, async (req, res) => {
   } catch (error) {
     if (error.message === 'NOT_FOUND') return res.status(404).json({ error: 'No encontrado' });
     if (error.message === 'PRECONDITION_FAILED') return res.status(412).json({ error: 'Conflicto' });
+    res.status(500).json({ error: 'Error interno' });
+  }
+});
+
+// ============================================================
+// ASSETS DINÁMICOS DESDE GITHUB (banner, mensajes, productos, categoria)
+// ============================================================
+const GITHUB_REPO = 'hibridenergia-alt/Hibrid.energia'; // AJUSTA si el nombre real del repo difiere
+const GITHUB_BRANCH = 'main';
+
+const ASSET_FOLDERS = {
+  banner: 'docs/banner',
+  mensajes: 'docs/mensajes',
+  productos: 'docs/productos',
+  categoria: 'docs/categoria'
+};
+
+async function listGithubFolder(folderPath) {
+  const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${folderPath}?ref=${GITHUB_BRANCH}`;
+  const res = await fetch(url, { headers: { 'User-Agent': 'hibrid-backend' } });
+  if (!res.ok) throw new Error('No se pudo listar la carpeta en GitHub');
+  const data = await res.json();
+  return data
+    .filter(item => item.type === 'file' && /\.(png|jpe?g|webp)$/i.test(item.name))
+    .map(item => item.path.replace('docs/', '')); // ej: "productos/paneles1.png"
+}
+
+function guessProductGroup(filename) {
+  const f = filename.toLowerCase();
+  if (f.startsWith('panele')) return 'Paneles';
+  if (f.startsWith('bateria')) return 'Baterías';
+  if (f.startsWith('inversor') || f.startsWith('imversor')) return 'Inversores';
+  if (f.startsWith('aero') || f.startsWith('aerp')) return 'Aerogeneradores';
+  if (f.startsWith('kit')) return 'Kits Solares';
+  return 'Otros';
+}
+
+const assetCache = new Map(); // folder -> { data, timestamp }
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutos
+
+app.get('/api/assets/:folder', requireAdmin, async (req, res) => {
+  const folderKey = req.params.folder;
+  const folderPath = ASSET_FOLDERS[folderKey];
+  if (!folderPath) return res.status(404).json({ error: 'Carpeta no reconocida' });
+
+  const forceRefresh = req.query.refresh === 'true';
+  const cached = assetCache.get(folderKey);
+  if (!forceRefresh && cached && (Date.now() - cached.timestamp < CACHE_TTL_MS)) {
+    return res.json(cached.data);
+  }
+
+  try {
+    const files = await listGithubFolder(folderPath);
+    let result = files;
+    if (folderKey === 'productos') {
+      const groups = {};
+      files.forEach(path => {
+        const filename = path.split('/').pop();
+        const groupName = guessProductGroup(filename);
+        (groups[groupName] ??= []).push({ value: path, label: filename.replace(/\.[^.]+$/, '') });
+      });
+      result = Object.entries(groups).map(([group, options]) => ({ group, options }));
+    }
+    assetCache.set(folderKey, { data: result, timestamp: Date.now() });
+    res.json(result);
+  } catch (e) {
+    if (cached) return res.json(cached.data); // si GitHub falla, sirve lo último conocido
+    res.status(502).json({ error: 'No se pudo leer GitHub: ' + e.message });
+  }
+});
+
+// ============================================================
+// CONFIGURACIÓN DEL SITIO (banner, mensaje de bienvenida, fotos de categorías)
+// ============================================================
+const DEFAULT_CONFIG = {
+  banner: { mode: 'fixed', images: ['categoria/logotipohibrid.png'] },
+  promo: { enabled: false, image: '', title: '', text: '', ctaLabel: 'Ver Catálogo', ctaFilter: 'ver todos' },
+  categorias: {
+    paneles: 'categoria/panelessolarescategoria.png',
+    inversores: 'categoria/inversorescategoria.png',
+    baterias: 'categoria/bateriascategoria.png',
+    aerogeneradores: 'categoria/eolicacategoria.png',
+    kits: 'categoria/kitsolarescategoria.png',
+    otros: 'categoria/otroscategoria.png'
+  },
+  etag: '"1"'
+};
+
+const configSchema = z.object({
+  banner: z.object({
+    mode: z.enum(['fixed', 'rotating']),
+    images: z.array(z.string()).min(1)
+  }).optional(),
+  promo: z.object({
+    enabled: z.boolean(),
+    image: z.string().optional(),
+    title: z.string().optional(),
+    text: z.string().optional(),
+    ctaLabel: z.string().optional(),
+    ctaFilter: z.string().optional()
+  }).optional(),
+  categorias: z.object({
+    paneles: z.string(), inversores: z.string(), baterias: z.string(),
+    aerogeneradores: z.string(), kits: z.string(), otros: z.string()
+  }).partial().optional()
+});
+
+async function getConfigSnapshot() {
+  const data = await redisClient.get('siteConfig');
+  if (!data) return structuredClone(DEFAULT_CONFIG);
+  try { return JSON.parse(data); } catch (e) { return structuredClone(DEFAULT_CONFIG); }
+}
+
+const updateConfigAtomically = (updaterFn) => atomicUpdate('siteConfig', DEFAULT_CONFIG, updaterFn);
+
+app.get('/api/config', async (req, res) => {
+  res.json(await getConfigSnapshot());
+});
+
+app.patch('/api/config', requireAdmin, async (req, res) => {
+  const ifMatch = req.headers['if-match'];
+  if (!ifMatch) return res.status(428).json({ error: 'If-Match header required' });
+  try {
+    const validated = configSchema.parse(req.body);
+    const updatedConfig = await updateConfigAtomically(current => {
+      if (current.etag !== ifMatch) throw new Error('PRECONDITION_FAILED');
+      return {
+        ...current,
+        banner: validated.banner ? { ...current.banner, ...validated.banner } : current.banner,
+        promo: validated.promo ? { ...current.promo, ...validated.promo } : current.promo,
+        categorias: validated.categorias ? { ...current.categorias, ...validated.categorias } : current.categorias,
+        etag: `"${crypto.randomUUID()}"`
+      };
+    });
+    res.setHeader('ETag', updatedConfig.etag);
+    res.json(updatedConfig);
+  } catch (error) {
+    if (error.message === 'PRECONDITION_FAILED') return res.status(412).json({ error: 'Modificado por otro usuario' });
+    if (error instanceof z.ZodError) return res.status(400).json({ error: error.errors });
     res.status(500).json({ error: 'Error interno' });
   }
 });
