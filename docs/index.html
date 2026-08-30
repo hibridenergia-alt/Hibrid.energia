@@ -93,6 +93,13 @@
       );
     }
 
+    function normalizeUrl(url) {
+      if (!url) return '';
+      const trimmed = url.trim();
+      if (!trimmed) return '';
+      return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+    }
+
     function App() {
       // view: 'home' | 'catalog' | 'cart' | 'admin'
       // pillar: 'energia' | 'construccion' | 'arriendo' (solo aplica a home/catalog)
@@ -281,10 +288,16 @@
 
       const saveConfig = async () => {
         try {
+          const cleanSocial = configForm.social ? {
+            facebook: normalizeUrl(configForm.social.facebook),
+            instagram: normalizeUrl(configForm.social.instagram),
+            tiktok: normalizeUrl(configForm.social.tiktok)
+          } : configForm.social;
+          const cleanFerreteria = configForm.ferreteria ? { ...configForm.ferreteria, url: normalizeUrl(configForm.ferreteria.url) } : configForm.ferreteria;
           const res = await fetch(`${API_URL}/api/config`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}`, 'If-Match': config.etag },
-            body: JSON.stringify({ banner: configForm.banner, promo: configForm.promo, categorias: configForm.categorias, ferreteria: configForm.ferreteria, social: configForm.social })
+            body: JSON.stringify({ banner: configForm.banner, promo: configForm.promo, categorias: configForm.categorias, ferreteria: cleanFerreteria, social: cleanSocial })
           });
           if (!res.ok) throw new Error('No se pudo guardar.');
           const updated = await res.json();
@@ -303,7 +316,7 @@
           {/* BARRA SUPERIOR: FERRETERÍA ONLINE */}
           {config && config.ferreteria?.enabled && config.ferreteria?.url && (
             <div className="bg-black border-b border-slate-800 py-1.5 px-4 text-xs flex justify-center md:justify-end items-center text-slate-400">
-              <a href={config.ferreteria.url} target="_blank" rel="noopener noreferrer" className="text-green-400 hover:underline font-bold">
+              <a href={normalizeUrl(config.ferreteria.url)} target="_blank" rel="noopener noreferrer" className="text-green-400 hover:underline font-bold">
                 {config.ferreteria.label || 'Ir a Ferretería Online →'}
               </a>
             </div>
@@ -372,7 +385,7 @@
 
                 {loading ? <p className="text-center text-slate-400 py-10">Cargando...</p> : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                    {products.filter(p => p.pillar === pillar && (filter === 'ver todos' || p.category === filter)).map(p => (
+                    {products.filter(p => (p.pillar || 'energia') === pillar && (filter === 'ver todos' || p.category === filter)).map(p => (
                       <div key={p.id} className={`${theme.card} rounded-xl overflow-hidden shadow-lg border ${theme.border} flex flex-col`}>
                         <img src={p.image || 'https://via.placeholder.com/300x200/1e293b/10b981?text=HiBRID'} alt={p.name} className="w-full h-48 object-cover bg-black" onError={(e)=>e.target.src='https://via.placeholder.com/300x200/1e293b/10b981?text=Sin+Foto'} />
                         <div className="p-5 flex flex-col flex-grow">
@@ -393,7 +406,7 @@
                         </div>
                       </div>
                     ))}
-                    {products.filter(p => p.pillar === pillar && (filter === 'ver todos' || p.category === filter)).length === 0 && (
+                    {products.filter(p => (p.pillar || 'energia') === pillar && (filter === 'ver todos' || p.category === filter)).length === 0 && (
                       <p className="text-slate-500 col-span-full text-center py-8">No hay ítems visibles en esta categoría todavía.</p>
                     )}
                   </div>
@@ -460,29 +473,24 @@
                           <h2 className="text-2xl font-bold text-white">Inventario Activo ({products.length})</h2>
                           <button onClick={() => { setFormData({pillar:'energia', category:'paneles'}); setModal({open: true, product: null}); }} className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold">+ Nuevo</button>
                         </div>
-                        <div className="bg-slate-900 rounded-xl overflow-hidden border border-slate-700 overflow-x-auto">
-                          <table className="w-full text-left text-sm text-slate-300 min-w-[650px]">
-                            <thead className="bg-slate-800 border-b border-slate-700 text-green-500">
-                              <tr><th className="p-4">Producto</th><th className="p-4">Pilar</th><th className="p-4">Cat</th><th className="p-4">Precio</th><th className="p-4 text-right">Acciones</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-700">
-                              {products.map(p => (
-                                <tr key={p.id} className={`hover:bg-slate-800/50 transition ${!p.visible ? 'opacity-50' : ''}`}>
-                                  <td className="p-4 font-medium text-white flex items-center space-x-3">
-                                    <img src={p.image} className="w-10 h-10 rounded object-cover border border-slate-600 bg-black" onError={(e)=>e.target.src='https://via.placeholder.com/40?text=NoImg'} />
-                                    <span>{p.name} {!p.visible && <span className="text-xs text-red-400 ml-2">(Oculto)</span>}</span>
-                                  </td>
-                                  <td className="p-4 uppercase text-xs">{p.pillar}</td>
-                                  <td className="p-4 uppercase text-xs">{p.category}</td>
-                                  <td className="p-4 font-bold text-green-400">${Number(p.price).toLocaleString('es-CL')}</td>
-                                  <td className="p-4 text-right space-x-3">
-                                    <button onClick={()=>{setFormData({...p}); setModal({open:true, product:p});}} className="text-blue-400 hover:text-blue-300">Editar</button>
-                                    <button onClick={()=>deleteProduct(p)} className="text-red-400 hover:text-red-300">Borrar</button>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                        <div className="bg-slate-900 rounded-xl overflow-hidden border border-slate-700 divide-y divide-slate-700">
+                          {products.map(p => (
+                            <div key={p.id} className={`p-4 flex items-center gap-3 hover:bg-slate-800/50 transition ${!p.visible ? 'opacity-50' : ''}`}>
+                              <img src={p.image} className="w-12 h-12 rounded object-cover border border-slate-600 bg-black flex-shrink-0" onError={(e)=>e.target.src='https://via.placeholder.com/48?text=NoImg'} />
+                              <div className="flex-grow min-w-0">
+                                <p className="font-medium text-white truncate">{p.name} {!p.visible && <span className="text-xs text-red-400 ml-1">(Oculto)</span>}</p>
+                                <div className="flex flex-wrap gap-1.5 mt-1">
+                                  <span className="text-[10px] uppercase bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full">{p.pillar || 'energia'}</span>
+                                  <span className="text-[10px] uppercase bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full">{p.category}</span>
+                                  <span className="text-xs font-bold text-green-400">${Number(p.price).toLocaleString('es-CL')}</span>
+                                </div>
+                              </div>
+                              <div className="flex flex-col gap-1 text-right flex-shrink-0">
+                                <button onClick={()=>{setFormData({...p}); setModal({open:true, product:p});}} className="text-blue-400 hover:text-blue-300 text-sm">Editar</button>
+                                <button onClick={()=>deleteProduct(p)} className="text-red-400 hover:text-red-300 text-sm">Borrar</button>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
@@ -631,9 +639,9 @@
             <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center text-slate-400 text-sm">
               <p>© 2026 HiBRID. Todos los derechos reservados.</p>
               <div className="flex space-x-6 mt-4 md:mt-0">
-                {config?.social?.facebook && <a href={config.social.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-green-500 transition"><IconFB /></a>}
-                {config?.social?.instagram && <a href={config.social.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-green-500 transition"><IconIG /></a>}
-                {config?.social?.tiktok && <a href={config.social.tiktok} target="_blank" rel="noopener noreferrer" className="hover:text-green-500 transition"><IconTikTok /></a>}
+                {config?.social?.facebook && <a href={normalizeUrl(config.social.facebook)} target="_blank" rel="noopener noreferrer" className="hover:text-green-500 transition"><IconFB /></a>}
+                {config?.social?.instagram && <a href={normalizeUrl(config.social.instagram)} target="_blank" rel="noopener noreferrer" className="hover:text-green-500 transition"><IconIG /></a>}
+                {config?.social?.tiktok && <a href={normalizeUrl(config.social.tiktok)} target="_blank" rel="noopener noreferrer" className="hover:text-green-500 transition"><IconTikTok /></a>}
               </div>
             </div>
           </footer>
