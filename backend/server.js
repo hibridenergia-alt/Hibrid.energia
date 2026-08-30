@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 
 // ============================================================
-// Configuración de Redis (cliente principal + cliente de transacciones)
+// Redis
 // ============================================================
 const redisClient = createClient({ url: process.env.REDIS_URL });
 const txClient = redisClient.duplicate();
@@ -33,7 +33,7 @@ try {
 
 app.use(helmet());
 app.use(express.json());
-app.set('trust proxy', 1); // Necesario en Render (proxy inverso)
+app.set('trust proxy', 1);
 
 app.use(cors({
   origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : '*',
@@ -43,17 +43,10 @@ app.use(cors({
 }));
 
 // ============================================================
-// Rate limiting (público vs admin, con stores separados)
+// Rate limiting (público vs admin, stores separados)
 // ============================================================
-const publicStore = redisClient.isOpen ? new RedisStore({
-  prefix: 'rl:public:',
-  sendCommand: (...args) => redisClient.sendCommand(args),
-}) : undefined;
-
-const adminStore = redisClient.isOpen ? new RedisStore({
-  prefix: 'rl:admin:',
-  sendCommand: (...args) => redisClient.sendCommand(args),
-}) : undefined;
+const publicStore = redisClient.isOpen ? new RedisStore({ prefix: 'rl:public:', sendCommand: (...args) => redisClient.sendCommand(args) }) : undefined;
+const adminStore = redisClient.isOpen ? new RedisStore({ prefix: 'rl:admin:', sendCommand: (...args) => redisClient.sendCommand(args) }) : undefined;
 
 const publicLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: true, legacyHeaders: false, store: publicStore });
 const adminLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 50, standardHeaders: true, legacyHeaders: false, store: adminStore });
@@ -64,7 +57,7 @@ app.use('/api/', (req, res, next) => {
 });
 
 // ============================================================
-// Utilidades de seguridad
+// Seguridad
 // ============================================================
 function safeCompare(a, b) {
   try {
@@ -86,7 +79,7 @@ const requireAdmin = (req, res, next) => {
 };
 
 // ============================================================
-// Persistencia atómica genérica (WATCH/MULTI sobre una clave Redis)
+// Persistencia atómica genérica
 // ============================================================
 async function atomicUpdate(redisKey, defaultValue, updaterFn, maxRetries = 3) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -108,17 +101,20 @@ async function atomicUpdate(redisKey, defaultValue, updaterFn, maxRetries = 3) {
 }
 
 // ============================================================
-// PRODUCTOS
+// PRODUCTOS (multi-pilar: Energía / Construcción / Arriendo)
 // ============================================================
+const PILLARS = ['energia', 'construccion', 'arriendo'];
+
+// NOTA: Energía sigue apuntando a las rutas planas antiguas (docs/productos/xxx.png)
+// hasta que muevas las fotos a docs/energia/productos/. Cuando migres, actualiza
+// las imágenes de los productos desde el Admin (Editar → nueva foto).
 const DEFAULT_PRODUCTS = [
-  { id: 'seed-panel-550w', name: 'Panel Solar Monocristalino 550W', category: 'paneles', price: 150000, description: 'Alta eficiencia, tecnología PERC.', image: 'productos/paneles1.png', visible: true, etag: '"1"' },
-  { id: 'seed-inversor-5kw', name: 'Inversor Híbrido 5kW', category: 'inversores', price: 850000, description: 'Onda senoidal pura, compatible con litio.', image: 'productos/inversor1.png', visible: true, etag: '"1"' },
-  { id: 'seed-bateria-4-8kwh', name: 'Batería de Litio 4.8kWh', category: 'baterias', price: 1250000, description: 'Ciclo profundo, 6000 ciclos DoD 80%.', image: 'productos/bateria1.png', visible: true, etag: '"1"' },
-  { id: 'seed-aerogenerador-1kw', name: 'Aerogenerador 1kW', category: 'aerogeneradores', price: 650000, description: 'Ideal para zonas costeras.', image: 'productos/aero1.png', visible: true, etag: '"1"' },
-  { id: 'seed-kit-solar-basico', name: 'Kit Solar Off-Grid Básico', category: 'kits', price: 2100000, description: 'Todo incluido para cabañas aisladas.', image: 'productos/kit1.png', visible: true, etag: '"1"' },
-  { id: 'seed-conectores-mc4', name: 'Conectores MC4 (Par)', category: 'otros', price: 4500, description: 'Conectores solares con certificación IP67.', image: 'productos/otros1.png', visible: true, etag: '"1"' },
-  { id: 'seed-trompo-h', name: 'Arriendo Autohormigonera / Trompo', category: 'arriendo', price: 45000, description: 'Equipos revisados y listos para faena diaria.', image: 'productos/arriendo1.png', visible: true, etag: '"1"' },
-  { id: 'seed-galpon-est', name: 'Estructura Metálica para Galpón', category: 'construccion', price: 3500000, description: 'Diseño y montaje bajo estándar industrial.', image: 'productos/construccion1.png', visible: true, etag: '"1"' }
+  { id: 'seed-panel-550w', name: 'Panel Solar Monocristalino 550W', pillar: 'energia', category: 'paneles', price: 150000, description: 'Alta eficiencia, tecnología PERC.', image: 'productos/paneles1.png', visible: true, etag: '"1"' },
+  { id: 'seed-inversor-5kw', name: 'Inversor Híbrido 5kW', pillar: 'energia', category: 'inversores', price: 850000, description: 'Onda senoidal pura, compatible con litio.', image: 'productos/inversor1.png', visible: true, etag: '"1"' },
+  { id: 'seed-bateria-4-8kwh', name: 'Batería de Litio 4.8kWh', pillar: 'energia', category: 'baterias', price: 1250000, description: 'Ciclo profundo, 6000 ciclos DoD 80%.', image: 'productos/bateria1.png', visible: true, etag: '"1"' },
+  { id: 'seed-conectores-mc4', name: 'Conectores MC4 (Par)', pillar: 'energia', category: 'otros', price: 4500, description: 'Conectores solares con certificación IP67.', image: 'productos/otros1.png', visible: true, etag: '"1"' },
+  { id: 'seed-trompo-h', name: 'Arriendo Autohormigonera / Trompo', pillar: 'arriendo', category: 'maquinaria', price: 45000, description: 'Equipo revisado, listo para faena diaria. Precio referencial por día.', image: '', visible: true, etag: '"1"' },
+  { id: 'seed-galpon-est', name: 'Estructura Metálica para Galpón', pillar: 'construccion', category: 'obras-civiles', price: 3500000, description: 'Diseño y montaje bajo estándar industrial. Precio referencial.', image: '', visible: true, etag: '"1"' }
 ];
 
 async function getProductsSnapshot() {
@@ -133,7 +129,8 @@ const productSchema = z.object({
   name: z.string().min(1),
   price: z.number().nonnegative(),
   description: z.string().optional(),
-  category: z.enum(['paneles', 'inversores', 'baterias', 'aerogeneradores', 'kits', 'arriendo', 'construccion', 'mantencion', 'otros']),
+  pillar: z.enum(PILLARS),
+  category: z.string().min(1), // validado contra las listas de categorías en el frontend; aquí solo se exige no vacío
   image: z.string().optional(),
   visible: z.boolean().optional()
 });
@@ -206,16 +203,23 @@ app.delete('/api/products/:id', requireAdmin, async (req, res) => {
 });
 
 // ============================================================
-// ASSETS DINÁMICOS DESDE GITHUB (banner, mensajes, productos, categoria)
+// ASSETS DINÁMICOS DESDE GITHUB (por pilar)
 // ============================================================
-const GITHUB_REPO = 'hibridenergia-alt/Hibrid.energia'; // AJUSTA si el nombre real del repo difiere
+const GITHUB_REPO = 'hibridenergia-alt/Hibrid.energia';
 const GITHUB_BRANCH = 'main';
 
+// NOTA DE MIGRACIÓN: cuando muevas las fotos de Energía a docs/energia/,
+// cambia estas dos líneas de 'docs/categoria' → 'docs/energia/categorias'
+// y de 'docs/productos' → 'docs/energia/productos'. Nada más cambia.
 const ASSET_FOLDERS = {
   banner: 'docs/banner',
   mensajes: 'docs/mensajes',
-  productos: 'docs/productos',
-  categoria: 'docs/categoria'
+  'categorias-energia': 'docs/categoria',
+  'productos-energia': 'docs/productos',
+  'categorias-construccion': 'docs/construccion/categorias',
+  'productos-construccion': 'docs/construccion/productos',
+  'categorias-arriendo': 'docs/arriendo/categorias',
+  'productos-arriendo': 'docs/arriendo/productos'
 };
 
 async function listGithubFolder(folderPath) {
@@ -231,24 +235,11 @@ async function listGithubFolder(folderPath) {
   const data = await res.json();
   return data
     .filter(item => item.type === 'file' && /\.(png|jpe?g|webp)$/i.test(item.name))
-    .map(item => item.path.replace('docs/', '')); // ej: "productos/paneles1.png"
+    .map(item => item.path.replace('docs/', ''));
 }
 
-function guessProductGroup(filename) {
-  const f = filename.toLowerCase();
-  if (f.startsWith('panele')) return 'Paneles';
-  if (f.startsWith('bateria')) return 'Baterías';
-  if (f.startsWith('inversor') || f.startsWith('imversor')) return 'Inversores';
-  if (f.startsWith('aero') || f.startsWith('aerp')) return 'Aerogeneradores';
-  if (f.startsWith('kit')) return 'Kits Solares';
-  if (f.startsWith('arriendo') || f.startsWith('maquina') || f.startsWith('trompo')) return 'Arriendo de Maquinaria';
-  if (f.startsWith('construccion') || f.startsWith('galpon')) return 'Construcción';
-  if (f.startsWith('mantencion')) return 'Mantención';
-  return 'Otros';
-}
-
-const assetCache = new Map(); // folder -> { data, timestamp }
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutos
+const assetCache = new Map();
+const CACHE_TTL_MS = 5 * 60 * 1000;
 
 app.get('/api/assets/:folder', requireAdmin, async (req, res) => {
   const folderKey = req.params.folder;
@@ -263,26 +254,16 @@ app.get('/api/assets/:folder', requireAdmin, async (req, res) => {
 
   try {
     const files = await listGithubFolder(folderPath);
-    let result = files;
-    if (folderKey === 'productos') {
-      const groups = {};
-      files.forEach(path => {
-        const filename = path.split('/').pop();
-        const groupName = guessProductGroup(filename);
-        (groups[groupName] ??= []).push({ value: path, label: filename.replace(/\.[^.]+$/, '') });
-      });
-      result = Object.entries(groups).map(([group, options]) => ({ group, options }));
-    }
-    assetCache.set(folderKey, { data: result, timestamp: Date.now() });
-    res.json(result);
+    assetCache.set(folderKey, { data: files, timestamp: Date.now() });
+    res.json(files);
   } catch (e) {
-    if (cached) return res.json(cached.data); // si GitHub falla, sirve lo último conocido
+    if (cached) return res.json(cached.data);
     res.status(502).json({ error: 'No se pudo leer GitHub: ' + e.message });
   }
 });
 
 // ============================================================
-// CONFIGURACIÓN DEL SITIO (banner, mensaje de bienvenida, fotos de categorías)
+// CONFIGURACIÓN DEL SITIO
 // ============================================================
 const DEFAULT_CONFIG = {
   banner: { mode: 'fixed', images: ['categoria/logotipohibrid.png'] },
@@ -293,20 +274,28 @@ const DEFAULT_CONFIG = {
     baterias: 'categoria/bateriascategoria.png',
     aerogeneradores: 'categoria/eolicacategoria.png',
     kits: 'categoria/kitsolarescategoria.png',
-    arriendo: 'categoria/arriendocategoria.png',
-    construccion: 'categoria/construccioncategoria.png',
-    mantencion: 'categoria/mantencioncategoria.png',
-    otros: 'categoria/otroscategoria.png'
+    otros: 'categoria/otroscategoria.png',
+    electricidad: 'categoria/otroscategoria.png',
+    soldadura: 'construccion/categorias/soldadura.png',
+    carpinteria: 'construccion/categorias/carpinteria.png',
+    gasfiteria: 'construccion/categorias/gasfiteria.png',
+    'obras-civiles': 'construccion/categorias/obrasciviles.png',
+    herramientas: 'arriendo/categorias/herramientas.png',
+    maquinaria: 'arriendo/categorias/maquinaria.png',
+    'movimiento-tierra': 'arriendo/categorias/movimientotierra.png',
+    'mantencion-maquinaria': 'arriendo/categorias/mantencion.png'
   },
   ferreteria: { enabled: false, url: '', label: '🛒 Ir a Ferretería Online (Insumos y Detalle) →' },
+  social: {
+    facebook: 'https://www.facebook.com/profile.php?id=61593714868741',
+    instagram: 'https://www.instagram.com/hibridenergia/',
+    tiktok: 'https://www.tiktok.com/@hibrid976'
+  },
   etag: '"1"'
 };
 
 const configSchema = z.object({
-  banner: z.object({
-    mode: z.enum(['fixed', 'rotating']),
-    images: z.array(z.string()).min(1)
-  }).optional(),
+  banner: z.object({ mode: z.enum(['fixed', 'rotating']), images: z.array(z.string()).min(1) }).optional(),
   promo: z.object({
     enabled: z.boolean(),
     mode: z.enum(['imagen', 'completo']).optional(),
@@ -317,11 +306,8 @@ const configSchema = z.object({
     ctaFilter: z.string().optional()
   }).optional(),
   categorias: z.record(z.string()).optional(),
-  ferreteria: z.object({
-    enabled: z.boolean(),
-    url: z.string().optional(),
-    label: z.string().optional()
-  }).optional()
+  ferreteria: z.object({ enabled: z.boolean(), url: z.string().optional(), label: z.string().optional() }).optional(),
+  social: z.object({ facebook: z.string().optional(), instagram: z.string().optional(), tiktok: z.string().optional() }).optional()
 });
 
 async function getConfigSnapshot() {
@@ -349,6 +335,7 @@ app.patch('/api/config', requireAdmin, async (req, res) => {
         promo: validated.promo ? { ...current.promo, ...validated.promo } : current.promo,
         categorias: validated.categorias ? { ...current.categorias, ...validated.categorias } : current.categorias,
         ferreteria: validated.ferreteria ? { ...current.ferreteria, ...validated.ferreteria } : current.ferreteria,
+        social: validated.social ? { ...current.social, ...validated.social } : current.social,
         etag: `"${crypto.randomUUID()}"`
       };
     });
