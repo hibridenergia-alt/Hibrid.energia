@@ -52,7 +52,7 @@ const publicLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standard
 const adminLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 50, standardHeaders: true, legacyHeaders: false, store: adminStore });
 
 app.use('/api/', (req, res, next) => {
-  const isPublicGet = req.method === 'GET' && (req.path === '/products' || req.path === '/config');
+  const isPublicGet = req.method === 'GET' && (req.path === '/products' || req.path === '/config' || req.path === '/services');
   return isPublicGet ? publicLimiter(req, res, next) : adminLimiter(req, res, next);
 });
 
@@ -291,6 +291,7 @@ const DEFAULT_CONFIG = {
     instagram: 'https://www.instagram.com/hibridenergia/',
     tiktok: 'https://www.tiktok.com/@hibrid976'
   },
+  energiaInstalacionPct: 15,
   etag: '"1"'
 };
 
@@ -307,7 +308,8 @@ const configSchema = z.object({
   }).optional(),
   categorias: z.record(z.string()).optional(),
   ferreteria: z.object({ enabled: z.boolean(), url: z.string().optional(), label: z.string().optional() }).optional(),
-  social: z.object({ facebook: z.string().optional(), instagram: z.string().optional(), tiktok: z.string().optional() }).optional()
+  social: z.object({ facebook: z.string().optional(), instagram: z.string().optional(), tiktok: z.string().optional() }).optional(),
+  energiaInstalacionPct: z.number().nonnegative().optional()
 });
 
 async function getConfigSnapshot() {
@@ -336,6 +338,7 @@ app.patch('/api/config', requireAdmin, async (req, res) => {
         categorias: validated.categorias ? { ...current.categorias, ...validated.categorias } : current.categorias,
         ferreteria: validated.ferreteria ? { ...current.ferreteria, ...validated.ferreteria } : current.ferreteria,
         social: validated.social ? { ...current.social, ...validated.social } : current.social,
+        energiaInstalacionPct: validated.energiaInstalacionPct !== undefined ? validated.energiaInstalacionPct : current.energiaInstalacionPct,
         etag: `"${crypto.randomUUID()}"`
       };
     });
@@ -344,6 +347,114 @@ app.patch('/api/config', requireAdmin, async (req, res) => {
   } catch (error) {
     if (error.message === 'PRECONDITION_FAILED') return res.status(412).json({ error: 'Modificado por otro usuario' });
     if (error instanceof z.ZodError) return res.status(400).json({ error: error.errors });
+    res.status(500).json({ error: 'Error interno' });
+  }
+});
+
+// ============================================================
+// COTIZADOR PROFESIONAL — Servicios (Construcción/Arriendo/Energía)
+// ============================================================
+const DEFAULT_SERVICES = [
+  { id: 'srv-instalacion-electrica', name: 'Instalación Eléctrica (por punto)', pillar: 'energia', category: 'electricidad', unit: 'punto', formula: true, materiales: 8000, manoObra: 12000, equipo: 2000, gg: 20, utilidad: 20, iva: 19, notaSec: true, visible: true, etag: '"1"' },
+
+  { id: 'srv-pintura', name: 'Pintura Interior/Exterior', pillar: 'construccion', category: 'obras-civiles', unit: 'm2', formula: true, materiales: 1800, manoObra: 3500, equipo: 700, gg: 20, utilidad: 20, iva: 19, visible: true, etag: '"1"' },
+  { id: 'srv-radier', name: 'Radier y Hormigón', pillar: 'construccion', category: 'obras-civiles', unit: 'm2', formula: true, materiales: 12000, manoObra: 8000, equipo: 3000, gg: 20, utilidad: 20, iva: 19, visible: true, etag: '"1"' },
+  { id: 'srv-soldadura', name: 'Soldadura y Estructuras Metálicas', pillar: 'construccion', category: 'soldadura', unit: 'm2', formula: true, materiales: 15000, manoObra: 10000, equipo: 4000, gg: 20, utilidad: 20, iva: 19, visible: true, etag: '"1"' },
+  { id: 'srv-albanileria', name: 'Albañilería y Reparaciones', pillar: 'construccion', category: 'obras-civiles', unit: 'm2', formula: true, materiales: 9000, manoObra: 7000, equipo: 1500, gg: 20, utilidad: 20, iva: 19, visible: true, etag: '"1"' },
+  { id: 'srv-techumbre', name: 'Techumbre', pillar: 'construccion', category: 'carpinteria', unit: 'm2', formula: true, materiales: 14000, manoObra: 9000, equipo: 2500, gg: 20, utilidad: 20, iva: 19, visible: true, etag: '"1"' },
+  { id: 'srv-gasfiteria', name: 'Gasfitería (por punto)', pillar: 'construccion', category: 'gasfiteria', unit: 'punto', formula: true, materiales: 10000, manoObra: 15000, equipo: 2000, gg: 20, utilidad: 20, iva: 19, visible: true, etag: '"1"' },
+  { id: 'srv-excavacion', name: 'Excavaciones y Movimiento de Tierra (con cuadrilla)', pillar: 'construccion', category: 'obras-civiles', unit: 'm3', formula: true, materiales: 0, manoObra: 6000, equipo: 8000, gg: 20, utilidad: 20, iva: 19, visible: true, etag: '"1"' },
+  { id: 'srv-limpieza', name: 'Limpieza y Retiro de Escombros', pillar: 'construccion', category: 'obras-civiles', unit: 'm3', formula: true, materiales: 0, manoObra: 4000, equipo: 5000, gg: 20, utilidad: 20, iva: 19, visible: true, etag: '"1"' },
+
+  { id: 'srv-arriendo-herramientas', name: 'Arriendo de Herramientas', pillar: 'arriendo', category: 'herramientas', unit: 'dia', formula: false, precioRef: 15000, visible: true, etag: '"1"' },
+  { id: 'srv-arriendo-maquinaria', name: 'Arriendo de Maquinaria', pillar: 'arriendo', category: 'maquinaria', unit: 'dia', formula: false, precioRef: 120000, visible: true, etag: '"1"' },
+  { id: 'srv-movimiento-tierra-arriendo', name: 'Movimiento de Tierra (solo equipo, sin operador)', pillar: 'arriendo', category: 'movimiento-tierra', unit: 'dia', formula: false, precioRef: 150000, visible: true, etag: '"1"' },
+  { id: 'srv-mantencion-maquinaria', name: 'Mantención de Maquinaria', pillar: 'arriendo', category: 'mantencion-maquinaria', unit: 'servicio', formula: false, precioRef: 45000, visible: true, etag: '"1"' }
+];
+
+async function getServicesSnapshot() {
+  const data = await redisClient.get('services');
+  if (!data) return structuredClone(DEFAULT_SERVICES);
+  try { return JSON.parse(data); } catch (e) { return structuredClone(DEFAULT_SERVICES); }
+}
+
+const updateServicesAtomically = (updaterFn) => atomicUpdate('services', DEFAULT_SERVICES, updaterFn);
+
+const serviceSchema = z.object({
+  name: z.string().min(1),
+  pillar: z.enum(PILLARS),
+  category: z.string().min(1),
+  unit: z.enum(['m2', 'm3', 'punto', 'dia', 'servicio']),
+  formula: z.boolean(),
+  materiales: z.number().nonnegative().optional(),
+  manoObra: z.number().nonnegative().optional(),
+  equipo: z.number().nonnegative().optional(),
+  gg: z.number().nonnegative().optional(),
+  utilidad: z.number().nonnegative().optional(),
+  iva: z.number().nonnegative().optional(),
+  precioRef: z.number().nonnegative().optional(),
+  notaSec: z.boolean().optional(),
+  visible: z.boolean().optional()
+});
+
+app.get('/api/services', async (req, res) => {
+  const services = await getServicesSnapshot();
+  const authHeader = req.headers.authorization || '';
+  const isAdmin = safeCompare(authHeader, `Bearer ${process.env.ADMIN_TOKEN}`);
+  res.json(isAdmin ? services : services.filter(s => s.visible));
+});
+
+app.post('/api/services', requireAdmin, async (req, res) => {
+  try {
+    const validated = serviceSchema.parse(req.body);
+    const newService = { ...validated, visible: validated.visible ?? true, id: crypto.randomUUID(), etag: `"${crypto.randomUUID()}"` };
+    await updateServicesAtomically(services => { services.push(newService); return services; });
+    res.setHeader('ETag', newService.etag);
+    res.status(201).json(newService);
+  } catch (error) {
+    if (error instanceof z.ZodError) return res.status(400).json({ error: error.errors });
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+app.patch('/api/services/:id', requireAdmin, async (req, res) => {
+  const ifMatch = req.headers['if-match'];
+  if (!ifMatch) return res.status(428).json({ error: 'If-Match header required' });
+  try {
+    const validated = serviceSchema.partial().parse(req.body);
+    let updated;
+    await updateServicesAtomically(services => {
+      const idx = services.findIndex(s => s.id === req.params.id);
+      if (idx === -1) throw new Error('NOT_FOUND');
+      if (services[idx].etag !== ifMatch) throw new Error('PRECONDITION_FAILED');
+      updated = { ...services[idx], ...validated, etag: `"${crypto.randomUUID()}"` };
+      services[idx] = updated;
+      return services;
+    });
+    res.setHeader('ETag', updated.etag);
+    res.json(updated);
+  } catch (error) {
+    if (error.message === 'NOT_FOUND') return res.status(404).json({ error: 'No encontrado' });
+    if (error.message === 'PRECONDITION_FAILED') return res.status(412).json({ error: 'Modificado por otro usuario' });
+    res.status(500).json({ error: 'Error interno' });
+  }
+});
+
+app.delete('/api/services/:id', requireAdmin, async (req, res) => {
+  const ifMatch = req.headers['if-match'];
+  if (!ifMatch) return res.status(428).json({ error: 'If-Match header required' });
+  try {
+    await updateServicesAtomically(services => {
+      const idx = services.findIndex(s => s.id === req.params.id);
+      if (idx === -1) throw new Error('NOT_FOUND');
+      if (services[idx].etag !== ifMatch) throw new Error('PRECONDITION_FAILED');
+      services.splice(idx, 1);
+      return services;
+    });
+    res.status(204).send();
+  } catch (error) {
+    if (error.message === 'NOT_FOUND') return res.status(404).json({ error: 'No encontrado' });
+    if (error.message === 'PRECONDITION_FAILED') return res.status(412).json({ error: 'Conflicto' });
     res.status(500).json({ error: 'Error interno' });
   }
 });
