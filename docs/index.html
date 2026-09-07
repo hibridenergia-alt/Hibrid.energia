@@ -105,6 +105,11 @@
       // pillar: 'energia' | 'construccion' | 'arriendo' (solo aplica a home/catalog)
       const [view, setView] = useState('home');
       const [pillar, setPillar] = useState('energia');
+      const [pillarTab, setPillarTab] = useState('catalogo'); // 'catalogo' | 'cotizador'
+      const [services, setServices] = useState([]);
+      const [cotizadorQty, setCotizadorQty] = useState({}); // { serviceId: cantidad }
+      const [calcKWh, setCalcKWh] = useState(15);
+      const [calcAutonomia, setCalcAutonomia] = useState(2);
       const [adminTab, setAdminTab] = useState('inventario');
       const [products, setProducts] = useState([]);
       const [cart, setCart] = useState([]);
@@ -123,6 +128,8 @@
       const [isAuthenticated, setIsAuthenticated] = useState(false);
       const [modal, setModal] = useState({ open: false, product: null });
       const [formData, setFormData] = useState({});
+      const [serviceModal, setServiceModal] = useState({ open: false, service: null });
+      const [serviceFormData, setServiceFormData] = useState({});
 
       const [pillarImageOptions, setPillarImageOptions] = useState([]);
       const [bannerAssets, setBannerAssets] = useState([]);
@@ -159,7 +166,7 @@
         return () => window.removeEventListener('popstate', handlePopState);
       }, []);
 
-      const goPillar = (p) => navigate('home', { pillar: p, filter: 'ver todos' });
+      const goPillar = (p) => { setPillarTab('catalogo'); navigate('home', { pillar: p, filter: 'ver todos' }); };
       const goCategory = (p, catId) => navigate('catalog', { pillar: p, filter: catId });
 
       const fetchProducts = useCallback(async () => {
@@ -177,6 +184,29 @@
           if (res.ok) setConfig(await res.json());
         } catch (e) { console.error("Error cargando configuración"); }
       }, []);
+
+      const fetchServices = useCallback(async () => {
+        try {
+          const res = await fetch(`${API_URL}/api/services`);
+          if (res.ok) setServices(await res.json());
+        } catch (e) { console.error("Error cargando servicios"); }
+      }, []);
+
+      useEffect(() => { fetchServices(); }, [fetchServices]);
+
+      function unitLabel(unit) {
+        return { m2: 'm²', m3: 'm³', punto: 'puntos', dia: 'días', servicio: 'servicio' }[unit] || unit;
+      }
+
+      function calcularServicio(s, cantidad) {
+        const q = Number(cantidad) || 0;
+        if (!s.formula) return { total: (s.precioRef || 0) * q };
+        const costoDirecto = (Number(s.materiales || 0) + Number(s.manoObra || 0) + Number(s.equipo || 0)) * q;
+        const conGG = costoDirecto * (1 + (s.gg || 0) / 100);
+        const neto = conGG * (1 + (s.utilidad || 0) / 100);
+        const final = neto * (1 + (s.iva || 0) / 100);
+        return { total: final };
+      }
 
       useEffect(() => { fetchProducts(); }, [fetchProducts]);
       useEffect(() => { fetchConfig(); }, [fetchConfig]);
@@ -240,6 +270,58 @@
         window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, '_blank');
       };
 
+      // ============================================================
+      // Cotizador: agregar servicio al carrito / cotizar directo
+      // ============================================================
+      const serviceAsCartItem = (s, cantidad, total, extraLabel) => ({
+        id: `${s.id}-${Date.now()}`,
+        name: extraLabel || `${s.name} (${cantidad} ${unitLabel(s.unit)})`,
+        price: Math.round(total)
+      });
+
+      const addServiceToCart = (s, cantidad) => {
+        const { total } = calcularServicio(s, cantidad);
+        addToCart(serviceAsCartItem(s, cantidad, total));
+      };
+
+      const sendServiceQuote = (s, cantidad) => {
+        const { total } = calcularServicio(s, cantidad);
+        let text = `Hola HiBRID, quiero cotizar:\n\n- ${s.name}: ${cantidad} ${unitLabel(s.unit)} (estimado $${Math.round(total).toLocaleString('es-CL')})`;
+        if (s.notaSec) text += `\n\n*Instalaciones nuevas requieren instalador certificado SEC.`;
+        text += `\n\n*Precio referencial, sujeto a evaluación técnica.`;
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, '_blank');
+      };
+
+      // Sistema Solar (Energía) — recomendación a partir de consumo real
+      const solarPanel = products.find(p => p.id === 'seed-panel-550w') || { price: 150000, name: 'Panel Solar 550W' };
+      const solarInversor = products.find(p => p.id === 'seed-inversor-5kw') || { price: 850000, name: 'Inversor Híbrido 5kW' };
+      const solarBateria = products.find(p => p.id === 'seed-bateria-4-8kwh') || { price: 1250000, name: 'Batería Litio 4.8kWh' };
+
+      const kwInversor = Math.ceil(calcKWh / 3.5);
+      const wPaneles = Math.ceil((calcKWh / 4.5) * 1.2 * 1000);
+      const cantPaneles = Math.max(1, Math.ceil(wPaneles / 550));
+      const cantBaterias = Math.max(1, Math.ceil((calcKWh * calcAutonomia) / 4.8));
+      const cantInversores = Math.max(1, Math.ceil(kwInversor / 5));
+      const materialesSolar = cantPaneles * solarPanel.price + cantInversores * solarInversor.price + cantBaterias * solarBateria.price;
+      const instalacionPct = config?.energiaInstalacionPct ?? 15;
+      const instalacionSolar = materialesSolar * (instalacionPct / 100);
+      const totalSolar = materialesSolar + instalacionSolar;
+
+      const addSolarToCart = () => {
+        addToCart(serviceAsCartItem({ id: 'srv-sistema-solar', unit: 'servicio' }, 1, totalSolar,
+          `Sistema Solar (${cantPaneles}x Panel, ${cantInversores}x Inversor, ${cantBaterias}x Batería)`));
+      };
+      const sendSolarQuote = () => {
+        const text = `Hola HiBRID, quiero cotizar un Sistema Solar:\n\n` +
+          `- Consumo: ${calcKWh} kWh/día, Autonomía: ${calcAutonomia} días\n` +
+          `- Recomendado: ${cantPaneles}x Panel 550W, ${cantInversores}x Inversor, ${cantBaterias}x Batería 4.8kWh\n` +
+          `- Materiales: $${Math.round(materialesSolar).toLocaleString('es-CL')}\n` +
+          `- Instalación (${instalacionPct}%): $${Math.round(instalacionSolar).toLocaleString('es-CL')}\n` +
+          `*TOTAL ESTIMADO: $${Math.round(totalSolar).toLocaleString('es-CL')}*\n\n` +
+          `*Precio referencial, sujeto a evaluación técnica del terreno.`;
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, '_blank');
+      };
+
       const loginAdmin = async (e) => {
         e.preventDefault();
         try {
@@ -297,13 +379,32 @@
           const res = await fetch(`${API_URL}/api/config`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}`, 'If-Match': config.etag },
-            body: JSON.stringify({ banner: configForm.banner, promo: configForm.promo, categorias: configForm.categorias, ferreteria: cleanFerreteria, social: cleanSocial })
+            body: JSON.stringify({ banner: configForm.banner, promo: configForm.promo, categorias: configForm.categorias, ferreteria: cleanFerreteria, social: cleanSocial, energiaInstalacionPct: configForm.energiaInstalacionPct })
           });
           if (!res.ok) throw new Error('No se pudo guardar.');
           const updated = await res.json();
           setConfig(updated);
           setConfigForm(updated);
           showToast('✅ Configuración guardada');
+        } catch (e) { alert(e.message); }
+      };
+
+      const saveService = async (e) => {
+        e.preventDefault();
+        try {
+          const payload = { ...serviceFormData };
+          ['materiales','manoObra','equipo','gg','utilidad','iva','precioRef'].forEach(k => {
+            if (payload[k] !== undefined && payload[k] !== '') payload[k] = Number(payload[k]);
+          });
+          const res = await fetch(`${API_URL}/api/services/${serviceModal.service.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}`, 'If-Match': serviceModal.service.etag },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error('No se pudo guardar el servicio.');
+          setServiceModal({ open: false, service: null });
+          fetchServices();
+          showToast('✅ Servicio actualizado');
         } catch (e) { alert(e.message); }
       };
 
@@ -347,29 +448,93 @@
 
           <main className="max-w-5xl mx-auto p-4 py-8 flex-grow w-full">
 
-            {/* VISTA: INICIO DE UN PILAR (grilla de categorías) */}
+            {/* VISTA: INICIO DE UN PILAR (grilla de categorías / Cotizador) */}
             {view === 'home' && (
               <div className="space-y-6">
-                <div className="text-center mb-8">
+                <div className="text-center mb-4">
                   <h2 className={`text-3xl font-bold mb-2 ${theme.text}`}>{info.title}</h2>
                   <p className="text-slate-400">{info.subtitle}</p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                  {CATEGORIA_META[pillar].map(cat => (
-                    <div key={cat.id} onClick={() => goCategory(pillar, cat.id)}
-                         className={`${theme.card} rounded-xl overflow-hidden cursor-pointer hover:ring-2 ${theme.ring} transition shadow-lg group relative h-40`}>
-                      <img src={config?.categorias?.[cat.id]} alt={cat.name} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition" onError={(e)=>e.target.src='https://via.placeholder.com/300x200/1e293b/10b981?text=HiBRID'} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent flex items-end p-4">
-                        <h3 className="font-bold text-lg text-white drop-shadow-lg">{cat.name}</h3>
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex justify-center gap-2 mb-6">
+                  <button onClick={() => setPillarTab('catalogo')} className={`px-5 py-2 rounded-full font-bold text-sm transition ${pillarTab === 'catalogo' ? `${theme.bg} text-white` : 'bg-slate-800 text-slate-400'}`}>Catálogo</button>
+                  <button onClick={() => setPillarTab('cotizador')} className={`px-5 py-2 rounded-full font-bold text-sm transition ${pillarTab === 'cotizador' ? `${theme.bg} text-white` : 'bg-slate-800 text-slate-400'}`}>Cotizador</button>
                 </div>
 
-                <button onClick={() => goCategory(pillar, 'ver todos')} className={`w-full mt-6 ${theme.card} border ${theme.border} py-4 rounded-xl font-bold ${theme.text} hover:opacity-90 transition`}>
-                  Ver todo {info.label}
-                </button>
+                {pillarTab === 'catalogo' && (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                      {CATEGORIA_META[pillar].map(cat => (
+                        <div key={cat.id} onClick={() => goCategory(pillar, cat.id)}
+                             className={`${theme.card} rounded-xl overflow-hidden cursor-pointer hover:ring-2 ${theme.ring} transition shadow-lg group relative h-40`}>
+                          <img src={config?.categorias?.[cat.id]} alt={cat.name} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition" onError={(e)=>e.target.src='https://via.placeholder.com/300x200/1e293b/10b981?text=HiBRID'} />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent flex items-end p-4">
+                            <h3 className="font-bold text-lg text-white drop-shadow-lg">{cat.name}</h3>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <button onClick={() => goCategory(pillar, 'ver todos')} className={`w-full mt-6 ${theme.card} border ${theme.border} py-4 rounded-xl font-bold ${theme.text} hover:opacity-90 transition`}>
+                      Ver todo {info.label}
+                    </button>
+                  </>
+                )}
+
+                {pillarTab === 'cotizador' && (
+                  <div className="space-y-4 max-w-xl mx-auto">
+                    {pillar === 'energia' && (
+                      <div className={`${theme.card} p-5 rounded-xl border ${theme.border} space-y-4`}>
+                        <h3 className={`font-bold text-lg ${theme.text}`}>☀️ Sistema Solar — Recomendación Automática</h3>
+                        <div>
+                          <label className="text-sm text-slate-300 block mb-1">Consumo diario: {calcKWh} kWh/día</label>
+                          <input type="range" min="2" max="50" value={calcKWh} onChange={e=>setCalcKWh(Number(e.target.value))} className="w-full accent-green-500" />
+                        </div>
+                        <div>
+                          <label className="text-sm text-slate-300 block mb-1">Días de autonomía: {calcAutonomia}</label>
+                          <input type="range" min="1" max="4" value={calcAutonomia} onChange={e=>setCalcAutonomia(Number(e.target.value))} className="w-full accent-green-500" />
+                        </div>
+                        <div className="bg-black p-4 rounded-lg space-y-1 text-sm text-slate-300">
+                          <p>⚡ {cantPaneles}x Panel Solar 550W</p>
+                          <p>🔌 {cantInversores}x Inversor Híbrido</p>
+                          <p>🔋 {cantBaterias}x Batería de Litio</p>
+                          <p className="text-slate-500 pt-2 border-t border-slate-700">Materiales: ${Math.round(materialesSolar).toLocaleString('es-CL')}</p>
+                          <p className="text-slate-500">Instalación ({instalacionPct}%): ${Math.round(instalacionSolar).toLocaleString('es-CL')}</p>
+                          <p className="text-white font-black text-lg pt-1">Total estimado: ${Math.round(totalSolar).toLocaleString('es-CL')}</p>
+                        </div>
+                        <p className="text-xs text-slate-500">*Precio referencial, sujeto a evaluación técnica del terreno.</p>
+                        <div className="flex gap-2">
+                          <button onClick={addSolarToCart} className={`flex-1 ${theme.bg} ${theme.bgHover} text-white py-2 rounded-lg font-bold text-sm`}>🛒 Carrito</button>
+                          <button onClick={sendSolarQuote} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg font-bold text-sm">📨 Cotizar</button>
+                        </div>
+                      </div>
+                    )}
+
+                    {services.filter(s => s.pillar === pillar || (s.category === 'electricidad' && pillar === 'construccion')).map(s => {
+                      const cantidad = cotizadorQty[s.id] ?? 1;
+                      const { total } = calcularServicio(s, cantidad);
+                      return (
+                        <div key={s.id} className={`${theme.card} p-5 rounded-xl border ${theme.border} space-y-3`}>
+                          <h3 className="font-bold text-white">{s.name}</h3>
+                          <div className="flex items-center gap-2">
+                            <label className="text-sm text-slate-300">Cantidad ({unitLabel(s.unit)}):</label>
+                            <input type="number" min="1" value={cantidad} onChange={e => setCotizadorQty({...cotizadorQty, [s.id]: Number(e.target.value)})} className="w-20 bg-black border border-slate-600 text-white p-1 rounded text-center" />
+                          </div>
+                          <p className="text-white font-black text-lg">Estimado: ${Math.round(total).toLocaleString('es-CL')}</p>
+                          <p className="text-xs text-slate-500">*Precio referencial, sujeto a evaluación técnica.</p>
+                          {s.notaSec && <p className="text-xs text-yellow-500">⚠️ Instalaciones nuevas requieren instalador certificado SEC.</p>}
+                          <div className="flex gap-2">
+                            <button onClick={() => addServiceToCart(s, cantidad)} className={`flex-1 ${theme.bg} ${theme.bgHover} text-white py-2 rounded-lg font-bold text-sm`}>🛒 Carrito</button>
+                            <button onClick={() => sendServiceQuote(s, cantidad)} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg font-bold text-sm">📨 Cotizar</button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {services.filter(s => s.pillar === pillar).length === 0 && pillar !== 'energia' && (
+                      <p className="text-slate-500 text-center py-8">Aún no hay servicios cotizables cargados para {info.label}.</p>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
@@ -463,6 +628,7 @@
                       <div className="flex gap-2">
                         <button onClick={() => setAdminTab('inventario')} className={`px-4 py-2 rounded-lg font-bold text-sm transition ${adminTab === 'inventario' ? 'bg-green-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-white'}`}>Inventario</button>
                         <button onClick={() => setAdminTab('portada')} className={`px-4 py-2 rounded-lg font-bold text-sm transition ${adminTab === 'portada' ? 'bg-green-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-white'}`}>Portada</button>
+                        <button onClick={() => setAdminTab('servicios')} className={`px-4 py-2 rounded-lg font-bold text-sm transition ${adminTab === 'servicios' ? 'bg-green-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-white'}`}>Cotizador</button>
                       </div>
                       <button onClick={logoutAdmin} className="bg-slate-700 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition">Cerrar sesión</button>
                     </div>
@@ -626,7 +792,40 @@
                           <input placeholder="Link de TikTok" value={configForm.social?.tiktok || ''} onChange={e=>setConfigForm({...configForm, social: {...(configForm.social||{}), tiktok: e.target.value}})} className="w-full bg-black border border-slate-600 text-white p-2 rounded" />
                         </div>
 
+                        {/* % INSTALACIÓN SISTEMA SOLAR */}
+                        <div className="bg-slate-900 p-6 rounded-xl border border-slate-700 space-y-2">
+                          <h3 className="text-xl font-bold text-white">☀️ % Instalación Sistema Solar</h3>
+                          <p className="text-xs text-slate-500">Porcentaje que se suma sobre el valor de los equipos en el Cotizador de Energía.</p>
+                          <input type="number" min="0" value={configForm.energiaInstalacionPct ?? 15} onChange={e=>setConfigForm({...configForm, energiaInstalacionPct: Number(e.target.value)})} className="w-24 bg-black border border-slate-600 text-white p-2 rounded" />
+                          <span className="text-slate-400 ml-1">%</span>
+                        </div>
+
                         <button onClick={saveConfig} className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition">Guardar Configuración de Portada</button>
+                      </div>
+                    )}
+
+                    {adminTab === 'servicios' && (
+                      <div className="space-y-6">
+                        <h2 className="text-2xl font-bold text-white">Servicios del Cotizador ({services.length})</h2>
+                        {['energia','construccion','arriendo'].map(pil => (
+                          <div key={pil} className="space-y-2">
+                            <h3 className={`font-bold ${accentClasses(pil).text}`}>{PILLAR_INFO[pil].label}</h3>
+                            <div className="bg-slate-900 rounded-xl border border-slate-700 divide-y divide-slate-700">
+                              {services.filter(s => s.pillar === pil).map(s => (
+                                <div key={s.id} className="p-4 flex items-center justify-between gap-3">
+                                  <div>
+                                    <p className="text-white font-medium">{s.name}</p>
+                                    <p className="text-xs text-slate-400">
+                                      {s.formula ? `Materiales $${s.materiales} + M.Obra $${s.manoObra} + Equipo $${s.equipo} · GG ${s.gg}% · Util ${s.utilidad}% · IVA ${s.iva}%` : `Precio referencial: $${Number(s.precioRef).toLocaleString('es-CL')} por ${unitLabel(s.unit)}`}
+                                    </p>
+                                  </div>
+                                  <button onClick={() => { setServiceFormData({...s}); setServiceModal({open:true, service:s}); }} className="text-blue-400 hover:text-blue-300 text-sm flex-shrink-0">Editar</button>
+                                </div>
+                              ))}
+                              {services.filter(s => s.pillar === pil).length === 0 && <p className="p-4 text-slate-500 text-sm">Sin servicios cargados.</p>}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
@@ -668,6 +867,50 @@
           {toastMsg && (
             <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-full shadow-2xl font-bold z-50 flex items-center space-x-2 toast-anim">
               <span>{toastMsg}</span>
+            </div>
+          )}
+
+          {/* MODAL DE SERVICIO (Cotizador) */}
+          {serviceModal.open && (
+            <div className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50">
+              <form onSubmit={saveService} className="bg-slate-900 p-6 rounded-xl border border-slate-600 max-w-md w-full space-y-4 max-h-[92vh] overflow-y-auto">
+                <h3 className="font-bold text-xl text-green-400 mb-2">Editar Precios — {serviceModal.service?.name}</h3>
+
+                {serviceFormData.formula ? (
+                  <>
+                    <label className="text-xs text-slate-400 block">Materiales (por {unitLabel(serviceFormData.unit)})</label>
+                    <input type="number" min="0" value={serviceFormData.materiales ?? 0} onChange={e=>setServiceFormData({...serviceFormData, materiales: e.target.value})} className="w-full bg-black border border-slate-600 text-white p-2 rounded" />
+                    <label className="text-xs text-slate-400 block">Mano de Obra (por {unitLabel(serviceFormData.unit)})</label>
+                    <input type="number" min="0" value={serviceFormData.manoObra ?? 0} onChange={e=>setServiceFormData({...serviceFormData, manoObra: e.target.value})} className="w-full bg-black border border-slate-600 text-white p-2 rounded" />
+                    <label className="text-xs text-slate-400 block">Equipo/Traslado (por {unitLabel(serviceFormData.unit)})</label>
+                    <input type="number" min="0" value={serviceFormData.equipo ?? 0} onChange={e=>setServiceFormData({...serviceFormData, equipo: e.target.value})} className="w-full bg-black border border-slate-600 text-white p-2 rounded" />
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <label className="text-xs text-slate-400 block">% Gastos Grales.</label>
+                        <input type="number" min="0" value={serviceFormData.gg ?? 20} onChange={e=>setServiceFormData({...serviceFormData, gg: e.target.value})} className="w-full bg-black border border-slate-600 text-white p-2 rounded" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-slate-400 block">% Utilidad</label>
+                        <input type="number" min="0" value={serviceFormData.utilidad ?? 20} onChange={e=>setServiceFormData({...serviceFormData, utilidad: e.target.value})} className="w-full bg-black border border-slate-600 text-white p-2 rounded" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-slate-400 block">% IVA</label>
+                        <input type="number" min="0" value={serviceFormData.iva ?? 19} onChange={e=>setServiceFormData({...serviceFormData, iva: e.target.value})} className="w-full bg-black border border-slate-600 text-white p-2 rounded" />
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <label className="text-xs text-slate-400 block">Precio referencial (por {unitLabel(serviceFormData.unit)})</label>
+                    <input type="number" min="0" value={serviceFormData.precioRef ?? 0} onChange={e=>setServiceFormData({...serviceFormData, precioRef: e.target.value})} className="w-full bg-black border border-slate-600 text-white p-2 rounded" />
+                  </>
+                )}
+
+                <div className="flex justify-end space-x-3 pt-4 border-t border-slate-700">
+                  <button type="button" onClick={()=>setServiceModal({open:false, service:null})} className="px-5 py-2 rounded text-slate-300 hover:bg-slate-800">Cancelar</button>
+                  <button type="submit" className="px-5 py-2 bg-green-600 hover:bg-green-500 text-white font-bold rounded">Guardar</button>
+                </div>
+              </form>
             </div>
           )}
 
